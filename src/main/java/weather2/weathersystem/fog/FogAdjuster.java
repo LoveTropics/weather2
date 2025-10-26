@@ -1,16 +1,16 @@
 package weather2.weathersystem.fog;
 
 import com.corosus.coroutil.util.CULog;
+import net.minecraft.client.Minecraft;
 import net.minecraft.util.Mth;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.material.FogType;
 import net.neoforged.neoforge.client.event.ViewportEvent;
 import org.joml.Vector3f;
-import weather2.datatypes.WeatherEventType;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.FogRenderer;
-import net.minecraft.world.entity.player.Player;
 import weather2.ClientTickHandler;
 import weather2.ClientWeatherProxy;
 import weather2.client.SceneEnhancer;
+import weather2.datatypes.WeatherEventType;
 import weather2.util.WeatherUtilEntity;
 
 import java.util.Random;
@@ -157,7 +157,7 @@ public class FogAdjuster {
         updateWeatherState();
 
         //get vanilla settings
-        if (event.getMode() == FogRenderer.FogMode.FOG_SKY) {
+		if (event.getType() == FogType.ATMOSPHERIC) {
             fogVanilla.setFogStartSky(event.getNearPlaneDistance());
             fogVanilla.setFogEndSky(event.getFarPlaneDistance());
         } else {
@@ -166,14 +166,12 @@ public class FogAdjuster {
         }
 
         if (SceneEnhancer.isFogOverridding()) {
-            if (event.getMode() == FogRenderer.FogMode.FOG_SKY) {
+			if (event.getType() == FogType.ATMOSPHERIC) {
                 event.setNearPlaneDistance(activeProfile.getFogStartSky());
                 event.setFarPlaneDistance(activeProfile.getFogEndSky());
-                event.setCanceled(true);
             } else {
                 event.setNearPlaneDistance(activeProfile.getFogStart());
                 event.setFarPlaneDistance(activeProfile.getFogEnd());
-                event.setCanceled(true);
             }
         }
     }

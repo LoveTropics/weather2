@@ -7,8 +7,6 @@ import com.mojang.brigadier.CommandDispatcher;
 import extendedrenderer.particle.ParticleRegistry;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.core.registries.Registries;
-import net.minecraft.data.DataGenerator;
-import net.minecraft.data.PackOutput;
 import net.minecraft.data.loot.LootTableProvider;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.CreativeModeTab;
@@ -26,7 +24,6 @@ import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.neoforged.fml.event.lifecycle.InterModProcessEvent;
 import net.neoforged.fml.loading.FMLEnvironment;
 import net.neoforged.neoforge.common.NeoForge;
-import net.neoforged.neoforge.common.data.ExistingFileHelper;
 import net.neoforged.neoforge.data.event.GatherDataEvent;
 import net.neoforged.neoforge.event.BuildCreativeModeTabContentsEvent;
 import net.neoforged.neoforge.event.RegisterCommandsEvent;
@@ -39,7 +36,15 @@ import net.neoforged.neoforge.registries.DeferredRegister;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import weather2.command.WeatherCommand;
-import weather2.config.*;
+import weather2.config.ConfigDebug;
+import weather2.config.ConfigMisc;
+import weather2.config.ConfigParticle;
+import weather2.config.ConfigSand;
+import weather2.config.ConfigSnow;
+import weather2.config.ConfigSound;
+import weather2.config.ConfigStorm;
+import weather2.config.ConfigTornado;
+import weather2.config.ConfigWind;
 import weather2.data.BlockAndItemProvider;
 import weather2.data.BlockLootTables;
 import weather2.data.WeatherRecipeProvider;
@@ -47,8 +52,8 @@ import weather2.util.WeatherUtilSound;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 // The value here should match an entry in the META-INF/mods.toml file
@@ -167,7 +172,7 @@ public class Weather
     private void processIMC(final InterModProcessEvent event)
     {
         LOGGER.info("Got IMC {}", event.getIMCStream().
-                map(m->m.getMessageSupplier().get()).
+			map(m -> m.messageSupplier().get()).
                 collect(Collectors.toList()));
     }
 
@@ -204,15 +209,10 @@ public class Weather
      * @param event
      */
     private void gatherData(GatherDataEvent event) {
-        DataGenerator gen = event.getGenerator();
-        if (event.includeServer()) {
-            gen.addProvider(event.includeServer(), new WeatherRecipeProvider(gen.getPackOutput(), event.getLookupProvider()));
-            gen.addProvider(event.includeServer(), new LootTableProvider(gen.getPackOutput(), Collections.emptySet(),
-                    List.of(new LootTableProvider.SubProviderEntry(BlockLootTables::new, LootContextParamSets.BLOCK)), event.getLookupProvider()));
-        }
-        if (event.includeClient()) {
-            gatherClientData(event);
-        }
+		event.createProvider(WeatherRecipeProvider.Runner::new);
+		event.createProvider((output, lookupProvider) -> new LootTableProvider(output, Set.of(),
+			List.of(new LootTableProvider.SubProviderEntry(BlockLootTables::new, LootContextParamSets.BLOCK)), lookupProvider));
+		gatherClientData(event);
     }
 
     /**
@@ -223,10 +223,7 @@ public class Weather
      */
     @OnlyIn(Dist.CLIENT)
     private void gatherClientData(GatherDataEvent event) {
-        DataGenerator gen = event.getGenerator();
-        PackOutput packOutput = gen.getPackOutput();
-        ExistingFileHelper existingFileHelper = event.getExistingFileHelper();
-        gen.addProvider(event.includeClient(), new ParticleRegistry(packOutput, event.getLookupProvider(), existingFileHelper));
-        gen.addProvider(event.includeClient(), new BlockAndItemProvider(packOutput, event.getLookupProvider(), existingFileHelper));
+		event.createProvider(ParticleRegistry::new);
+		event.createProvider(BlockAndItemProvider::new);
     }
 }

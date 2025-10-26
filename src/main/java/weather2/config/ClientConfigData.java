@@ -22,14 +22,14 @@ public class ClientConfigData {
      * @param nbt
      */
     public void readNBT(CompoundTag nbt) {
-        overcastMode = nbt.getBoolean("overcastMode");
-        Storm_Tornado_grabPlayer = nbt.getBoolean("Storm_Tornado_grabPlayer");
-        Storm_Tornado_grabPlayersOnly = nbt.getBoolean("Storm_Tornado_grabPlayersOnly");
-        Storm_Tornado_grabMobs = nbt.getBoolean("Storm_Tornado_grabMobs");
-        Storm_Tornado_grabAnimals = nbt.getBoolean("Storm_Tornado_grabAnimals");
-        Storm_Tornado_grabVillagers = nbt.getBoolean("Storm_Tornado_grabVillagers");
-        Storm_Tornado_grabItems = nbt.getBoolean("Storm_Tornado_grabItems");
-        Aesthetic_Only_Mode = nbt.getBoolean("Aesthetic_Only_Mode");
+		overcastMode = nbt.getBooleanOr("overcastMode", false);
+		Storm_Tornado_grabPlayer = nbt.getBooleanOr("Storm_Tornado_grabPlayer", true);
+		Storm_Tornado_grabPlayersOnly = nbt.getBooleanOr("Storm_Tornado_grabPlayersOnly", false);
+		Storm_Tornado_grabMobs = nbt.getBooleanOr("Storm_Tornado_grabMobs", true);
+		Storm_Tornado_grabAnimals = nbt.getBooleanOr("Storm_Tornado_grabAnimals", true);
+		Storm_Tornado_grabVillagers = nbt.getBooleanOr("Storm_Tornado_grabVillagers", true);
+		Storm_Tornado_grabItems = nbt.getBooleanOr("Storm_Tornado_grabItems", false);
+		Aesthetic_Only_Mode = nbt.getBooleanOr("Aesthetic_Only_Mode", false);
     }
 
     /**

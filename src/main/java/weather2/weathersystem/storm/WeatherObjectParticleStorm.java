@@ -50,10 +50,10 @@ public class WeatherObjectParticleStorm extends WeatherObject {
 
 	public WeatherObjectParticleStorm(WeatherManager parManager) {
 		super(parManager);
-		
+
 		this.weatherObjectType = EnumWeatherObjectType.SAND;
 	}
-	
+
 	public void initStormSpawn(Vec3 pos) {
 		this.pos = pos;
 		this.maxAge = 20*60*5;
@@ -72,7 +72,8 @@ public class WeatherObjectParticleStorm extends WeatherObject {
 	public static boolean isColdForStorm(Level world, Holder<Biome> biome, boolean forSpawn, BlockPos pos) {
 		//return biome.getPrecipitation() == Biome.Precipitation.SNOW;
 		//adjusted to this way to make it work with serene seasons
-		boolean canPrecip = biome.value().getPrecipitationAt(pos) == Biome.Precipitation.RAIN || biome.value().getPrecipitationAt(pos) == Biome.Precipitation.SNOW;
+		Biome.Precipitation precipitationAt = biome.value().getPrecipitationAt(pos, world.getSeaLevel());
+		boolean canPrecip = precipitationAt == Biome.Precipitation.RAIN || precipitationAt == Biome.Precipitation.SNOW;
 		return canPrecip && CoroUtilCompatibility.coldEnoughToSnow(biome.value(), pos, world);
 	}
 
@@ -84,7 +85,7 @@ public class WeatherObjectParticleStorm extends WeatherObject {
 	public int getSize() {
 		return 250;
 	}
-	
+
 	@Override
 	public void tick() {
 		super.tick();
@@ -194,12 +195,12 @@ public class WeatherObjectParticleStorm extends WeatherObject {
 		Vec3 vec = new Vec3(x, y, z);
 		return vec;
 	}
-	
+
 	@Override
 	public int getUpdateRateForNetwork() {
 		return 1;
 	}
-	
+
 	@Override
 	public void nbtSyncForClient() {
 		super.nbtSyncForClient();
@@ -209,7 +210,7 @@ public class WeatherObjectParticleStorm extends WeatherObject {
 		data.putString("type", type.key);
 		data.putString("test", "WHAT");
 	}
-	
+
 	@Override
 	public void nbtSyncFromServer() {
 		super.nbtSyncFromServer();

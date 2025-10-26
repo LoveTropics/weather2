@@ -2,25 +2,42 @@ package weather2.client.entity.render;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
-import java.util.Random;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
-import net.minecraft.client.renderer.texture.TextureAtlas;
-import net.minecraft.resources.ResourceLocation;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
 import org.joml.Matrix4f;
+import weather2.client.entity.render.state.LightningBoltWeatherNewRenderState;
 import weather2.weathersystem.storm.LightningBoltWeatherNew;
 
+import java.util.Random;
+
 @OnlyIn(Dist.CLIENT)
-public class LightningBoltWeatherNewRenderer extends EntityRenderer<LightningBoltWeatherNew> {
+public class LightningBoltWeatherNewRenderer extends EntityRenderer<LightningBoltWeatherNew, LightningBoltWeatherNewRenderState> {
    public LightningBoltWeatherNewRenderer(EntityRendererProvider.Context p_174286_) {
       super(p_174286_);
    }
 
-   public void render(LightningBoltWeatherNew p_115266_, float p_115267_, float p_115268_, PoseStack p_115269_, MultiBufferSource p_115270_, int p_115271_) {
+	@Override
+	public LightningBoltWeatherNewRenderState createRenderState() {
+		return new LightningBoltWeatherNewRenderState();
+	}
+
+	@Override
+	public void extractRenderState(LightningBoltWeatherNew entity, LightningBoltWeatherNewRenderState reusedState, float partialTick) {
+		super.extractRenderState(entity, reusedState, partialTick);
+		reusedState.seed = entity.seed;
+	}
+
+	@Override
+	protected boolean affectedByCulling(LightningBoltWeatherNew display) {
+		return false;
+	}
+
+	@Override
+	public void render(LightningBoltWeatherNewRenderState p_115266_, PoseStack p_115269_, MultiBufferSource p_115270_, int p_115271_) {
       float[] afloat = new float[8];
       float[] afloat1 = new float[8];
       float f = 0.0F;
@@ -32,9 +49,9 @@ public class LightningBoltWeatherNewRenderer extends EntityRenderer<LightningBol
          afloat1[i] = f1;
          f += (float)(random.nextInt(11) - 5);
          f1 += (float)(random.nextInt(11) - 5);
-      }
+	  }
 
-      VertexConsumer vertexconsumer = p_115270_.getBuffer(RenderType.lightning());
+		VertexConsumer vertexconsumer = p_115270_.getBuffer(RenderType.lightning());
       Matrix4f matrix4f = p_115269_.last().pose();
 
       for(int j = 0; j < 4; ++j) {
@@ -96,7 +113,4 @@ public class LightningBoltWeatherNewRenderer extends EntityRenderer<LightningBol
       p_115274_.addVertex(p_115273_, p_115275_ + (p_115287_ ? p_115284_ : -p_115284_), (float)(p_115277_ * 16), p_115276_ + (p_115288_ ? p_115284_ : -p_115284_)).setColor(p_115280_, p_115281_, p_115282_, 0.3F);
    }
 
-   public ResourceLocation getTextureLocation(LightningBoltWeatherNew p_115264_) {
-      return TextureAtlas.LOCATION_BLOCKS;
-   }
 }

@@ -10,6 +10,7 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
+import net.neoforged.neoforge.client.network.ClientPacketDistributor;
 import net.neoforged.neoforge.network.PacketDistributor;
 import net.neoforged.neoforge.network.handling.IPayloadHandler;
 import net.neoforged.neoforge.network.registration.PayloadRegistrar;
@@ -74,7 +75,7 @@ public class WeatherNetworkingv2 extends WeatherNetworkingBase {
 
     @Override
     public void clientSendToServer(CompoundTag data) {
-        PacketDistributor.sendToServer(new PacketNBTFromClient(data));
+		ClientPacketDistributor.sendToServer(new PacketNBTFromClient(data));
     }
 
     @Override

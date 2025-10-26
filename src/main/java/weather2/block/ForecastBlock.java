@@ -2,9 +2,9 @@ package weather2.block;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
-import net.minecraft.world.ItemInteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
@@ -28,9 +28,9 @@ public class ForecastBlock extends Block {
     }
 
     @Override
-    protected ItemInteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hitResult) {
+	protected InteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hitResult) {
         if (use(state, level, pos, player, hand, hitResult) == InteractionResult.SUCCESS) {
-            return ItemInteractionResult.SUCCESS;
+			return InteractionResult.SUCCESS;
         }
         return super.useItemOn(stack, state, level, pos, player, hand, hitResult);
     }
@@ -39,7 +39,6 @@ public class ForecastBlock extends Block {
     protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hitResult) {
         return use(state, level, pos, player, InteractionHand.MAIN_HAND, hitResult);
     }
-
 
     public InteractionResult use(BlockState p_60503_, Level p_60504_, BlockPos p_60505_, Player p_60506_, InteractionHand p_60507_, BlockHitResult p_60508_) {
 
@@ -63,11 +62,12 @@ public class ForecastBlock extends Block {
             }
             if (chanceEvery10Days > 0 && diceRollRate > 0) {
                 chanceEvery10Days = ((float)day / (float)diceRollRate) / chanceEvery10Days;
-            }
-            p_60506_.sendSystemMessage(Component.literal(String.format("Chance of a deadly storm here every:")));
-            p_60506_.sendSystemMessage(Component.literal(String.format("%d days: %.2f", rateOften, (chance * 100F)) + "% from nearby biome temperature differences"));
-            p_60506_.sendSystemMessage(Component.literal(String.format("%d days: %.2f", rateLessOften, (chanceEvery10Days * 100F)) + "% from randomly trying once a day"));
-
+			}
+			if (p_60506_ instanceof ServerPlayer serverPlayer) {
+				serverPlayer.sendSystemMessage(Component.literal(String.format("Chance of a deadly storm here every:")));
+				serverPlayer.sendSystemMessage(Component.literal(String.format("%d days: %.2f", rateOften, (chance * 100F)) + "% from nearby biome temperature differences"));
+				serverPlayer.sendSystemMessage(Component.literal(String.format("%d days: %.2f", rateLessOften, (chanceEvery10Days * 100F)) + "% from randomly trying once a day"));
+			}
             int count = 0;
             for (int i = 0; i < 100000; i++) {
                 if (p_60504_.random.nextInt(1000) == 0) {

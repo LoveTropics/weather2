@@ -1,24 +1,17 @@
 package weather2;
 
-import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.server.level.ServerLevel;
-import net.minecraft.util.datafix.DataFixTypes;
-import net.minecraft.world.entity.raid.Raids;
-import net.minecraft.world.level.ForcedChunksSavedData;
 import net.minecraft.world.level.saveddata.SavedData;
+import net.minecraft.world.level.saveddata.SavedDataType;
 
 public class WorldNBTData extends SavedData {
 
+	public static final SavedDataType<WorldNBTData> TYPE = new SavedDataType<>(Weather.MODID + "-" + "weather_data", WorldNBTData::new, CODEC, null);
     private CompoundTag data;
     private IWorldData dataHandler;
 
-    public static SavedData.Factory<WorldNBTData> factory() {
-        return new SavedData.Factory<>(WorldNBTData::new, WorldNBTData::load, null);
-    }
-
     public WorldNBTData() {
-        this.data = new CompoundTag();
+		this(new CompoundTag());
     }
 
     public WorldNBTData(CompoundTag data) {
@@ -29,12 +22,11 @@ public class WorldNBTData extends SavedData {
         this.dataHandler = dataHandler;
     }
 
-    public static WorldNBTData load(CompoundTag p_151484_, HolderLookup.Provider registries) {
+	public static WorldNBTData load(CompoundTag p_151484_) {
         return new WorldNBTData(p_151484_);
     }
 
-    @Override
-    public CompoundTag save(CompoundTag p_77763_, HolderLookup.Provider provider) {
+	public CompoundTag save(CompoundTag p_77763_) {
         dataHandler.save(p_77763_);
         return p_77763_;
     }

@@ -1,21 +1,29 @@
 package weather2;
 
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.world.entity.ai.village.poi.PoiType;
-import net.minecraft.world.item.BlockItem;
-import net.minecraft.world.item.Item;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockBehaviour;
-import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.material.MapColor;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.neoforge.registries.DeferredRegister;
-import weather2.block.*;
-import weather2.blockentity.*;
-import weather2.item.WeatherItem;
+import weather2.block.AnemometerBlock;
+import weather2.block.DeflectorBlock;
+import weather2.block.ForecastBlock;
+import weather2.block.SandLayerBlock;
+import weather2.block.SensorBlock;
+import weather2.block.SirenBlock;
+import weather2.block.WindTurbineBlock;
+import weather2.block.WindVaneBlock;
+import weather2.blockentity.AnemometerBlockEntity;
+import weather2.blockentity.DeflectorBlockEntity;
+import weather2.blockentity.SensorBlockEntity;
+import weather2.blockentity.SirenBlockEntity;
+import weather2.blockentity.WindTurbineBlockEntity;
+import weather2.blockentity.WindVaneBlockEntity;
 
 import java.util.function.Supplier;
 
@@ -53,23 +61,23 @@ public class WeatherBlocks {
 
     @SuppressWarnings("ConstantConditions")
     public static final Supplier<BlockEntityType<DeflectorBlockEntity>> BLOCK_ENTITY_DEFLECTOR = BLOCK_ENTITIES.register(DEFLECTOR, () ->
-            BlockEntityType.Builder.of(DeflectorBlockEntity::new, BLOCK_DEFLECTOR.get()).build(null));
+		new BlockEntityType<>(DeflectorBlockEntity::new, BLOCK_DEFLECTOR.get()));
 
     @SuppressWarnings("ConstantConditions")
     public static final Supplier<BlockEntityType<SirenBlockEntity>> BLOCK_ENTITY_TORNADO_SIREN = BLOCK_ENTITIES.register(TORNADO_SIREN, () ->
-            BlockEntityType.Builder.of(SirenBlockEntity::new, BLOCK_TORNADO_SIREN.get()).build(null));
+		new BlockEntityType<>(SirenBlockEntity::new, BLOCK_TORNADO_SIREN.get()));
 
     public static final Supplier<BlockEntityType<SensorBlockEntity>> BLOCK_ENTITY_TORNADO_SENSOR = BLOCK_ENTITIES.register(TORNADO_SENSOR, () ->
-            BlockEntityType.Builder.of(SensorBlockEntity::new, BLOCK_TORNADO_SENSOR.get()).build(null));
+		new BlockEntityType<>(SensorBlockEntity::new, BLOCK_TORNADO_SENSOR.get()));
 
     public static final Supplier<BlockEntityType<AnemometerBlockEntity>> BLOCK_ENTITY_ANEMOMETER = BLOCK_ENTITIES.register(ANEMOMETER, () ->
-            BlockEntityType.Builder.of(AnemometerBlockEntity::new, BLOCK_ANEMOMETER.get()).build(null));
+		new BlockEntityType<>(AnemometerBlockEntity::new, BLOCK_ANEMOMETER.get()));
 
     public static final Supplier<BlockEntityType<WindVaneBlockEntity>> BLOCK_ENTITY_WIND_VANE = BLOCK_ENTITIES.register(WIND_VANE, () ->
-            BlockEntityType.Builder.of(WindVaneBlockEntity::new, BLOCK_WIND_VANE.get()).build(null));
+		new BlockEntityType<>(WindVaneBlockEntity::new, BLOCK_WIND_VANE.get()));
 
     public static final Supplier<BlockEntityType<WindTurbineBlockEntity>> BLOCK_ENTITY_WIND_TURBINE = BLOCK_ENTITIES.register(WIND_TURBINE, () ->
-            BlockEntityType.Builder.of(WindTurbineBlockEntity::new, BLOCK_WIND_TURBINE.get()).build(null));
+		new BlockEntityType<>(WindTurbineBlockEntity::new, BLOCK_WIND_TURBINE.get()));
 
     /*public static final Supplier<BlockEntityType<WeatherMachineBlockEntity>> BLOCK_ENTITY_WEATHER_MACHINE = BLOCK_ENTITIES.register(WEATHER_MACHINE, () ->
             BlockEntityType.Builder.of(WeatherMachineBlockEntity::new, BLOCK_WEATHER_MACHINE.get()).build(null));*/

@@ -34,8 +34,8 @@ public record PacketNBTFromClient(CompoundTag nbt) implements PacketBase
         try {
             if (player instanceof ServerPlayer) {
 
-                String packetCommand = nbt.getString("packetCommand");
-                String command = nbt.getString("command");
+				String packetCommand = nbt.getStringOr("packetCommand", "");
+				String command = nbt.getStringOr("command", "");
 
                 Weather.dbg("Weather2 packet command from client: " + packetCommand + " - " + command);
 

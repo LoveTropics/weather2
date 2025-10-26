@@ -1,8 +1,6 @@
 package weather2.blockentity;
 
-import com.corosus.coroutil.util.CULog;
 import net.minecraft.core.BlockPos;
-import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
@@ -43,9 +41,9 @@ public class DeflectorBlockEntity extends BlockEntity {
         }
     }
 
-    @Override
-    public void setRemoved() {
-        super.setRemoved();
-
-    }
+	@Override
+	public void preRemoveSideEffects(BlockPos pos, BlockState state) {
+		super.preRemoveSideEffects(pos, state);
+		blockBroken();
+	}
 }

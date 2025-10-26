@@ -1,7 +1,11 @@
 package weather2.weathersystem;
 
-import com.corosus.coroutil.util.*;
+import com.corosus.coroutil.util.CULog;
+import com.corosus.coroutil.util.CoroUtilBlock;
+import com.corosus.coroutil.util.CoroUtilCompatibility;
+import com.corosus.coroutil.util.CoroUtilMisc;
 import com.google.common.collect.Lists;
+import javax.annotation.Nullable;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtUtils;
@@ -20,8 +24,15 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.chunk.LevelChunk;
 import net.minecraft.world.phys.Vec3;
-import weather2.*;
-import weather2.config.*;
+import weather2.ServerWeatherProxy;
+import weather2.Weather;
+import weather2.WeatherBlocks;
+import weather2.WeatherNetworkingv2;
+import weather2.config.ConfigMisc;
+import weather2.config.ConfigSand;
+import weather2.config.ConfigSnow;
+import weather2.config.ConfigStorm;
+import weather2.config.WeatherUtilConfig;
 import weather2.datatypes.StormState;
 import weather2.util.CachedNBTTagCompound;
 import weather2.util.WeatherUtilBlock;
@@ -30,8 +41,12 @@ import weather2.weathersystem.storm.WeatherObject;
 import weather2.weathersystem.storm.WeatherObjectParticleStorm;
 import weather2.weathersystem.wind.WindManager;
 
-import javax.annotation.Nullable;
-import java.util.*;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Random;
 
 public class WeatherManagerServer extends WeatherManager {
 	private final ServerLevel world;
@@ -280,7 +295,7 @@ public class WeatherManagerServer extends WeatherManager {
 		data.put("data", parStorm.getNbtCache().getNewNBT());
 		//data.put("data", parStorm.nbtSyncForClient(new NBTTagCompound()));
 		//fix for client having broken states
-		data.getCompound("data").putBoolean("removed", true);
+		data.getCompoundOrEmpty("data").putBoolean("removed", true);
 		//Weather.eventChannel.sendToDimension(PacketHelper.getNBTPacket(data, Weather.eventChannelName), getWorld().getDimension().getType().getId());
 		//WeatherNetworking.HANDLER.send(PacketDistributor.DIMENSION.with(() -> getWorld().dimension()), new PacketNBTFromServer(data));
 		WeatherNetworkingv2.instance().serverSendToClientsInDimension(data, getWorld());
@@ -401,7 +416,7 @@ public class WeatherManagerServer extends WeatherManager {
 			} else {
 				world.players().stream().forEach(player -> {
 					CompoundTag playerNBT = player.getPersistentData();
-					long lastStormTimePlayer = playerNBT.getLong(stormString);
+					long lastStormTimePlayer = playerNBT.getLongOr(stormString, 0);
 					if (lastStormTimePlayer == 0 || lastStormTimePlayer + timeBetweenTicks < level.getGameTime()) {
 						boolean stormMade = trySpawnParticleStormNearPos(player.level(), player.position(), type);
 						if (stormMade) {
@@ -695,7 +710,7 @@ public class WeatherManagerServer extends WeatherManager {
 		data.put("data", parStorm.getNbtCache().getNewNBT());
 		boolean testNetworkData = false;
 		if (testNetworkData) {
-			System.out.println("sending to client: " + parStorm.getNbtCache().getNewNBT().getAllKeys().size());
+			System.out.println("sending to client: " + parStorm.getNbtCache().getNewNBT().keySet().size());
 			if (parStorm instanceof StormObject) {
 				System.out.println("Real: " + ((StormObject) parStorm).levelCurIntensityStage);
 				if (parStorm.getNbtCache().getNewNBT().contains("levelCurIntensityStage")) {
@@ -705,7 +720,7 @@ public class WeatherManagerServer extends WeatherManager {
 				}
 			}
 
-			Iterator iterator = parStorm.getNbtCache().getNewNBT().getAllKeys().iterator();
+			Iterator iterator = parStorm.getNbtCache().getNewNBT().keySet().iterator();
 			String keys = "";
 			while (iterator.hasNext()) {
 				keys = keys.concat((String) iterator.next() + "; ");

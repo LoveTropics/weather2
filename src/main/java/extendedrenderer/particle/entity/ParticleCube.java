@@ -2,7 +2,6 @@ package extendedrenderer.particle.entity;
 
 import com.corosus.coroutil.util.CULog;
 import com.corosus.coroutil.util.CoroUtilBlock;
-import com.corosus.coroutil.util.CoroUtilMisc;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Axis;
 import extendedrenderer.particle.ParticleRegistry;
@@ -10,15 +9,10 @@ import net.minecraft.client.Camera;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.particle.ParticleRenderType;
-import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.block.BlockRenderDispatcher;
-import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
-import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.Direction;
 import net.minecraft.util.Mth;
-import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
@@ -28,7 +22,6 @@ import org.joml.Vector3f;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 
 public class ParticleCube extends ParticleTexFX {
 
@@ -60,28 +53,18 @@ public class ParticleCube extends ParticleTexFX {
 	}
 
 	public TextureAtlasSprite getSpriteFromState(BlockState state) {
-		BlockRenderDispatcher blockrenderdispatcher = Minecraft.getInstance().getBlockRenderer();
-		BakedModel model = blockrenderdispatcher.getBlockModel(state);
-		for(Direction direction : Direction.values()) {
-			List<BakedQuad> list = model.getQuads(state, direction, RandomSource.create());
-			if (list.size() > 0) {
-				return list.get(0).getSprite();
-			}
-			//plan b
-			if (model.getParticleIcon() != null) {
-				return model.getParticleIcon();
-			}
-		}
-		return null;
+		Minecraft mc = Minecraft.getInstance();
+		BlockRenderDispatcher blockrenderdispatcher = mc.getBlockRenderer();
+		return blockrenderdispatcher.getBlockModelShaper().getParticleIcon(state, level, BlockPos.ZERO);
 	}
 
 	@Override
 	public void render(VertexConsumer buffer, Camera renderInfo, float partialTicks) {
 		//if (true) return;
-		Vec3 Vector3d = renderInfo.getPosition();
-		float f = (float)(Mth.lerp(partialTicks, this.xo, this.x) - Vector3d.x());
-		float f1 = (float)(Mth.lerp(partialTicks, this.yo, this.y) - Vector3d.y());
-		float f2 = (float)(Mth.lerp(partialTicks, this.zo, this.z) - Vector3d.z());
+		Vec3 pos = renderInfo.getPosition();
+		float f = (float) (Mth.lerp(partialTicks, this.xo, this.x) - pos.x());
+		float f1 = (float) (Mth.lerp(partialTicks, this.yo, this.y) - pos.y());
+		float f2 = (float) (Mth.lerp(partialTicks, this.zo, this.z) - pos.z());
 		Quaternionf quaternion;
 		if (this.facePlayer || (this.rotationPitch == 0 && this.rotationYaw == 0)) {
 			quaternion = renderInfo.rotation();

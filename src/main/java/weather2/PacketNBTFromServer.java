@@ -30,8 +30,8 @@ public record PacketNBTFromServer(CompoundTag nbt) implements PacketBase
     {
 
         try {
-            String packetCommand = nbt.getString("packetCommand");
-            String command = nbt.getString("command");
+			String packetCommand = nbt.getStringOr("packetCommand", "");
+			String command = nbt.getStringOr("command", "");
 
             //System.out.println("Weather2 packet command from server: " + packetCommand);
             if (packetCommand.equals("WeatherData")) {

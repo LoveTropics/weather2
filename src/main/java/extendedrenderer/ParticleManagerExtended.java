@@ -1,18 +1,31 @@
 package extendedrenderer;
 
-import com.google.common.collect.*;
+import com.google.common.collect.EvictingQueue;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+import com.google.common.collect.Queues;
 import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.blaze3d.vertex.*;
+import com.mojang.blaze3d.vertex.BufferBuilder;
+import com.mojang.blaze3d.vertex.MeshData;
+import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.Tesselator;
 import com.mojang.logging.LogUtils;
 import extendedrenderer.particle.entity.EntityRotFX;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
+import javax.annotation.Nullable;
 import net.minecraft.CrashReport;
 import net.minecraft.CrashReportCategory;
 import net.minecraft.ReportedException;
 import net.minecraft.Util;
 import net.minecraft.client.Camera;
 import net.minecraft.client.multiplayer.ClientLevel;
-import net.minecraft.client.particle.*;
+import net.minecraft.client.particle.Particle;
+import net.minecraft.client.particle.ParticleDescription;
+import net.minecraft.client.particle.ParticleProvider;
+import net.minecraft.client.particle.ParticleRenderType;
+import net.minecraft.client.particle.SpriteSet;
+import net.minecraft.client.particle.TrackingEmitter;
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.client.renderer.MultiBufferSource;
@@ -20,12 +33,8 @@ import net.minecraft.client.renderer.texture.SpriteLoader;
 import net.minecraft.client.renderer.texture.TextureAtlas;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.renderer.texture.TextureManager;
-import net.minecraft.core.BlockPos;
-import net.minecraft.core.Direction;
 import net.minecraft.core.particles.ParticleGroup;
 import net.minecraft.core.particles.ParticleOptions;
-import net.minecraft.core.particles.ParticleType;
-import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.FileToIdConverter;
 import net.minecraft.resources.ResourceLocation;
@@ -33,24 +42,25 @@ import net.minecraft.server.packs.resources.PreparableReloadListener;
 import net.minecraft.server.packs.resources.Resource;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.util.GsonHelper;
-import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
+import net.minecraft.util.profiling.Profiler;
 import net.minecraft.util.profiling.ProfilerFiller;
-import net.minecraft.world.entity.Entity;
-import net.minecraft.world.level.block.RenderShape;
-import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.phys.AABB;
-import net.minecraft.world.phys.shapes.VoxelShape;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
-import net.neoforged.neoforge.client.ClientHooks;
 import org.joml.Matrix4fStack;
 import org.slf4j.Logger;
 
-import javax.annotation.Nullable;
 import java.io.IOException;
 import java.io.Reader;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Queue;
+import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
 import java.util.stream.Collectors;
@@ -61,7 +71,7 @@ public class ParticleManagerExtended implements PreparableReloadListener {
    private static final FileToIdConverter PARTICLE_LISTER = FileToIdConverter.json("particles");
    private static final ResourceLocation PARTICLES_ATLAS_INFO = ResourceLocation.withDefaultNamespace("particles");
    private static final int MAX_PARTICLES_PER_LAYER = 16384;
-   private static final List<ParticleRenderType> RENDER_ORDER = ImmutableList.of(ParticleRenderType.TERRAIN_SHEET, ParticleRenderType.PARTICLE_SHEET_OPAQUE, ParticleRenderType.PARTICLE_SHEET_LIT, ParticleRenderType.PARTICLE_SHEET_TRANSLUCENT, ParticleRenderType.CUSTOM, ParticleRenderType.CUSTOM, EntityRotFX.SORTED_OPAQUE_BLOCK, EntityRotFX.SORTED_TRANSLUCENT);
+	private static final List<ParticleRenderType> RENDER_ORDER = ImmutableList.of(ParticleRenderType.TERRAIN_SHEET, ParticleRenderType.PARTICLE_SHEET_OPAQUE, ParticleRenderType.PARTICLE_SHEET_TRANSLUCENT, ParticleRenderType.CUSTOM, ParticleRenderType.CUSTOM, EntityRotFX.SORTED_OPAQUE_BLOCK, EntityRotFX.SORTED_TRANSLUCENT);
    protected ClientLevel level;
    public final Map<ParticleRenderType, Queue<Particle>> particles = Maps.newTreeMap(net.neoforged.neoforge.client.ClientHooks.makeParticleRenderTypeComparator(RENDER_ORDER));
    private final Queue<TrackingEmitter> trackingEmitters = Queues.newArrayDeque();
@@ -80,7 +90,8 @@ public class ParticleManagerExtended implements PreparableReloadListener {
       this.textureManager = p_107300_;
    }
 
-   public CompletableFuture<Void> reload(PreparableReloadListener.PreparationBarrier p_107305_, ResourceManager p_107306_, ProfilerFiller p_107307_, ProfilerFiller p_107308_, Executor p_107309_, Executor p_107310_) {
+	@Override
+	public CompletableFuture<Void> reload(PreparationBarrier p_107305_, ResourceManager p_107306_, Executor p_107309_, Executor p_107310_) {
       @OnlyIn(Dist.CLIENT)
       record ParticleDefinition(ResourceLocation id, Optional<List<ResourceLocation>> sprites) {
       }
@@ -99,11 +110,12 @@ public class ParticleManagerExtended implements PreparableReloadListener {
       CompletableFuture<SpriteLoader.Preparations> completablefuture1 = SpriteLoader.create(this.textureAtlas).loadAndStitch(p_107306_, PARTICLES_ATLAS_INFO, 0, p_107309_).thenCompose(SpriteLoader.Preparations::waitForUpload);
       return CompletableFuture.allOf(completablefuture1, completablefuture).thenCompose(p_107305_::wait).thenAcceptAsync((p_247900_) -> {
          this.clearParticles();
-         p_107308_.startTick();
-         p_107308_.push("upload");
+		  ProfilerFiller profiler = Profiler.get();
+		  profiler.startTick();
+		  profiler.push("upload");
          SpriteLoader.Preparations spriteloader$preparations = completablefuture1.join();
          this.textureAtlas.upload(spriteloader$preparations);
-         p_107308_.popPush("bindSpriteSets");
+		  profiler.popPush("bindSpriteSets");
          Set<ResourceLocation> set = new HashSet<>();
          TextureAtlasSprite textureatlassprite = spriteloader$preparations.missing();
          completablefuture.join().forEach((p_247911_) -> {
@@ -132,8 +144,8 @@ public class ParticleManagerExtended implements PreparableReloadListener {
             LOGGER.warn("Missing particle sprites: {}", set.stream().sorted().map(ResourceLocation::toString).collect(Collectors.joining(",")));
          }
 
-         p_107308_.pop();
-         p_107308_.endTick();
+		  profiler.pop();
+		  profiler.endTick();
       }, p_107310_);
    }
 
@@ -175,11 +187,12 @@ public class ParticleManagerExtended implements PreparableReloadListener {
    }
 
    public void tick() {
-      this.level.getProfiler().push("weather2_particle_tick");
+	   ProfilerFiller profiler = Profiler.get();
+	   profiler.push("weather2_particle_tick");
       this.particles.forEach((p_288249_, p_288250_) -> {
-         this.level.getProfiler().push("weather2_particle_tick_" + p_288249_.toString());
+		  profiler.push("weather2_particle_tick_" + p_288249_.toString());
          this.tickParticleList(p_288250_);
-         this.level.getProfiler().pop();
+		  profiler.pop();
       });
       if (!this.trackingEmitters.isEmpty()) {
          List<TrackingEmitter> list = Lists.newArrayList();
@@ -202,7 +215,7 @@ public class ParticleManagerExtended implements PreparableReloadListener {
             }).add(particle);
          }
       }
-      this.level.getProfiler().pop();
+	   profiler.pop();
    }
 
    private void tickParticleList(Collection<Particle> p_107385_) {
@@ -246,7 +259,8 @@ public class ParticleManagerExtended implements PreparableReloadListener {
    }
 
    public void render(PoseStack p_107337_, MultiBufferSource.BufferSource p_107338_, LightTexture p_107339_, Camera p_107340_, float p_107341_, @Nullable net.minecraft.client.renderer.culling.Frustum clippingHelper) {
-      this.level.getProfiler().push("weather2_particle_render");
+	   ProfilerFiller profiler = Profiler.get();
+	   profiler.push("weather2_particle_render");
       //if (true) return;
       float fogStart = RenderSystem.getShaderFogStart();
       float fogEnd = RenderSystem.getShaderFogEnd();
@@ -276,7 +290,7 @@ public class ParticleManagerExtended implements PreparableReloadListener {
       int particleCount = 0;
 
       for(ParticleRenderType particlerendertype : this.particles.keySet()) { // Forge: allow custom IParticleRenderType's
-         this.level.getProfiler().push(particlerendertype.toString());
+		  profiler.push(particlerendertype.toString());
          if (particlerendertype == ParticleRenderType.NO_RENDER) continue;
          Iterable<Particle> iterable = this.particles.get(particlerendertype);
          if (iterable != null) {
@@ -312,7 +326,7 @@ public class ParticleManagerExtended implements PreparableReloadListener {
                BufferUploader.drawWithShader(meshdata);
             }
          }
-         this.level.getProfiler().pop();
+		  profiler.pop();
       }
 
       //TODO: 1.21 figure out the purpose of this
@@ -327,7 +341,7 @@ public class ParticleManagerExtended implements PreparableReloadListener {
 
       RenderSystem.setShaderFogStart(fogStart);
       RenderSystem.setShaderFogEnd(fogEnd);
-      this.level.getProfiler().pop();
+	   profiler.pop();
    }
 
    public void setLevel(@Nullable ClientLevel p_107343_) {
@@ -351,7 +365,7 @@ public class ParticleManagerExtended implements PreparableReloadListener {
       this.trackedParticleCounts.clear();
    }
 
-   @OnlyIn(Dist.CLIENT)
+	@OnlyIn(Dist.CLIENT)
    static class MutableSpriteSet implements SpriteSet {
       private List<TextureAtlasSprite> sprites;
 

@@ -3,14 +3,17 @@ package weather2.weathersystem.wind;
 import com.corosus.coroutil.util.CoroUtilBlock;
 import com.corosus.coroutil.util.CoroUtilEntOrParticle;
 import com.corosus.coroutil.util.CoroUtilMisc;
+import javax.annotation.Nullable;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.util.profiling.Profiler;
+import net.minecraft.util.profiling.ProfilerFiller;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.levelgen.Heightmap;
 import net.minecraft.world.level.levelgen.synth.PerlinNoise;
 import net.minecraft.world.phys.Vec3;
-import net.minecraft.server.level.ServerLevel;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
 import weather2.PerlinNoiseHelper;
@@ -23,7 +26,6 @@ import weather2.weathersystem.WeatherManager;
 import weather2.weathersystem.WeatherManagerServer;
 import weather2.weathersystem.storm.StormObject;
 
-import javax.annotation.Nullable;
 import java.util.HashMap;
 import java.util.Random;
 
@@ -77,9 +79,9 @@ public class WindManager {
 
 	public WindManager(WeatherManager parManager) {
 		manager = parManager;
-		
+
 		Random rand = new Random();
-		
+
 		windAngleGlobal = rand.nextInt(360);
 	}
 
@@ -90,7 +92,7 @@ public class WindManager {
 	public float getWindSpeed(@Nullable BlockPos pos) {
 		return getWindSpeed(pos, 1);
 	}
-	
+
 	public float getWindSpeed(@Nullable BlockPos pos, float extraHeightAmpMax) {
 		//TODO: rethink use of Weather.isLoveTropicsInstalled() here, this was added just to get wind working in LT again, but theres probably a better way to integrate it
 		//this is new since adding turbines after last love tropics, so somethings not accounted for correctly
@@ -127,7 +129,8 @@ public class WindManager {
 		if (manager.getWorld().isClientSide() && useClientCache) {
 			return cachedWindSpeedClient;
 		}
-		this.manager.getWorld().getProfiler().push("weather2_wind_calculation");
+		ProfilerFiller profiler = Profiler.get();
+		profiler.push("weather2_wind_calculation");
 		boolean eventFastest = false;
 		float lastWindSpeed;
 		//dont waste cpu on client using the cache system when we only need the info around the player, especially given all the particles using it
@@ -155,7 +158,7 @@ public class WindManager {
 		if (extraHeightAmpMax >= 2) {
 			cap = extraHeightAmpMax + 1;
 		}
-		this.manager.getWorld().getProfiler().pop();
+		profiler.pop();
 		return Math.min(cap, lastWindSpeed);
 	}
 
@@ -565,8 +568,8 @@ public class WindManager {
 	public float getWindSpeedAmplifierForHeight(int height, int averageHeight, float extraHeightAmpMax) {
 		//prevent weird math using negative numbers
 		int maxSpeedHeight = manager.getWorld().getHeight();
-		if (manager.getWorld().getMinBuildHeight() < 0) {
-			int heightAdj = Math.abs(manager.getWorld().getMinBuildHeight());
+		if (manager.getWorld().getMinY() < 0) {
+			int heightAdj = Math.abs(manager.getWorld().getMinY());
 			height += heightAdj;
 			averageHeight += heightAdj;
 		}
@@ -580,13 +583,13 @@ public class WindManager {
 	}
 
 	/**
-	 * 
+	 *
 	 * To solve the problem of speed going overkill due to bad formulas
-	 * 
+	 *
 	 * end goal: make object move at speed of wind
 	 * - object has a weight that slows that adjustment
 	 * - conservation of momentum
-	 * 
+	 *
 	 * calculate force based on wind speed vs objects speed
 	 * - use that force to apply to weight of object
 	 * - profit
@@ -597,11 +600,11 @@ public class WindManager {
 
 		Vec3 motion = applyWindForceImpl(pos, new Vec3(CoroUtilEntOrParticle.getMotionX(ent), CoroUtilEntOrParticle.getMotionY(ent), CoroUtilEntOrParticle.getMotionZ(ent)),
 				WeatherUtilEntity.getWeight(ent), multiplier, maxSpeed, dynamicWind);
-		
+
 		CoroUtilEntOrParticle.setMotionX(ent, motion.x);
     	CoroUtilEntOrParticle.setMotionZ(ent, motion.z);
 	}
-	
+
 	/**
 	 * Handle generic uses of wind force, for stuff like weather objects that arent entities or paticles
 	 */
@@ -620,38 +623,38 @@ public class WindManager {
 
     	float windX = (float) -Math.sin(Math.toRadians(windAngle)) * windSpeed;
     	float windZ = (float) Math.cos(Math.toRadians(windAngle)) * windSpeed;
-    	
-    	float objX = (float) motion.x;
+
+		float objX = (float) motion.x;
     	float objZ = (float) motion.z;
-		
-    	float windWeight = 1F;
+
+		float windWeight = 1F;
     	float objWeight = weight;
-    	
-    	//divide by zero protection
+
+		//divide by zero protection
     	if (objWeight <= 0) {
     		objWeight = 0.001F;
     	}
 
     	float weightDiff = windWeight / objWeight;
-    	
-    	float vecX = (objX - windX) * weightDiff;
+
+		float vecX = (objX - windX) * weightDiff;
     	float vecZ = (objZ - windZ) * weightDiff;
-    	
-    	vecX *= multiplier;
+
+		vecX *= multiplier;
     	vecZ *= multiplier;
-    	
-    	//copy over existing motion data
+
+		//copy over existing motion data
     	Vec3 newMotion = motion;
-    	
-    	double speedCheck = (Math.abs(vecX) + Math.abs(vecZ)) / 2D;
+
+		double speedCheck = (Math.abs(vecX) + Math.abs(vecZ)) / 2D;
         if (speedCheck < maxSpeed) {
         	newMotion = new Vec3(objX - vecX, motion.y, objZ - vecZ);
         } else {
         	float speedDampen = (float)(maxSpeed / speedCheck);
 			newMotion = new Vec3(objX - vecX*speedDampen, motion.y, objZ - vecZ*speedDampen);
 		}
-        
-        return newMotion;
+
+		return newMotion;
 	}
 
 	public CompoundTag nbtSyncForClient() {
@@ -680,16 +683,16 @@ public class WindManager {
 
 	public void nbtSyncFromServer(CompoundTag parNBT) {
 
-		windSpeedGlobal = parNBT.getFloat("windSpeedGlobal");
-		windAngleGlobal = parNBT.getFloat("windAngleGlobal");
-		windSpeedGust = parNBT.getFloat("windSpeedGust");
-		windAngleGust = parNBT.getFloat("windAngleGust");
+		windSpeedGlobal = parNBT.getFloatOr("windSpeedGlobal", 0);
+		windAngleGlobal = parNBT.getFloatOr("windAngleGlobal", 0);
+		windSpeedGust = parNBT.getFloatOr("windSpeedGust", 0);
+		windAngleGust = parNBT.getFloatOr("windAngleGust", 0);
 
 		/*windSpeedEvent = parNBT.getFloat("windSpeedEvent");
 		windAngleEvent = parNBT.getFloat("windAngleEvent");
 		windTimeEvent = parNBT.getInt("windTimeEvent");*/
 
-		windTimeGust = parNBT.getInt("windTimeGust");
+		windTimeGust = parNBT.getIntOr("windTimeGust", 0);
 
 		//System.out.println("synced client wind speed for " + manager.getWorld().dimension() + " - " + windSpeedGlobal + " - " + this);
 	}
@@ -713,19 +716,19 @@ public class WindManager {
 	}
 
 	public void read(CompoundTag data) {
-		windSpeedGlobal = data.getFloat("windSpeedGlobal");
-		windAngleGlobal = data.getFloat("windAngleGlobal");
+		windSpeedGlobal = data.getFloatOr("windSpeedGlobal", 0);
+		windAngleGlobal = data.getFloatOr("windAngleGlobal", 0);
 
-		windSpeedGust = data.getFloat("windSpeedGust");
-		windAngleGust = data.getFloat("windAngleGust");
-		windTimeGust = data.getInt("windTimeGust");
+		windSpeedGust = data.getFloatOr("windSpeedGust", 0);
+		windAngleGust = data.getFloatOr("windAngleGust", 0);
+		windTimeGust = data.getIntOr("windTimeGust", 0);
 
-		windSpeedEvent = data.getFloat("windSpeedEvent");
-		windAngleEvent = data.getFloat("windAngleEvent");
-		windTimeEvent = data.getInt("windTimeEvent");
+		windSpeedEvent = data.getFloatOr("windSpeedEvent", 0);
+		windAngleEvent = data.getFloatOr("windAngleEvent", 0);
+		windTimeEvent = data.getIntOr("windTimeEvent", 0);
 
-		lowWindTimer = data.getInt("lowWindTimer");
-		highWindTimer = data.getInt("highWindTimer");
+		lowWindTimer = data.getIntOr("lowWindTimer", 0);
+		highWindTimer = data.getIntOr("highWindTimer", 0);
 	}
 
 	public CompoundTag write(CompoundTag data) {

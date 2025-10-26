@@ -71,20 +71,20 @@ public class WeatherManagerClient extends WeatherManager {
 		//tick volcano
 		//remove volcano???
 
-		String command = parNBT.getString("command");
+		String command = parNBT.getStringOr("command", "");
 
 		if (command.equals("syncStormNew")) {
 
 			CULog.dbg("nbtSyncFromServer: " + parNBT);
 
 			//Weather.dbg("creating client side storm");
-			CompoundTag stormNBT = parNBT.getCompound("data");
-			long ID = stormNBT.getLong("ID");
+			CompoundTag stormNBT = parNBT.getCompoundOrEmpty("data");
+			long ID = stormNBT.getLongOr("ID", 0);
 			Weather.dbg("syncStormNewsss, ID: " + ID);
 
 			//new check to workaround weird bug of WeatherNetworkingv2.instance().serverSendToClientsInDimension sending to every client no matter what
 			//turns out it was IDEA caching builds for some ungodly reason, remove this code
-			String dimID = stormNBT.getString("dimID");
+			String dimID = stormNBT.getStringOr("dimID", "");
 
 			/*CULog.dbg(dimID + " vs " + this.dimension.toString());
 			if (!dimID.equals(this.dimension.toString())) {
@@ -92,7 +92,7 @@ public class WeatherManagerClient extends WeatherManager {
 				return;
 			}*/
 
-			EnumWeatherObjectType weatherObjectType = EnumWeatherObjectType.get(stormNBT.getInt("weatherObjectType"));
+			EnumWeatherObjectType weatherObjectType = EnumWeatherObjectType.get(stormNBT.getIntOr("weatherObjectType", 0));
 
 			WeatherObject wo = null;
 			if (weatherObjectType == EnumWeatherObjectType.CLOUD) {
@@ -114,8 +114,8 @@ public class WeatherManagerClient extends WeatherManager {
 
 		} else if (command.equals("syncStormRemove")) {
 			//Weather.dbg("removing client side storm");
-			CompoundTag stormNBT = parNBT.getCompound("data");
-			long ID = stormNBT.getLong("ID");
+			CompoundTag stormNBT = parNBT.getCompoundOrEmpty("data");
+			long ID = stormNBT.getLongOr("ID", 0);
 
 			WeatherObject so = lookupStormObjectsByID.get(ID);
 			if (so != null) {
@@ -126,8 +126,8 @@ public class WeatherManagerClient extends WeatherManager {
 			}
 		} else if (command.equals("syncStormUpdate")) {
 			//Weather.dbg("updating client side storm");
-			CompoundTag stormNBT = parNBT.getCompound("data");
-			long ID = stormNBT.getLong("ID");
+			CompoundTag stormNBT = parNBT.getCompoundOrEmpty("data");
+			long ID = stormNBT.getLongOr("ID", 0);
 
 			WeatherObject so = lookupStormObjectsByID.get(ID);
 			if (so != null) {
@@ -141,7 +141,7 @@ public class WeatherManagerClient extends WeatherManager {
 		} else if (command.equals("syncWindUpdate")) {
 			//Weather.dbg("updating client side wind");
 
-			CompoundTag nbt = parNBT.getCompound("data");
+			CompoundTag nbt = parNBT.getCompoundOrEmpty("data");
 
 			getWindManager().nbtSyncFromServer(nbt);
 		} else if (command.equals("syncWeatherUpdate")) {
@@ -149,24 +149,24 @@ public class WeatherManagerClient extends WeatherManager {
 
 			//NBTTagCompound nbt = parNBT.getCompound("data");
 
-			isVanillaRainActiveOnServer = parNBT.getBoolean("isVanillaRainActiveOnServer");
-			isVanillaThunderActiveOnServer = parNBT.getBoolean("isVanillaThunderActiveOnServer");
-			vanillaRainTimeOnServer = parNBT.getInt("vanillaRainTimeOnServer");
-			vanillaRainAmountOnServer = parNBT.getFloat("vanillaRainAmountOnServer");
+			isVanillaRainActiveOnServer = parNBT.getBooleanOr("isVanillaRainActiveOnServer", false);
+			isVanillaThunderActiveOnServer = parNBT.getBooleanOr("isVanillaThunderActiveOnServer", false);
+			vanillaRainTimeOnServer = parNBT.getIntOr("vanillaRainTimeOnServer", 0);
+			vanillaRainAmountOnServer = parNBT.getFloatOr("vanillaRainAmountOnServer", 0);
 
 			//windMan.nbtSyncFromServer(nbt);
 		} else if (command.equals("syncBlockParticleNew")) {
 			//Weather.dbg("updating client side wind");
 
-			CompoundTag nbt = parNBT.getCompound("data");
+			CompoundTag nbt = parNBT.getCompoundOrEmpty("data");
 
-			int posX = nbt.getInt("posX");
-			int posY = nbt.getInt("posY") + 1;
-			int posZ = nbt.getInt("posZ");
+			int posX = nbt.getIntOr("posX", 0);
+			int posY = nbt.getIntOr("posY", 0) + 1;
+			int posZ = nbt.getIntOr("posZ", 0);
 
-			BlockState state = NbtUtils.readBlockState(getWorld().holderLookup(Registries.BLOCK), nbt.getCompound("blockstate"));
+			BlockState state = NbtUtils.readBlockState(getWorld().holderLookup(Registries.BLOCK), nbt.getCompoundOrEmpty("blockstate"));
 
-			long ownerID = nbt.getLong("ownerID");
+			long ownerID = nbt.getLongOr("ownerID", 0);
 
 			//CULog.dbg("add cube at " + posX + " " + posY + " " + posZ);
 

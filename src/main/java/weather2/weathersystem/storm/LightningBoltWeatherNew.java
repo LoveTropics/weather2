@@ -2,22 +2,15 @@ package weather2.weathersystem.storm;
 
 import com.corosus.coroutil.util.CoroUtilBlock;
 import com.google.common.collect.Sets;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
-import java.util.stream.Stream;
 import javax.annotation.Nullable;
 import net.minecraft.advancements.CriteriaTriggers;
 import net.minecraft.core.BlockPos;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.network.protocol.Packet;
-import net.minecraft.network.protocol.game.ClientboundAddEntityPacket;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
-import net.minecraft.world.Difficulty;
+import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.level.GameRules;
@@ -28,8 +21,15 @@ import net.minecraft.world.level.block.LightningRodBlock;
 import net.minecraft.world.level.block.WeatheringCopper;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.gameevent.GameEvent;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
+
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Stream;
 
 public class LightningBoltWeatherNew extends Entity {
    private static final int START_LIFE = 2;
@@ -47,7 +47,6 @@ public class LightningBoltWeatherNew extends Entity {
 
    public LightningBoltWeatherNew(EntityType<? extends LightningBoltWeatherNew> p_20865_, Level p_20866_) {
       super(p_20865_, p_20866_);
-      this.noCulling = true;
       this.life = 2;
       this.seed = this.random.nextLong();
       this.flashes = this.random.nextInt(3) + 1;
@@ -154,25 +153,30 @@ public class LightningBoltWeatherNew extends Entity {
 
    }
 
-   private BlockPos getStrikePosition() {
+	@Override
+	public boolean hurtServer(ServerLevel level, DamageSource damageSource, float amount) {
+		return false;
+	}
+
+	private BlockPos getStrikePosition() {
       Vec3 vec3 = this.position();
       return CoroUtilBlock.blockPos(vec3.x, vec3.y - 1.0E-6D, vec3.z);
    }
 
    private void spawnFire(int p_20871_) {
-      if (!this.visualOnly && !this.level().isClientSide && this.level().getGameRules().getBoolean(GameRules.RULE_DOFIRETICK)) {
+	   if (!this.visualOnly && level() instanceof ServerLevel level && level.getGameRules().getBoolean(GameRules.RULE_DOFIRETICK)) {
          BlockPos blockpos = this.blockPosition();
-         BlockState blockstate = BaseFireBlock.getState(this.level(), blockpos);
-         if (this.level().getBlockState(blockpos).isAir() && blockstate.canSurvive(this.level(), blockpos)) {
-            this.level().setBlockAndUpdate(blockpos, blockstate);
+		   BlockState blockstate = BaseFireBlock.getState(level, blockpos);
+		   if (level.getBlockState(blockpos).isAir() && blockstate.canSurvive(level, blockpos)) {
+			   level.setBlockAndUpdate(blockpos, blockstate);
             ++this.blocksSetOnFire;
          }
 
          for(int i = 0; i < p_20871_; ++i) {
             BlockPos blockpos1 = blockpos.offset(this.random.nextInt(3) - 1, this.random.nextInt(3) - 1, this.random.nextInt(3) - 1);
-            blockstate = BaseFireBlock.getState(this.level(), blockpos1);
-            if (this.level().getBlockState(blockpos1).isAir() && blockstate.canSurvive(this.level(), blockpos1)) {
-               this.level().setBlockAndUpdate(blockpos1, blockstate);
+			 blockstate = BaseFireBlock.getState(level, blockpos1);
+			 if (level.getBlockState(blockpos1).isAir() && blockstate.canSurvive(level, blockpos1)) {
+				 level.setBlockAndUpdate(blockpos1, blockstate);
                ++this.blocksSetOnFire;
             }
          }
@@ -242,11 +246,13 @@ public class LightningBoltWeatherNew extends Entity {
    protected void defineSynchedData() {
    }
 
-   protected void readAdditionalSaveData(CompoundTag p_20873_) {
-   }
+	@Override
+	protected void readAdditionalSaveData(ValueInput input) {
+	}
 
-   protected void addAdditionalSaveData(CompoundTag p_20877_) {
-   }
+	@Override
+	protected void addAdditionalSaveData(ValueOutput output) {
+	}
 
    public int getBlocksSetOnFire() {
       return this.blocksSetOnFire;

@@ -28,12 +28,12 @@ public class ActiveTornadoConfig {
 
     public static ActiveTornadoConfig deserialize(CompoundTag tag) {
         ActiveTornadoConfig config = new ActiveTornadoConfig();
-        config.setRadiusOfBase(tag.getFloat("radiusOfBase"));
-        config.setRadiusIncreasePerLayer(tag.getFloat("radiusIncreasePerLayer"));
-        config.setHeight(tag.getFloat("height"));
-        config.setSpinSpeed(tag.getFloat("spinSpeed"));
-        config.setEntityPullDistXZ(tag.getFloat("entityPullDistXZ"));
-        config.setEntityPullDistXZForY(tag.getFloat("entityPullDistXZForY"));
+		config.setRadiusOfBase(tag.getFloatOr("radiusOfBase", 0));
+		config.setRadiusIncreasePerLayer(tag.getFloatOr("radiusIncreasePerLayer", 0));
+		config.setHeight(tag.getFloatOr("height", 0));
+		config.setSpinSpeed(tag.getFloatOr("spinSpeed", 0));
+		config.setEntityPullDistXZ(tag.getFloatOr("entityPullDistXZ", 0));
+		config.setEntityPullDistXZForY(tag.getFloatOr("entityPullDistXZForY", 0));
         return config;
     }
 

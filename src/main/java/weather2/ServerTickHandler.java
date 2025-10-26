@@ -4,12 +4,12 @@ import com.corosus.coroutil.util.CULog;
 import com.corosus.modconfig.ConfigMod;
 import it.unimi.dsi.fastutil.objects.Reference2ObjectOpenHashMap;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.level.LevelAccessor;
-import net.minecraft.world.level.Level;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.LevelAccessor;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.InterModComms;
 import net.neoforged.fml.common.Mod;
@@ -23,7 +23,6 @@ import weather2.config.ConfigMisc;
 import weather2.config.WeatherUtilConfig;
 import weather2.weathersystem.WeatherManagerServer;
 import weather2.weathersystem.storm.StormObject;
-import weather2.weathersystem.wind.WindManager;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -100,14 +99,14 @@ public class ServerTickHandler {
 	public static void processIMCMessages() {
 		InterModComms.getMessages("weather2").forEach((msg) -> {
 			CompoundTag tag = (CompoundTag) msg.messageSupplier().get();
-			String dimResource = tag.getString("dimension");
+			String dimResource = tag.getStringOr("dimension", "");
 			WeatherManagerServer wm = MANAGERSLOOKUP.get(dimResource);
 			if (wm != null) {
 				if (msg.method().equals("player_tornado")) {
-					int timeTicks = tag.getInt("time_ticks");
-					boolean baby = tag.getBoolean("baby");
+					int timeTicks = tag.getIntOr("time_ticks", 0);
+					boolean baby = tag.getBooleanOr("baby", false);
 					//boolean sharknado = tag.getBoolean("sharknado");
-					String uuid = tag.getString("uuid");
+					String uuid = tag.getStringOr("uuid", "");
 					Player player = wm.getWorld().getPlayerByUUID(UUID.fromString(uuid));
 					if (player != null) {
 						StormObject stormObject = new StormObject(wm);

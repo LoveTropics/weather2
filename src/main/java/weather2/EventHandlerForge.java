@@ -33,15 +33,16 @@ public class EventHandlerForge {
 
 	@SubscribeEvent
 	@OnlyIn(Dist.CLIENT)
-    public void worldRender(RenderLevelStageEvent event)
-    {
-		if (event.getStage() == RenderLevelStageEvent.Stage.AFTER_WEATHER) {
-			ClientTickHandler.getClientWeather();
-		} else if (event.getStage() == RenderLevelStageEvent.Stage.AFTER_PARTICLES) {
-			if (ConfigDebug.Particle_engine_render) {
-				//System.out.println("dsf " + event.getPartialTick().getGameTimeDeltaTicks());
-				ClientTickHandler.particleManagerExtended().render(event.getPoseStack(), null, Minecraft.getInstance().gameRenderer.lightTexture(), event.getCamera(), event.getPartialTick().getGameTimeDeltaPartialTick(false), event.getFrustum());
-			}
+	public void worldRenderAfterWeather(RenderLevelStageEvent.AfterWeather event) {
+		ClientTickHandler.getClientWeather();
+	}
+
+	@SubscribeEvent
+	@OnlyIn(Dist.CLIENT)
+	public void worldRenderAfterParticles(RenderLevelStageEvent.AfterParticles event) {
+		if (ConfigDebug.Particle_engine_render) {
+			//System.out.println("dsf " + event.getPartialTick().getGameTimeDeltaTicks());
+			ClientTickHandler.particleManagerExtended().render(event.getPoseStack(), null, Minecraft.getInstance().gameRenderer.lightTexture(), event.getCamera(), event.getPartialTick().getGameTimeDeltaPartialTick(false), event.getFrustum());
 		}
     }
 
@@ -49,20 +50,19 @@ public class EventHandlerForge {
 	@OnlyIn(Dist.CLIENT)
     public void onFogColors(ViewportEvent.ComputeFogColor event) {
         SceneEnhancer.getFogAdjuster().onFogColors(event);
-		
+
 	}
-	
+
 	@SubscribeEvent(priority = EventPriority.LOWEST)
 	@OnlyIn(Dist.CLIENT)
 	public void onFogRender(ViewportEvent.RenderFog event) {
 		SceneEnhancer.getFogAdjuster().onFogRender(event);
 	}
-	
+
 	@SubscribeEvent
 	@OnlyIn(Dist.CLIENT)
-	public void renderTick(RenderLevelStageEvent event) {
+	public void renderTick(RenderLevelStageEvent.AfterLevel event) {
 		//TODO: 1.21 verify this is good enough instead of RenderTickEvent via forge
-		if (event.getStage() != RenderLevelStageEvent.Stage.AFTER_LEVEL) return;
 		SceneEnhancer.renderTick(event);
 	}
 
@@ -81,8 +81,8 @@ public class EventHandlerForge {
 	public void onPlayerClone(PlayerEvent.Clone event) {
 		CompoundTag tag = event.getOriginal().getPersistentData();
 		CompoundTag tag2 = event.getEntity().getPersistentData();
-		tag2.putLong("lastSandstormTime", tag.getLong("lastSandstormTime"));
-		tag2.putLong("lastStormDeadlyTime", tag.getLong("lastStormDeadlyTime"));
+		tag2.putLong("lastSandstormTime", tag.getLongOr("lastSandstormTime", 0));
+		tag2.putLong("lastStormDeadlyTime", tag.getLongOr("lastStormDeadlyTime", 0));
 	}
 
 	public void onServerPlayerUpdate(EntityTickEvent.Pre event) {

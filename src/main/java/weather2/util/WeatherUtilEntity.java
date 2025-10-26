@@ -6,6 +6,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.animal.Squid;
 import net.minecraft.world.entity.item.ItemEntity;
@@ -13,7 +14,6 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.FishingHook;
 import net.minecraft.world.entity.vehicle.AbstractMinecart;
 import net.minecraft.world.entity.vehicle.Boat;
-import net.minecraft.world.item.ArmorItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
@@ -28,9 +28,11 @@ import net.neoforged.fml.LogicalSide;
 import net.neoforged.fml.util.thread.EffectiveSide;
 
 import java.util.HashMap;
+import java.util.List;
+import java.util.stream.Stream;
 
 public class WeatherUtilEntity {
-	
+
     public static float getWeight(Object entity1, boolean forTornado)
     {
     	Level world = CoroUtilEntOrParticle.getWorld(entity1);
@@ -57,7 +59,7 @@ public class WeatherUtilEntity {
         if (entity1 instanceof LivingEntity)
         {
         	LivingEntity livingEnt = (LivingEntity) entity1;
-        	int airTime = livingEnt.getPersistentData().getInt("timeInAir");
+			int airTime = livingEnt.getPersistentData().getIntOr("timeInAir", 0);
         	if (livingEnt.onGround() || livingEnt.isInWater())
             {
                 airTime = 0;
@@ -65,8 +67,8 @@ public class WeatherUtilEntity {
             else {
             	airTime++;
             }
-        	
-        	livingEnt.getPersistentData().putInt("timeInAir", airTime);
+
+			livingEnt.getPersistentData().putInt("timeInAir", airTime);
 
 			if (entity1 instanceof Player) {
 				if (((Player) entity1).abilities.instabuild) return 99999999F;
@@ -110,7 +112,13 @@ public class WeatherUtilEntity {
 
 	public static float getWeightAdjFromEquipment(float weightIn, Player player) {
 		float influence = 1.2F;
-		for (ItemStack stack : player.getArmorSlots()) {
+		List<ItemStack> armorItems = Stream.of(
+			EquipmentSlot.HEAD,
+			EquipmentSlot.CHEST,
+			EquipmentSlot.LEGS,
+			EquipmentSlot.FEET
+		).map(player::getItemBySlot).toList();
+		for (ItemStack stack : armorItems) {
 			if (armorToWeight.containsKey(stack.getItem())) {
 				weightIn += armorToWeight.get(stack.getItem()) * influence;
 			}
@@ -144,7 +152,7 @@ public class WeatherUtilEntity {
 		if (entity1 instanceof LivingEntity)
 		{
 			LivingEntity livingEnt = (LivingEntity) entity1;
-			int airTime = livingEnt.getPersistentData().getInt("timeInAir");
+			int airTime = livingEnt.getPersistentData().getIntOr("timeInAir", 0);
 			if (livingEnt.onGround() || livingEnt.isInWater())
 			{
 				airTime = 0;
@@ -175,20 +183,20 @@ public class WeatherUtilEntity {
 
 		return 1F;
 	}
-    
-    public static boolean isParticleRotServerSafe(Level world, Object obj) {
+
+	public static boolean isParticleRotServerSafe(Level world, Object obj) {
     	if (EffectiveSide.get().equals(LogicalSide.SERVER)) {
     		return false;
     	}
     	if (!world.isClientSide) return false;
     	return isParticleRotClientCheck(obj);
     }
-    
-    public static boolean isParticleRotClientCheck(Object obj) {
+
+	public static boolean isParticleRotClientCheck(Object obj) {
     	return obj instanceof EntityRotFX;
     }
-    
-    public static double getDistanceSqEntToPos(Entity ent, BlockPos pos) {
+
+	public static double getDistanceSqEntToPos(Entity ent, BlockPos pos) {
     	return ent.position().distanceToSqr(Vec3.atCenterOf(pos));
     }
 

@@ -9,7 +9,6 @@ import net.minecraft.data.PackOutput;
 import net.minecraft.resources.ResourceLocation;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.neoforge.client.event.TextureAtlasStitchedEvent;
-import net.neoforged.neoforge.common.data.ExistingFileHelper;
 import net.neoforged.neoforge.common.data.SpriteSourceProvider;
 import weather2.Weather;
 
@@ -63,9 +62,9 @@ public class ParticleRegistry extends SpriteSourceProvider {
 	public static TextureAtlasSprite square16;
 	public static TextureAtlasSprite square64;
 
-	public ParticleRegistry(PackOutput output, CompletableFuture<HolderLookup.Provider> lookupProvider, ExistingFileHelper fileHelper)
+	public ParticleRegistry(PackOutput output, CompletableFuture<HolderLookup.Provider> lookupProvider)
 	{
-		super(output, lookupProvider, ExtendedRenderer.modid, fileHelper);
+		super(output, lookupProvider, ExtendedRenderer.modid);
 	}
 
 	@Override

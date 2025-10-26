@@ -43,12 +43,12 @@ public class CachedNBTTagCompound {
 
 	public long getLong(String key) {
 		if (!newData.contains(key))
-			newData.putLong(key, cachedData.getLong(key));
-		return newData.getLong(key);
+			newData.putLong(key, cachedData.getLongOr(key, 0));
+		return newData.getLongOr(key, 0);
 	}
 
 	public void putLong(String key, long newVal) {
-		if (!cachedData.contains(key) || cachedData.getLong(key) != newVal || forced) {
+		if (!cachedData.contains(key) || cachedData.getLongOr(key, 0) != newVal || forced) {
 			newData.putLong(key, newVal);
 		}
 		cachedData.putLong(key, newVal);
@@ -56,12 +56,12 @@ public class CachedNBTTagCompound {
 
 	public int getInt(String key) {
 		if (!newData.contains(key))
-			newData.putInt(key, cachedData.getInt(key));
-		return newData.getInt(key);
+			newData.putInt(key, cachedData.getIntOr(key, 0));
+		return newData.getIntOr(key, 0);
 	}
 
 	public void putInt(String key, int newVal) {
-		if (!cachedData.contains(key) || cachedData.getInt(key) != newVal || forced) {
+		if (!cachedData.contains(key) || cachedData.getIntOr(key, 0) != newVal || forced) {
 			newData.putInt(key, newVal);
 		}
 		cachedData.putInt(key, newVal);
@@ -69,12 +69,12 @@ public class CachedNBTTagCompound {
 
 	public short getShort(String key) {
 		if (!newData.contains(key))
-			newData.putShort(key, cachedData.getShort(key));
-		return newData.getShort(key);
+			newData.putShort(key, cachedData.getShortOr(key, (short) 0));
+		return newData.getShortOr(key, (short) 0);
 	}
 
 	public void putShort(String key, short newVal) {
-		if (!cachedData.contains(key) || cachedData.getShort(key) != newVal || forced) {
+		if (!cachedData.contains(key) || cachedData.getShortOr(key, (short) 0) != newVal || forced) {
 			newData.putShort(key, newVal);
 		}
 		cachedData.putShort(key, newVal);
@@ -82,12 +82,12 @@ public class CachedNBTTagCompound {
 
 	public String getString(String key) {
 		if (!newData.contains(key))
-			newData.putString(key, cachedData.getString(key));
-		return newData.getString(key);
+			newData.putString(key, cachedData.getStringOr(key, ""));
+		return newData.getStringOr(key, "");
 	}
 
 	public void putString(String key, String newVal) {
-		if (!cachedData.contains(key) || !cachedData.getString(key).equals(newVal) || forced) {
+		if (!cachedData.contains(key) || !cachedData.getStringOr(key, "").equals(newVal) || forced) {
 			newData.putString(key, newVal);
 		}
 		cachedData.putString(key, newVal);
@@ -95,12 +95,12 @@ public class CachedNBTTagCompound {
 
 	public boolean getBoolean(String key) {
 		if (!newData.contains(key))
-			newData.putBoolean(key, cachedData.getBoolean(key));
-		return newData.getBoolean(key);
+			newData.putBoolean(key, cachedData.getBooleanOr(key, false));
+		return newData.getBooleanOr(key, false);
 	}
 
 	public void putBoolean(String key, boolean newVal) {
-		if (!cachedData.contains(key) || cachedData.getBoolean(key) != newVal || forced) {
+		if (!cachedData.contains(key) || cachedData.getBooleanOr(key, false) != newVal || forced) {
 			newData.putBoolean(key, newVal);
 		}
 		cachedData.putBoolean(key, newVal);
@@ -108,12 +108,12 @@ public class CachedNBTTagCompound {
 
 	public float getFloat(String key) {
 		if (!newData.contains(key))
-			newData.putFloat(key, cachedData.getFloat(key));
-		return newData.getFloat(key);
+			newData.putFloat(key, cachedData.getFloatOr(key, 0));
+		return newData.getFloatOr(key, 0);
 	}
 
 	public void putFloat(String key, float newVal) {
-		if (!cachedData.contains(key) || cachedData.getFloat(key) != newVal || forced) {
+		if (!cachedData.contains(key) || cachedData.getFloatOr(key, 0) != newVal || forced) {
 			newData.putFloat(key, newVal);
 		}
 		cachedData.putFloat(key, newVal);
@@ -121,19 +121,19 @@ public class CachedNBTTagCompound {
 
 	public double getDouble(String key) {
 		if (!newData.contains(key))
-			newData.putDouble(key, cachedData.getDouble(key));
-		return newData.getDouble(key);
+			newData.putDouble(key, cachedData.getDoubleOr(key, 0));
+		return newData.getDoubleOr(key, 0);
 	}
 
 	public void putDouble(String key, double newVal) {
-		if (!cachedData.contains(key) || cachedData.getDouble(key) != newVal || forced) {
+		if (!cachedData.contains(key) || cachedData.getDoubleOr(key, 0) != newVal || forced) {
 			newData.putDouble(key, newVal);
 		}
 		cachedData.putDouble(key, newVal);
 	}
 
 	public CompoundTag get(String key) {
-		return newData.getCompound(key);
+		return newData.getCompoundOrEmpty(key);
 	}
 
 	/** warning, not cached **/

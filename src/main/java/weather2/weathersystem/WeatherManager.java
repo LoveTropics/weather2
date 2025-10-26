@@ -5,20 +5,25 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.util.datafix.DataFixTypes;
-import net.minecraft.world.level.ForcedChunksSavedData;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.saveddata.SavedData;
 import net.minecraft.world.phys.Vec3;
 import weather2.IWorldData;
 import weather2.Weather;
 import weather2.WorldNBTData;
 import weather2.config.ConfigStorm;
 import weather2.config.WeatherUtilConfig;
-import weather2.weathersystem.storm.*;
+import weather2.weathersystem.storm.EnumWeatherObjectType;
+import weather2.weathersystem.storm.StormObject;
+import weather2.weathersystem.storm.WeatherObject;
+import weather2.weathersystem.storm.WeatherObjectParticleStorm;
+import weather2.weathersystem.storm.WeatherObjectSandstormOld;
 import weather2.weathersystem.wind.WindManager;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 
 public abstract class WeatherManager implements IWorldData {
 	public final ResourceKey<Level> dimension;
@@ -409,43 +414,42 @@ public abstract class WeatherManager implements IWorldData {
 
 	public void read() {
 
-		WorldNBTData worldNBTData = ((ServerLevel)getWorld()).getDataStorage().computeIfAbsent(WorldNBTData.factory(), Weather.MODID + "-" + "weather_data");
+		WorldNBTData worldNBTData = ((ServerLevel) getWorld()).getDataStorage().computeIfAbsent(WorldNBTData.TYPE);
 		worldNBTData.setDataHandler(this);
 
 		CULog.dbg("weather data: " + worldNBTData.getData());
 
 		CompoundTag data = worldNBTData.getData();
 
-		lastStormFormed = data.getLong("lastStormFormed");
-		lastSandstormFormed = data.getLong("lastSandstormFormed");
-		lastSnowstormFormed = data.getLong("lastSnowstormFormed");
+		lastStormFormed = data.getLongOr("lastStormFormed", 0);
+		lastSandstormFormed = data.getLongOr("lastSandstormFormed", 0);
+		lastSnowstormFormed = data.getLongOr("lastSnowstormFormed", 0);
 
-		//prevent setting to 0 for worlds updating to new weather version
-		if (data.contains("cloudIntensity")) {
-			cloudIntensity = data.getFloat("cloudIntensity");
-		}
+		cloudIntensity = data.getFloatOr("cloudIntensity", 1.0f);
 
-		WeatherObject.lastUsedStormID = data.getLong("lastUsedIDStorm");
+		WeatherObject.lastUsedStormID = data.getLongOr("lastUsedIDStorm", 0);
 
-		wind.read(data.getCompound("windMan"));
+		wind.read(data.getCompoundOrEmpty("windMan"));
 
-		CompoundTag nbtStorms = data.getCompound("stormData");
+		CompoundTag nbtStorms = data.getCompoundOrEmpty("stormData");
 
-		Iterator it = nbtStorms.getAllKeys().iterator();
+		Iterator it = nbtStorms.keySet().iterator();
 
 		while (it.hasNext()) {
 			String tagName = (String) it.next();
-			CompoundTag stormData = nbtStorms.getCompound(tagName);
+			CompoundTag stormData = nbtStorms.getCompoundOrEmpty(tagName);
 
 			//if (ServerTickHandler.getWeatherManagerFor(dimension) != null) {
 				WeatherObject wo = null;
-				if (stormData.getInt("weatherObjectType") == EnumWeatherObjectType.CLOUD.ordinal()) {
+			if (stormData.getIntOr("weatherObjectType", -1) == EnumWeatherObjectType.CLOUD.ordinal()) {
 					wo = new StormObject(this);
-				} else if (stormData.getInt("weatherObjectType") == EnumWeatherObjectType.SAND.ordinal()) {
+			}
+			else if (stormData.getIntOr("weatherObjectType", -1) == EnumWeatherObjectType.SAND.ordinal()) {
 					wo = new WeatherObjectParticleStorm(this);
 					((WeatherObjectParticleStorm)wo).setType(WeatherObjectParticleStorm.StormType.SANDSTORM);
 					//initStormNew???
-				} else if (stormData.getInt("weatherObjectType") == EnumWeatherObjectType.SNOW.ordinal()) {
+			}
+			else if (stormData.getIntOr("weatherObjectType", -1) == EnumWeatherObjectType.SNOW.ordinal()) {
 					wo = new WeatherObjectParticleStorm(this);
 					((WeatherObjectParticleStorm)wo).setType(WeatherObjectParticleStorm.StormType.SNOWSTORM);
 					//initStormNew???
@@ -466,14 +470,14 @@ public abstract class WeatherManager implements IWorldData {
 			}*/
 		}
 
-		CompoundTag nbtDeflectors = data.getCompound("deflectorData");
+		CompoundTag nbtDeflectors = data.getCompoundOrEmpty("deflectorData");
 
-		Iterator it2 = nbtDeflectors.getAllKeys().iterator();
+		Iterator it2 = nbtDeflectors.keySet().iterator();
 
 		while (it2.hasNext()) {
 			String tagName = (String) it2.next();
-			long hash = nbtDeflectors.getLong(tagName);
-			if (!BlockPos.of(hash).equals(new BlockPos(0, 0, 0))) {
+			long hash = nbtDeflectors.getLongOr(tagName, 0);
+			if (!BlockPos.of(hash).equals(BlockPos.ZERO)) {
 				CULog.dbg("adding deflector from disk: " + BlockPos.of(hash));
 				registerDeflector(BlockPos.of(hash));
 			} else {
@@ -493,7 +497,7 @@ public abstract class WeatherManager implements IWorldData {
 	}
 
 	public void registerDeflector(BlockPos pos) {
-		long hash = BlockPos.asLong(pos.getX(), pos.getY(), pos.getZ());
+		long hash = pos.asLong();
 		if (!this.lookupWeatherBlockDamageDeflector.containsKey(hash)) {
 			CULog.dbg("adding weather deflector poi at " + pos);
 			this.lookupWeatherBlockDamageDeflector.put(hash, pos);
@@ -501,7 +505,7 @@ public abstract class WeatherManager implements IWorldData {
 	}
 
 	public void removeDeflector(BlockPos pos) {
-		long hash = BlockPos.asLong(pos.getX(), pos.getY(), pos.getZ());
+		long hash = pos.asLong();
 		CULog.dbg("removing weather deflector poi at " + pos);
 		this.lookupWeatherBlockDamageDeflector.remove(hash);
 	}

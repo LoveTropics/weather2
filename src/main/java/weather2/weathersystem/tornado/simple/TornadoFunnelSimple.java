@@ -4,11 +4,9 @@ import com.corosus.coroutil.util.CULog;
 import extendedrenderer.particle.ParticleRegistry;
 import extendedrenderer.particle.entity.PivotingParticle;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.ParticleStatus;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
-import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.level.ParticleStatus;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
@@ -17,7 +15,6 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
-import net.neoforged.neoforge.common.NeoForge;
 import weather2.Weather;
 import weather2.weathersystem.storm.StormObject;
 import weather2.weathersystem.tornado.ActiveTornadoConfig;
@@ -200,9 +197,9 @@ public class TornadoFunnelSimple {
              */
 
             List<PivotingParticle> listLayer = listLayers.get(i).getListParticles();
-            List<PivotingParticle> listLayerExtra = listLayers.get(i).getListParticlesExtra();
+			List<PivotingParticle> listLayerExtra = listLayers.get(i).getListParticlesExtra();
 
-            float radius = config.getRadiusOfBase() + (config.getRadiusIncreasePerLayer() * (i));
+			float radius = config.getRadiusOfBase() + (config.getRadiusIncreasePerLayer() * (i));
             float radiusAdjustedForParticleSize = radius * (radius / radiusMax);
 
             float circumference = radius * 2 * Mth.PI;

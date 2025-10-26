@@ -1,52 +1,74 @@
 package weather2.client;
 
 import com.corosus.coroutil.config.ConfigCoroUtil;
-import com.corosus.coroutil.util.*;
-import net.minecraft.core.Direction;
-import net.minecraft.core.particles.ParticleOptions;
-import net.minecraft.sounds.SoundEvents;
-import net.minecraft.tags.FluidTags;
-import net.minecraft.world.level.LevelReader;
-import net.minecraft.world.level.block.*;
-import net.minecraft.world.level.material.FluidState;
-import net.minecraft.world.level.material.MapColor;
-import net.neoforged.neoforge.client.event.RenderLevelStageEvent;
-import weather2.config.ConfigMisc;
-import weather2.config.ConfigSound;
-import weather2.datatypes.PrecipitationType;
-import weather2.datatypes.WeatherEventType;
+import com.corosus.coroutil.util.CULog;
+import com.corosus.coroutil.util.ChunkCoordinatesBlock;
+import com.corosus.coroutil.util.CoroUtilBlock;
+import com.corosus.coroutil.util.CoroUtilCompatibility;
+import com.corosus.coroutil.util.CoroUtilMisc;
 import extendedrenderer.particle.ParticleRegistry;
 import extendedrenderer.particle.behavior.ParticleBehaviorSandstorm;
-import extendedrenderer.particle.entity.*;
-import net.minecraft.world.level.block.state.BlockState;
+import extendedrenderer.particle.entity.DustEmitter;
+import extendedrenderer.particle.entity.EntityRotFX;
+import extendedrenderer.particle.entity.ParticleCrossSection;
+import extendedrenderer.particle.entity.ParticleTexExtraRender;
+import extendedrenderer.particle.entity.ParticleTexFX;
+import extendedrenderer.particle.entity.ParticleTexLeafColor;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.particle.FlameParticle;
 import net.minecraft.client.particle.Particle;
 import net.minecraft.client.particle.SuspendedParticle;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
-import net.minecraft.client.ParticleStatus;
-import net.minecraft.client.multiplayer.ClientLevel;
-import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.player.Player;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.core.Vec3i;
+import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.level.ParticleStatus;
+import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
-import net.minecraft.core.BlockPos;
+import net.minecraft.tags.FluidTags;
 import net.minecraft.util.Mth;
-import net.minecraft.world.phys.shapes.VoxelShape;
-import net.minecraft.world.phys.Vec3;
-import net.minecraft.core.Vec3i;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.biome.Biome;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.CampfireBlock;
+import net.minecraft.world.level.block.GrassBlock;
+import net.minecraft.world.level.block.SnowLayerBlock;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.levelgen.Heightmap;
+import net.minecraft.world.level.material.FluidState;
+import net.minecraft.world.level.material.MapColor;
+import net.minecraft.world.phys.Vec3;
+import net.minecraft.world.phys.shapes.VoxelShape;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
-import weather2.*;
+import net.neoforged.neoforge.client.event.RenderLevelStageEvent;
+import weather2.ClientTickHandler;
+import weather2.ClientWeatherHelper;
+import weather2.ClientWeatherProxy;
+import weather2.SoundRegistry;
+import weather2.Weather;
 import weather2.client.entity.particle.ParticleHail;
 import weather2.client.entity.particle.ParticleSandstorm;
+import weather2.config.ConfigMisc;
 import weather2.config.ConfigParticle;
 import weather2.config.ConfigSand;
-import weather2.util.*;
+import weather2.config.ConfigSound;
+import weather2.datatypes.PrecipitationType;
+import weather2.datatypes.WeatherEventType;
+import weather2.util.WeatherUtilBlock;
+import weather2.util.WeatherUtilDim;
+import weather2.util.WeatherUtilEntity;
+import weather2.util.WeatherUtilParticle;
+import weather2.util.WeatherUtilSound;
+import weather2.util.WindReader;
 import weather2.weathersystem.WeatherManagerClient;
 import weather2.weathersystem.fog.FogAdjuster;
 import weather2.weathersystem.storm.StormObject;
@@ -54,7 +76,12 @@ import weather2.weathersystem.storm.WeatherObjectParticleStorm;
 import weather2.weathersystem.tornado.TornadoManagerTodoRenameMe;
 import weather2.weathersystem.wind.WindManager;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Queue;
+import java.util.Random;
 
 @OnlyIn(Dist.CLIENT)
 public class SceneEnhancer implements Runnable {
@@ -319,7 +346,7 @@ public class SceneEnhancer implements Runnable {
 				int l = random.nextInt(21) - 10;
 				BlockPos blockpos2 = levelreader.getHeightmapPos(Heightmap.Types.MOTION_BLOCKING, blockpos.offset(k, 0, l));
 				Biome biome = levelreader.getBiome(blockpos2).value();
-				if (blockpos2.getY() > levelreader.getMinBuildHeight() && blockpos2.getY() <= blockpos.getY() + 10 && blockpos2.getY() >= blockpos.getY() - 10 && biome.getPrecipitationAt(blockpos2) == Biome.Precipitation.RAIN && biome.warmEnoughToRain(blockpos2)) {
+				if (blockpos2.getY() > levelreader.getMinY() && blockpos2.getY() <= blockpos.getY() + 10 && blockpos2.getY() >= blockpos.getY() - 10 && biome.getPrecipitationAt(blockpos2, levelreader.getSeaLevel()) == Biome.Precipitation.RAIN && biome.warmEnoughToRain(blockpos2, levelreader.getSeaLevel())) {
 					blockpos1 = blockpos2.below();
 					if (minecraft.options.particles.get() == ParticleStatus.MINIMAL) {
 						break;
@@ -646,7 +673,7 @@ public class SceneEnhancer implements Runnable {
 		}
 
 		//check rules same way vanilla texture precip does
-		if (biome != null && (biome.getPrecipitationAt(posPlayer) != Biome.Precipitation.NONE)) {
+		if (biome != null && (biome.getPrecipitationAt(posPlayer, entP.level().getSeaLevel()) != Biome.Precipitation.NONE)) {
 			if (curPrecipVal > 0) {
 				if (isRain) {
 					spawnCount = 0;
@@ -1469,9 +1496,8 @@ public class SceneEnhancer implements Runnable {
 		return fogAdjuster.isFogOverriding();
     }
 
-    public static void renderTick(RenderLevelStageEvent event) {
+	public static void renderTick(RenderLevelStageEvent.AfterLevel event) {
 		//TODO: 1.21 verify this is good enough instead of RenderTickEvent via forge
-		if (event.getStage() != RenderLevelStageEvent.Stage.AFTER_LEVEL) return;
 		Minecraft client = Minecraft.getInstance();
 		ClientWeatherProxy weather = ClientWeatherProxy.get();
 		if (client.level != null) {

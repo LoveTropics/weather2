@@ -1,8 +1,8 @@
 package weather2.util;
 
-import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.state.BlockState;
 
 public class WeatherUtilDim {
 
@@ -16,7 +16,7 @@ public class WeatherUtilDim {
             } else {
                 for(BlockPos blockpos1 = blockpos.below(); blockpos1.getY() > pos.getY(); blockpos1 = blockpos1.below()) {
                     BlockState blockstate = world.getBlockState(blockpos1);
-                    if (blockstate.getLightBlock(world, blockpos1) > 0 && !blockstate.liquid()) {
+					if (blockstate.getLightBlock() > 0 && !blockstate.liquid()) {
                         return false;
                     }
                 }
