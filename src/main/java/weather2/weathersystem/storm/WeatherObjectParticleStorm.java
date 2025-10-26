@@ -25,7 +25,7 @@ import java.util.Random;
 public class WeatherObjectParticleStorm extends WeatherObject {
 
 	public int age = 0;
-	public int maxAge = 20*20;
+	public int maxAge = 20 * 20;
 
 	public Random rand = new Random();
 
@@ -56,7 +56,7 @@ public class WeatherObjectParticleStorm extends WeatherObject {
 
 	public void initStormSpawn(Vec3 pos) {
 		this.pos = pos;
-		this.maxAge = 20*60*5;
+		this.maxAge = 20 * 60 * 5;
 	}
 
 	public static boolean canSpawnHere(Level world, BlockPos pos, StormType type, boolean forSpawn) {
@@ -118,9 +118,9 @@ public class WeatherObjectParticleStorm extends WeatherObject {
 		float age = this.age;
 		float maxAge = this.maxAge;
 		if (age / maxAge <= 0.5F) {
-			return age / (maxAge/2);
+			return age / (maxAge / 2);
 		} else {
-			return 1F - (age / (maxAge/2) - 1F);
+			return 1F - (age / (maxAge / 2) - 1F);
 		}
 	}
 
@@ -147,13 +147,13 @@ public class WeatherObjectParticleStorm extends WeatherObject {
 
 		//keep it set to do a lot of work only occasionally, prevents chunk render tick spam for client which kills fps
 		int delay = ConfigSand.Sandstorm_Sand_Buildup_TickRate;
-		int loop = (int)((float)ConfigSand.Sandstorm_Sand_Buildup_LoopAmountBase * getIntensity());
+		int loop = (int) ((float) ConfigSand.Sandstorm_Sand_Buildup_LoopAmountBase * getIntensity());
 		boolean buildupOutsideArea = ConfigSand.Sandstorm_Sand_Buildup_AllowOutsideDesert;
 		int maxBlockStackingAllowed = ConfigSand.Sandstorm_Sand_Block_Max_Height;
 
 		if (getType() == StormType.SNOWSTORM) {
 			delay = ConfigSnow.Snowstorm_Snow_Buildup_TickRate;
-			loop = (int)((float)ConfigSnow.Snowstorm_Snow_Buildup_LoopAmountBase * getIntensity());
+			loop = (int) ((float) ConfigSnow.Snowstorm_Snow_Buildup_LoopAmountBase * getIntensity());
 			buildupOutsideArea = ConfigSnow.Snowstorm_Snow_Buildup_AllowOutsideColdBiomes;
 			maxBlockStackingAllowed = ConfigSnow.Snowstorm_Snow_Block_Max_Height;
 		}
@@ -178,7 +178,7 @@ public class WeatherObjectParticleStorm extends WeatherObject {
 						if (!world.hasChunkAt(blockPos)) continue;
 
 						if (buildupOutsideArea ||
-								canSpawnHere(world, blockPos, getType(), false)) {
+							canSpawnHere(world, blockPos, getType(), false)) {
 							WeatherUtilBlock.fillAgainstWallSmoothly(world, new Vec3(blockPos.getX(), blockPos.getY(), blockPos.getZ()), angle, 15, 2, getBlockForBuildup(), maxBlockStackingAllowed);
 						}
 					}
@@ -223,8 +223,7 @@ public class WeatherObjectParticleStorm extends WeatherObject {
 	}
 
 	@Override
-	public void read()
-	{
+	public void read() {
 		super.read();
 		nbtSyncFromServer();
 		CachedNBTTagCompound var1 = this.getNbtCache();
@@ -232,8 +231,7 @@ public class WeatherObjectParticleStorm extends WeatherObject {
 	}
 
 	@Override
-	public void write()
-	{
+	public void write() {
 		super.write();
 		nbtSyncForClient();
 

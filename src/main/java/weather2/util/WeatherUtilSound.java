@@ -34,8 +34,8 @@ public class WeatherUtilSound {
     public static long soundTimer[] = new long[6];
     
     public static void init() {
-    	Random rand = new Random();
-    	snd_tornado_dmg_close[0] = "destruction_0_";
+        Random rand = new Random();
+        snd_tornado_dmg_close[0] = "destruction_0_";
         snd_tornado_dmg_close[1] = "destruction_1_";
         snd_tornado_dmg_close[2] = "destruction_2_";
         snd_wind_close[0] = "wind_close_0_";

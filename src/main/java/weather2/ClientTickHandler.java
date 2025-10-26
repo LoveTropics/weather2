@@ -26,7 +26,7 @@ public class ClientTickHandler
 	public static final ClientTickHandler INSTANCE = new ClientTickHandler();
 
 	public static Level lastWorld;
-	
+
 	public static WeatherManagerClient weatherManager;
 	public static SceneEnhancer sceneEnhancer;
 
@@ -141,26 +141,27 @@ public class ClientTickHandler
 
     public static WeatherManagerClient getClientWeather() {
 
-    	try {
+		try {
 			Level world = Minecraft.getInstance().level;
-    		if (weatherManager == null || world != lastWorld) {
-    			init(world);
-        	}
-    	} catch (Exception ex) {
-    		Weather.dbg("Weather2: Warning, client received packet before it was ready to use, and failed to init client weather due to null world");
-    	}
+			if (weatherManager == null || world != lastWorld) {
+				init(world);
+			}
+		}
+		catch (Exception ex) {
+			Weather.dbg("Weather2: Warning, client received packet before it was ready to use, and failed to init client weather due to null world");
+		}
 		return weatherManager;
     }
 
     public static void init(Level world) {
 		Weather.dbg("Weather2: Initializing WeatherManagerClient for client world and requesting full sync");
 
-    	lastWorld = world;
-    	weatherManager = new WeatherManagerClient(world.dimension());
+		lastWorld = world;
+		weatherManager = new WeatherManagerClient(world.dimension());
 
-    	Minecraft mc = Minecraft.getInstance();
+		Minecraft mc = Minecraft.getInstance();
 
-    	if (particleManagerExtended == null) {
+		if (particleManagerExtended == null) {
 			particleManagerExtended = new ParticleManagerExtended(mc.level, mc.getTextureManager());
 		} else {
 			particleManagerExtended.setLevel((ClientLevel) world);
@@ -179,8 +180,7 @@ public class ClientTickHandler
 		return particleManagerExtended;
 	}
 
-	public static Player getPlayer()
-	{
+	public static Player getPlayer() {
 		return Minecraft.getInstance().player;
 	}
 }

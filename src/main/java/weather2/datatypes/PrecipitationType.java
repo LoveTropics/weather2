@@ -1,10 +1,10 @@
 package weather2.datatypes;
 
 public enum PrecipitationType {
-	NORMAL,
-	ACID,
-	HAIL,
-	SNOW;
+    NORMAL,
+    ACID,
+    HAIL,
+    SNOW;
 
-	public static final PrecipitationType[] VALUES = values();
+    public static final PrecipitationType[] VALUES = values();
 }

@@ -72,9 +72,9 @@ public class EventHandlerForge {
 		if (ent.level().isClientSide && (ent instanceof Player && ((Player) ent).isLocalPlayer())) {
 			onClientPlayerUpdate(event);
 		}
-		/*if (!ent.level.isClientSide && ent instanceof Player) {
-			onServerPlayerUpdate(event);
-		}*/
+        /*if (!ent.level.isClientSide && ent instanceof Player) {
+            onServerPlayerUpdate(event);
+        }*/
 	}
 
 	@SubscribeEvent

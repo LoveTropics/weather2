@@ -37,14 +37,14 @@ public class WeatherManagerClient extends WeatherManager {
 		super.tick();
 		if (!Weather.isLoveTropicsInstalled()) {
 			//TODO: disabled for 1.20, might need to go mixin from here
-			/*ICloudRenderHandler cloudRenderHandler = ((ClientLevel) getWorld()).effects().getCloudRenderHandler();
-			if (cloudRenderHandler == null) {
-				((ClientLevel) getWorld()).effects().setCloudRenderHandler(new CloudRenderHandler());
-			}
-			IWeatherParticleRenderHandler handler = ((ClientLevel) getWorld()).effects().getWeatherParticleRenderHandler();
-			if (handler == null) {
-				((ClientLevel) getWorld()).effects().setWeatherParticleRenderHandler(new WeatherParticleRenderHandler());
-			}*/
+            /*ICloudRenderHandler cloudRenderHandler = ((ClientLevel) getWorld()).effects().getCloudRenderHandler();
+            if (cloudRenderHandler == null) {
+                ((ClientLevel) getWorld()).effects().setCloudRenderHandler(new CloudRenderHandler());
+            }
+            IWeatherParticleRenderHandler handler = ((ClientLevel) getWorld()).effects().getWeatherParticleRenderHandler();
+            if (handler == null) {
+                ((ClientLevel) getWorld()).effects().setWeatherParticleRenderHandler(new WeatherParticleRenderHandler());
+            }*/
 
 			boolean cloudTest = false;
 			if (cloudTest) {
@@ -86,11 +86,11 @@ public class WeatherManagerClient extends WeatherManager {
 			//turns out it was IDEA caching builds for some ungodly reason, remove this code
 			String dimID = stormNBT.getStringOr("dimID", "");
 
-			/*CULog.dbg(dimID + " vs " + this.dimension.toString());
-			if (!dimID.equals(this.dimension.toString())) {
-				CULog.dbg("dimensions dont match, aborting sync of new tornado");
-				return;
-			}*/
+            /*CULog.dbg(dimID + " vs " + this.dimension.toString());
+            if (!dimID.equals(this.dimension.toString())) {
+                CULog.dbg("dimensions dont match, aborting sync of new tornado");
+                return;
+            }*/
 
 			EnumWeatherObjectType weatherObjectType = EnumWeatherObjectType.get(stormNBT.getIntOr("weatherObjectType", 0));
 
@@ -99,10 +99,10 @@ public class WeatherManagerClient extends WeatherManager {
 				wo = new StormObject(ClientTickHandler.weatherManager);
 			} else if (weatherObjectType == EnumWeatherObjectType.SAND) {
 				wo = new WeatherObjectParticleStorm(ClientTickHandler.weatherManager);
-				((WeatherObjectParticleStorm)wo).setType(WeatherObjectParticleStorm.StormType.SANDSTORM);
+				((WeatherObjectParticleStorm) wo).setType(WeatherObjectParticleStorm.StormType.SANDSTORM);
 			} else if (weatherObjectType == EnumWeatherObjectType.SNOW) {
 				wo = new WeatherObjectParticleStorm(ClientTickHandler.weatherManager);
-				((WeatherObjectParticleStorm)wo).setType(WeatherObjectParticleStorm.StormType.SNOWSTORM);
+				((WeatherObjectParticleStorm) wo).setType(WeatherObjectParticleStorm.StormType.SNOWSTORM);
 			}
 
 			//StormObject so
@@ -179,10 +179,10 @@ public class WeatherManagerClient extends WeatherManager {
 					float randRange = 3;
 					for (int i = 0; i < extraCubes; i++) {
 						ParticleCube hail = new ParticleCube(getWorld(),
-								posX + (rand.nextFloat() - rand.nextFloat()) * randRange,
-								posY + (rand.nextFloat() - rand.nextFloat()) * randRange,
-								posZ + (rand.nextFloat() - rand.nextFloat()) * randRange,
-								0D, 0D, 0D, state);
+							posX + (rand.nextFloat() - rand.nextFloat()) * randRange,
+							posY + (rand.nextFloat() - rand.nextFloat()) * randRange,
+							posZ + (rand.nextFloat() - rand.nextFloat()) * randRange,
+							0D, 0D, 0D, state);
 						SceneEnhancer.checkParticleBehavior();
 						SceneEnhancer.particleBehavior.initParticleCube(hail);
 						storm.listParticlesDebris.add(hail);

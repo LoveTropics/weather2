@@ -20,9 +20,9 @@ public class WeatherObject {
 	 * helps with multiplayer, requiring 30 seconds of no players near before removal
 	 */
 	public int ticksSinceNoNearPlayer = 0;
-	
+
 	public WeatherManager manager;
-	
+
 	public Vec3 pos = Vec3.ZERO;
 	public Vec3 posGround = Vec3.ZERO;
 	public Vec3 motion = Vec3.ZERO;
@@ -42,64 +42,64 @@ public class WeatherObject {
 		manager = parManager;
 		nbtCache = new CachedNBTTagCompound();
 	}
-	
+
 	public void initFirstTime() {
 		ID = lastUsedStormID++;
 	}
-	
+
 	public void tick() {
-		
+
 	}
-	
+
 	@OnlyIn(Dist.CLIENT)
 	public void tickRender(float partialTick) {
-		
+
 	}
-	
+
 	public void reset() {
 		remove();
 	}
-	
+
 	public void remove() {
 		//Weather.dbg("storm killed, ID: " + ID);
-		
+
 		isDead = true;
-		
+
 		//cleanup memory
 		//if (FMLCommonHandler.instance().getEffectiveSide() == Dist.CLIENT/*manager.getWorld().isRemote*/) {
 		if (EffectiveSide.get().equals(LogicalSide.CLIENT)) {
 			cleanupClient();
 		}
-		
+
 		cleanup();
 	}
-	
+
 	public void cleanup() {
 		manager = null;
 	}
-	
+
 	@OnlyIn(Dist.CLIENT)
 	public void cleanupClient() {
-		
+
 	}
-	
+
 	public int getUpdateRateForNetwork() {
 		return 40;
 	}
-	
+
 	public void read() {
-		
-    }
-	
+
+	}
+
 	public void write() {
 
     }
-	
+
 	public void nbtSyncFromServer() {
 		CachedNBTTagCompound parNBT = this.getNbtCache();
 		ID = parNBT.getLong("ID");
 		//Weather.dbg("StormObject " + ID + " receiving sync");
-		
+
 		pos = new Vec3(parNBT.getDouble("posX"), parNBT.getDouble("posY"), parNBT.getDouble("posZ"));
 		//motion = new Vec3(parNBT.getDouble("motionX"), parNBT.getDouble("motionY"), parNBT.getDouble("motionZ"));
 		motion = new Vec3(parNBT.getDouble("vecX"), parNBT.getDouble("vecY"), parNBT.getDouble("vecZ"));
@@ -107,16 +107,16 @@ public class WeatherObject {
 		maxSize = parNBT.getInt("maxSize");
 		this.weatherObjectType = EnumWeatherObjectType.get(parNBT.getInt("weatherObjectType"));
 	}
-	
+
 	public void nbtSyncForClient() {
 		CachedNBTTagCompound nbt = this.getNbtCache();
 		nbt.putDouble("posX", pos.x);
 		nbt.putDouble("posY", pos.y);
 		nbt.putDouble("posZ", pos.z);
 
-		/*nbt.putDouble("motionX", motion.xCoord);
-		nbt.putDouble("motionY", motion.yCoord);
-		nbt.putDouble("motionZ", motion.zCoord);*/
+        /*nbt.putDouble("motionX", motion.xCoord);
+        nbt.putDouble("motionY", motion.yCoord);
+        nbt.putDouble("motionZ", motion.zCoord);*/
 		nbt.putDouble("vecX", motion.x);
 		nbt.putDouble("vecY", motion.y);
 		nbt.putDouble("vecZ", motion.z);
@@ -129,9 +129,9 @@ public class WeatherObject {
 		nbt.putInt("maxSize", maxSize);
 		nbt.putInt("weatherObjectType", this.weatherObjectType.ordinal());
 
-		/*if (manager != null && manager.getWorld() != null) {
-			nbt.putString("dimID", manager.getWorld().dimension().toString());
-		}*/
+        /*if (manager != null && manager.getWorld() != null) {
+            nbt.putString("dimID", manager.getWorld().dimension().toString());
+        }*/
 	}
 
 	public CachedNBTTagCompound getNbtCache() {
@@ -145,5 +145,5 @@ public class WeatherObject {
 	public int getSize() {
 		return size;
 	}
-	
+
 }

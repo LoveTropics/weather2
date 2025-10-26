@@ -89,9 +89,9 @@ public class ServerTickHandler {
 			}
 
 			//TODO: only sync when things change? is now sent via PlayerLoggedInEvent at least
-			/*if (event.level.getGameTime() % 200 == 0) {
-				syncServerConfigToClient(null);
-			}*/
+            /*if (event.level.getGameTime() % 200 == 0) {
+                syncServerConfigToClient(null);
+            }*/
 		}
 
 	}

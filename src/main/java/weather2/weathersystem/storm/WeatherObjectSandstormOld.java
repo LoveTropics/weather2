@@ -25,21 +25,21 @@ import weather2.weathersystem.wind.WindManager;
 public class WeatherObjectSandstormOld extends WeatherObject {
 
 	public int age = 0;
-	public int maxAge = 20*20;
+	public int maxAge = 20 * 20;
 
 	public Random rand = new Random();
-	
+
 	public WeatherObjectSandstormOld(WeatherManager parManager) {
 		super(parManager);
-		
+
 		this.weatherObjectType = EnumWeatherObjectType.SAND;
 	}
-	
+
 	public void initSandstormSpawn(Vec3 pos) {
 		this.pos = pos;
-		this.maxAge = 20*60*5;
+		this.maxAge = 20 * 60 * 5;
 	}
-	
+
 	public static boolean isDesert(Biome biome) {
 		return isDesert(biome, false);
 	}
@@ -51,7 +51,7 @@ public class WeatherObjectSandstormOld extends WeatherObject {
 	public int getSize() {
 		return 250;
 	}
-	
+
 	@Override
 	public void tick() {
 		super.tick();
@@ -79,9 +79,9 @@ public class WeatherObjectSandstormOld extends WeatherObject {
 		float age = this.age;
 		float maxAge = this.maxAge;
 		if (age / maxAge <= 0.5F) {
-			return age / (maxAge/2);
+			return age / (maxAge / 2);
 		} else {
-			return 1F - (age / (maxAge/2) - 1F);
+			return 1F - (age / (maxAge / 2) - 1F);
 		}
 	}
 
@@ -99,7 +99,7 @@ public class WeatherObjectSandstormOld extends WeatherObject {
 
 		//keep it set to do a lot of work only occasionally, prevents chunk render tick spam for client which kills fps
 		int delay = ConfigSand.Sandstorm_Sand_Buildup_TickRate;
-		int loop = (int)((float)ConfigSand.Sandstorm_Sand_Buildup_LoopAmountBase * getIntensity());
+		int loop = (int) ((float) ConfigSand.Sandstorm_Sand_Buildup_LoopAmountBase * getIntensity());
 
 		//sand block buildup
 		if (!world.isClientSide) {
@@ -137,12 +137,12 @@ public class WeatherObjectSandstormOld extends WeatherObject {
 		Vec3 vec = new Vec3(x, y, z);
 		return vec;
 	}
-	
+
 	@Override
 	public int getUpdateRateForNetwork() {
 		return 1;
 	}
-	
+
 	@Override
 	public void nbtSyncForClient() {
 		super.nbtSyncForClient();
@@ -150,7 +150,7 @@ public class WeatherObjectSandstormOld extends WeatherObject {
 		data.putInt("age", age);
 		data.putInt("maxAge", maxAge);
 	}
-	
+
 	@Override
 	public void nbtSyncFromServer() {
 		super.nbtSyncFromServer();
@@ -160,8 +160,7 @@ public class WeatherObjectSandstormOld extends WeatherObject {
 	}
 
 	@Override
-	public void read()
-	{
+	public void read() {
 		super.read();
 		nbtSyncFromServer();
 		CachedNBTTagCompound var1 = this.getNbtCache();
@@ -169,8 +168,7 @@ public class WeatherObjectSandstormOld extends WeatherObject {
 	}
 
 	@Override
-	public void write()
-	{
+	public void write() {
 		super.write();
 		nbtSyncForClient();
 

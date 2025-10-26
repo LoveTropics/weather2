@@ -118,21 +118,21 @@ public class WeatherUtil {
         listGrabBlockCache.put(registeredName, !returnVal);
         return !returnVal;
     }
-	
+
     public static boolean isPaused() {
-    	if (Minecraft.getInstance().isPaused()) return true;
-    	return false;
+        if (Minecraft.getInstance().isPaused()) return true;
+        return false;
     }
-    
+
     public static boolean isPausedSideSafe(Level world) {
-    	//return false if server side because it cant be paused legit
-    	if (!world.isClientSide) return false;
-    	return isPausedForClient();
+        //return false if server side because it cant be paused legit
+        if (!world.isClientSide) return false;
+        return isPausedForClient();
     }
-    
+
     public static boolean isPausedForClient() {
-    	if (Minecraft.getInstance().isPaused()) return true;
-    	return false;
+        if (Minecraft.getInstance().isPaused()) return true;
+        return false;
     }
 
     public static boolean isAprilFoolsDay() {
@@ -285,5 +285,5 @@ public class WeatherUtil {
         double d2 = vec2.z - vec1.z;
         return Math.sqrt(d0 * d0 + d1 * d1 + d2 * d2);
     }
-    
+
 }

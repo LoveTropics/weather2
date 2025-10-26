@@ -65,7 +65,7 @@ public abstract class WeatherManager implements IWorldData {
 				WeatherObject so = list.get(i);
 				if (this instanceof WeatherManagerServer && so.isDead) {
 					removeStormObject(so.ID);
-					((WeatherManagerServer)this).syncStormRemove(so);
+					((WeatherManagerServer) this).syncStormRemove(so);
 				} else {
 
 					if (!so.isDead) {
@@ -152,7 +152,8 @@ public abstract class WeatherManager implements IWorldData {
 						obj.tickRender(partialTick);
 					}
 				}
-			} catch (Exception e) {
+			}
+			catch (Exception e) {
 				e.printStackTrace();
 			}
 		}
@@ -223,8 +224,8 @@ public abstract class WeatherManager implements IWorldData {
 				double dist = storm.pos.distanceTo(parPos);
 				if (dist < closestDist && dist <= maxDist && !storm.isFirenado) {
 					if ((storm.attrib_precipitation && orRain) ||
-							((severityFlagMin == -1 || storm.levelCurIntensityStage >= severityFlagMin) &&
-									(severityFlagMax == -1 || storm.levelCurIntensityStage <= severityFlagMax))) {
+						((severityFlagMin == -1 || storm.levelCurIntensityStage >= severityFlagMin) &&
+							(severityFlagMax == -1 || storm.levelCurIntensityStage <= severityFlagMax))) {
 						closestStorm = storm;
 						closestDist = dist;
 					}
@@ -235,12 +236,12 @@ public abstract class WeatherManager implements IWorldData {
 		return closestStorm;
 
 		//not sure i can avoid a double use of distance calculation adding to iteration cost, this method might not be stream worthy
-		/*return getStormObjects().stream()
-				.map(wo -> (StormObject)wo)
-				.filter(so -> !so.isDead)
-				.filter(so -> (so.attrib_precipitation && orRain) || (severityFlagMin == -1 || so.levelCurIntensityStage >= severityFlagMin))
-				.filter(so -> so.pos.distanceTo(parPos) < maxDist)
-				.min(Comparator.comparing(so -> so.pos.distanceTo(parPos))).orElse(null);*/
+        /*return getStormObjects().stream()
+                .map(wo -> (StormObject)wo)
+                .filter(so -> !so.isDead)
+                .filter(so -> (so.attrib_precipitation && orRain) || (severityFlagMin == -1 || so.levelCurIntensityStage >= severityFlagMin))
+                .filter(so -> so.pos.distanceTo(parPos) < maxDist)
+                .min(Comparator.comparing(so -> so.pos.distanceTo(parPos))).orElse(null);*/
 	}
 
 	public boolean isPrecipitatingAt(BlockPos pos) {
@@ -254,27 +255,27 @@ public abstract class WeatherManager implements IWorldData {
 	 * @return
 	 */
 	public boolean isPrecipitatingAt(Vec3 parPos) {
-		/*List<WeatherObject> listStorms = getStormObjects();
+        /*List<WeatherObject> listStorms = getStormObjects();
 
-		for (int i = 0; i < listStorms.size(); i++) {
-			WeatherObject wo = listStorms.get(i);
-			if (wo instanceof StormObject) {
-				StormObject storm = (StormObject) wo;
-				if (storm == null || storm.isDead) continue;
-				if (storm.attrib_precipitation) {
-					double dist = storm.pos.distanceTo(parPos);
-					if (dist < storm.size) {
-						return true;
-					}
-				}
-			}
-		}
+        for (int i = 0; i < listStorms.size(); i++) {
+            WeatherObject wo = listStorms.get(i);
+            if (wo instanceof StormObject) {
+                StormObject storm = (StormObject) wo;
+                if (storm == null || storm.isDead) continue;
+                if (storm.attrib_precipitation) {
+                    double dist = storm.pos.distanceTo(parPos);
+                    if (dist < storm.size) {
+                        return true;
+                    }
+                }
+            }
+        }
 
-		return false;*/
+        return false;*/
 
 		return getStormObjects().stream()
-				.map(wo -> (StormObject)wo)
-				.anyMatch(so -> !so.isDead && so.attrib_precipitation && so.pos.distanceTo(parPos) < so.size);
+			.map(wo -> (StormObject) wo)
+			.anyMatch(so -> !so.isDead && so.attrib_precipitation && so.pos.distanceTo(parPos) < so.size);
 	}
 
 	/**
@@ -297,9 +298,9 @@ public abstract class WeatherManager implements IWorldData {
 				WeatherObjectSandstormOld storm = (WeatherObjectSandstormOld) wo;
 				if (storm == null || storm.isDead) continue;
 				double dist = storm.pos.distanceTo(parPos);
-				/*if (getWorld().isRemote) {
-					System.out.println("close storm candidate: " + dist + " - " + storm.state + " - " + storm.attrib_rain);
-				}*/
+                /*if (getWorld().isRemote) {
+                    System.out.println("close storm candidate: " + dist + " - " + storm.state + " - " + storm.attrib_rain);
+                }*/
 				if (dist < closestDist && dist <= maxDist) {
 					//if ((storm.attrib_precipitation && orRain) || (severityFlagMin == -1 || storm.levelCurIntensityStage >= severityFlagMin)) {
 					closestStorm = storm;
@@ -343,7 +344,7 @@ public abstract class WeatherManager implements IWorldData {
 					storms.add(storm);
 				}
 			} else if (wo instanceof WeatherObjectSandstormOld && ConfigStorm.Storm_Deflector_RemoveSandstorms) {
-				WeatherObjectSandstormOld sandstorm = (WeatherObjectSandstormOld)wo;
+				WeatherObjectSandstormOld sandstorm = (WeatherObjectSandstormOld) wo;
 				double distToStorm = parPos.distanceTo(sandstorm.pos);
 				if (distToStorm < maxDist) {
 					storms.add(wo);
@@ -366,7 +367,7 @@ public abstract class WeatherManager implements IWorldData {
 					storms.add(storm);
 				}
 			} else if (wo instanceof WeatherObjectSandstormOld) {
-				WeatherObjectSandstormOld sandstorm = (WeatherObjectSandstormOld)wo;
+				WeatherObjectSandstormOld sandstorm = (WeatherObjectSandstormOld) wo;
 				double distToStorm = parPos.distanceTo(sandstorm.pos);
 				if (distToStorm < maxDist) {
 					storms.add(wo);
@@ -440,34 +441,33 @@ public abstract class WeatherManager implements IWorldData {
 			CompoundTag stormData = nbtStorms.getCompoundOrEmpty(tagName);
 
 			//if (ServerTickHandler.getWeatherManagerFor(dimension) != null) {
-				WeatherObject wo = null;
+			WeatherObject wo = null;
 			if (stormData.getIntOr("weatherObjectType", -1) == EnumWeatherObjectType.CLOUD.ordinal()) {
-					wo = new StormObject(this);
+				wo = new StormObject(this);
+			} else if (stormData.getIntOr("weatherObjectType", -1) == EnumWeatherObjectType.SAND.ordinal()) {
+				wo = new WeatherObjectParticleStorm(this);
+				((WeatherObjectParticleStorm) wo).setType(WeatherObjectParticleStorm.StormType.SANDSTORM);
+				//initStormNew???
+			} else if (stormData.getIntOr("weatherObjectType", -1) == EnumWeatherObjectType.SNOW.ordinal()) {
+				wo = new WeatherObjectParticleStorm(this);
+				((WeatherObjectParticleStorm) wo).setType(WeatherObjectParticleStorm.StormType.SNOWSTORM);
+				//initStormNew???
 			}
-			else if (stormData.getIntOr("weatherObjectType", -1) == EnumWeatherObjectType.SAND.ordinal()) {
-					wo = new WeatherObjectParticleStorm(this);
-					((WeatherObjectParticleStorm)wo).setType(WeatherObjectParticleStorm.StormType.SANDSTORM);
-					//initStormNew???
+			try {
+				wo.getNbtCache().setNewNBT(stormData);
+				wo.read();
+				wo.getNbtCache().updateCacheFromNew();
 			}
-			else if (stormData.getIntOr("weatherObjectType", -1) == EnumWeatherObjectType.SNOW.ordinal()) {
-					wo = new WeatherObjectParticleStorm(this);
-					((WeatherObjectParticleStorm)wo).setType(WeatherObjectParticleStorm.StormType.SNOWSTORM);
-					//initStormNew???
-				}
-				try {
-					wo.getNbtCache().setNewNBT(stormData);
-					wo.read();
-					wo.getNbtCache().updateCacheFromNew();
-				} catch (Exception ex) {
-					ex.printStackTrace();
-				}
-				addStormObject(wo);
+			catch (Exception ex) {
+				ex.printStackTrace();
+			}
+			addStormObject(wo);
 
-				//TODO: possibly unneeded/redundant/bug inducing, packets will be sent upon request from client
-				((WeatherManagerServer)(this)).syncStormNew(wo);
-			/*} else {
-				System.out.println("WARNING: trying to load storm objects for missing dimension: " + dimension);
-			}*/
+			//TODO: possibly unneeded/redundant/bug inducing, packets will be sent upon request from client
+			((WeatherManagerServer) (this)).syncStormNew(wo);
+            /*} else {
+                System.out.println("WARNING: trying to load storm objects for missing dimension: " + dimension);
+            }*/
 		}
 
 		CompoundTag nbtDeflectors = data.getCompoundOrEmpty("deflectorData");

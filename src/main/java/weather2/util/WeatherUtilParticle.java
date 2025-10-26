@@ -64,8 +64,8 @@ public class WeatherUtilParticle {
         }
         catch (Exception ex)
         {
-        	//System.out.println("temp message: obf reflection fail!");
-        	//ex.printStackTrace();
+            //System.out.println("temp message: obf reflection fail!");
+            //ex.printStackTrace();
             try
             {
                 field = (ParticleEngine.class).getDeclaredField("f_107289_");
@@ -82,7 +82,7 @@ public class WeatherUtilParticle {
     @OnlyIn(Dist.CLIENT)
     public static float getParticleWeight(EntityRotFX entity1)
     {
-    	//commented out for weather2 copy
+        //commented out for weather2 copy
         /*if (entity1 instanceof EntityFallingRainFX)
         {
             return 1.1F;

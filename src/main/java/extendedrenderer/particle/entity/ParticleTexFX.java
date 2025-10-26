@@ -21,7 +21,7 @@ public class ParticleTexFX extends EntityRotFX {
         this.setLifetime(100);
         this.setCanCollide(false);
     }
-	
+
 	public float getParticleGravity() {
 		return this.gravity;
 	}

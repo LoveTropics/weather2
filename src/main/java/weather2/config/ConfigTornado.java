@@ -92,7 +92,7 @@ public class ConfigTornado implements IConfigCategory {
 		WeatherUtil.updateGrabBlockList(Storm_Tornado_GrabList);
 
 		//if (ConfigCoroUtil.useLoggingDebug) {
-			//WeatherUtil.testAllBlocks();
+		//WeatherUtil.testAllBlocks();
 		//}
     }
 }

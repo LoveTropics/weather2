@@ -40,10 +40,11 @@ public final class ClientWeatherProxy {
 	public float getRainAmount() {
 		if (isWeatherEffectsServerSideControlled()) {
 			return ClientWeatherIntegration.get().getRainAmount();
-		/*} else if (ClientTickHandler.clientConfigData.overcastMode) {
-			if (Minecraft.getInstance().level == null) return 0;
-			return Math.max(0, Minecraft.getInstance().level.rainLevel * SceneEnhancer.downfallSheetThreshold - 0.02F); //enough rain without the downfall
-		*/} else {
+        /*} else if (ClientTickHandler.clientConfigData.overcastMode) {
+            if (Minecraft.getInstance().level == null) return 0;
+            return Math.max(0, Minecraft.getInstance().level.rainLevel * SceneEnhancer.downfallSheetThreshold - 0.02F); //enough rain without the downfall
+        */
+		} else {
 			return ClientWeatherHelper.get().getPrecipitationStrength(Minecraft.getInstance().player);
 		}
 	}
@@ -51,10 +52,11 @@ public final class ClientWeatherProxy {
 	public float getVanillaRainAmount() {
 		if (Weather.isLoveTropicsInstalled()) {
 			return ClientWeatherIntegration.get().getVanillaRainAmount();
-		/*} else if (ClientTickHandler.clientConfigData.overcastMode) {
-			if (Minecraft.getInstance().level == null) return 0;
-			return Minecraft.getInstance().level.rainLevel * 1F;
-		*/} else {
+        /*} else if (ClientTickHandler.clientConfigData.overcastMode) {
+            if (Minecraft.getInstance().level == null) return 0;
+            return Minecraft.getInstance().level.rainLevel * 1F;
+        */
+		} else {
 			return ClientWeatherHelper.get().getPrecipitationStrength(Minecraft.getInstance().player);
 		}
 	}

@@ -45,7 +45,7 @@ public class SoundRegistry {
 		register("streaming.siren_sandstorm_4");
 		register("streaming.siren_sandstorm_5_extra");
 		register("streaming.siren_sandstorm_6_extra");
-		
+
 	}
 
 	public static void register(String soundPath) {
@@ -55,12 +55,12 @@ public class SoundRegistry {
 		//TODO: WIP SoundEvent event = SoundEvent.createVariableRangeEvent(resLoc).setRegistryName(resLoc);
 		//ForgeRegistries.SOUND_EVENTS.register(resLoc, event);
 		SOUND_EVENTS.register(
-				soundPath, // must match the resource location on the next line
-		() -> {
-			//SoundEvent event = SoundEvent.createVariableRangeEvent(ResourceLocation.fromNamespaceAndPath(Weather.MODID, soundPath));
-			lookupStringToEvent.put(soundPath, event);
-			return event;
-		});
+			soundPath, // must match the resource location on the next line
+			() -> {
+				//SoundEvent event = SoundEvent.createVariableRangeEvent(ResourceLocation.fromNamespaceAndPath(Weather.MODID, soundPath));
+				lookupStringToEvent.put(soundPath, event);
+				return event;
+			});
 		if (lookupStringToEvent.containsKey(soundPath)) {
 			System.out.println("WEATHER SOUNDS WARNING: duplicate sound registration for " + soundPath);
 		}

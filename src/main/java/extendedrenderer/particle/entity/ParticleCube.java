@@ -86,57 +86,57 @@ public class ParticleCube extends ParticleTexFX {
 		Vector3f[] face;
 
 		//xy -z
-		face = new Vector3f[]{
-				new Vector3f(-1.0F, -1.0F, -1.0F),
-				new Vector3f(-1.0F, 1.0F, -1.0F),
-				new Vector3f(1.0F, 1.0F, -1.0F),
-				new Vector3f(1.0F, -1.0F, -1.0F)};
+		face = new Vector3f[] {
+			new Vector3f(-1.0F, -1.0F, -1.0F),
+			new Vector3f(-1.0F, 1.0F, -1.0F),
+			new Vector3f(1.0F, 1.0F, -1.0F),
+			new Vector3f(1.0F, -1.0F, -1.0F)};
 		faces.add(face);
 
 		//xy +z
-		face = new Vector3f[]{
-				new Vector3f(-1.0F, -1.0F, 1.0F),
-				new Vector3f(-1.0F, 1.0F, 1.0F),
-				new Vector3f(1.0F, 1.0F, 1.0F),
-				new Vector3f(1.0F, -1.0F, 1.0F)};
+		face = new Vector3f[] {
+			new Vector3f(-1.0F, -1.0F, 1.0F),
+			new Vector3f(-1.0F, 1.0F, 1.0F),
+			new Vector3f(1.0F, 1.0F, 1.0F),
+			new Vector3f(1.0F, -1.0F, 1.0F)};
 		faces.add(face);
 
 		//yz -x
-		face = new Vector3f[]{
-				new Vector3f(-1.0F, -1.0F, -1.0F),
-				new Vector3f(-1.0F, 1.0F, -1.0F),
-				new Vector3f(-1.0F, 1.0F, 1.0F),
-				new Vector3f(-1.0F, -1.0F, 1.0F)};
+		face = new Vector3f[] {
+			new Vector3f(-1.0F, -1.0F, -1.0F),
+			new Vector3f(-1.0F, 1.0F, -1.0F),
+			new Vector3f(-1.0F, 1.0F, 1.0F),
+			new Vector3f(-1.0F, -1.0F, 1.0F)};
 		faces.add(face);
 
 		//yz +x
-		face = new Vector3f[]{
-				new Vector3f(1.0F, -1.0F, -1.0F),
-				new Vector3f(1.0F, 1.0F, -1.0F),
-				new Vector3f(1.0F, 1.0F, 1.0F),
-				new Vector3f(1.0F, -1.0F, 1.0F)};
+		face = new Vector3f[] {
+			new Vector3f(1.0F, -1.0F, -1.0F),
+			new Vector3f(1.0F, 1.0F, -1.0F),
+			new Vector3f(1.0F, 1.0F, 1.0F),
+			new Vector3f(1.0F, -1.0F, 1.0F)};
 		faces.add(face);
 
 		//xz -y
-		face = new Vector3f[]{
-				new Vector3f(-1.0F, -1.0F, -1.0F),
-				new Vector3f(-1.0F, -1.0F, 1.0F),
-				new Vector3f(1.0F, -1.0F, 1.0F),
-				new Vector3f(1.0F, -1.0F, -1.0F)};
+		face = new Vector3f[] {
+			new Vector3f(-1.0F, -1.0F, -1.0F),
+			new Vector3f(-1.0F, -1.0F, 1.0F),
+			new Vector3f(1.0F, -1.0F, 1.0F),
+			new Vector3f(1.0F, -1.0F, -1.0F)};
 		faces.add(face);
 
 		//xz +y
-		face = new Vector3f[]{
-				new Vector3f(-1.0F, 1.0F, -1.0F),
-				new Vector3f(-1.0F, 1.0F, 1.0F),
-				new Vector3f(1.0F, 1.0F, 1.0F),
-				new Vector3f(1.0F, 1.0F, -1.0F)};
+		face = new Vector3f[] {
+			new Vector3f(-1.0F, 1.0F, -1.0F),
+			new Vector3f(-1.0F, 1.0F, 1.0F),
+			new Vector3f(1.0F, 1.0F, 1.0F),
+			new Vector3f(1.0F, 1.0F, -1.0F)};
 		faces.add(face);
 
 		float f4 = this.getQuadSize(partialTicks);
 
 		for (Vector3f[] entryFace : faces) {
-			for(int i = 0; i < 4; ++i) {
+			for (int i = 0; i < 4; ++i) {
 				entryFace[i].rotate(quaternion);
 				entryFace[i].mul(f4);
 				entryFace[i].add(f, f1, f2);

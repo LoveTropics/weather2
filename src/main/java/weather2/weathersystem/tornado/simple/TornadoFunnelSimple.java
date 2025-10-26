@@ -197,9 +197,9 @@ public class TornadoFunnelSimple {
              */
 
             List<PivotingParticle> listLayer = listLayers.get(i).getListParticles();
-			List<PivotingParticle> listLayerExtra = listLayers.get(i).getListParticlesExtra();
+            List<PivotingParticle> listLayerExtra = listLayers.get(i).getListParticlesExtra();
 
-			float radius = config.getRadiusOfBase() + (config.getRadiusIncreasePerLayer() * (i));
+            float radius = config.getRadiusOfBase() + (config.getRadiusIncreasePerLayer() * (i));
             float radiusAdjustedForParticleSize = radius * (radius / radiusMax);
 
             float circumference = radius * 2 * Mth.PI;

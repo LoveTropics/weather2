@@ -172,7 +172,7 @@ public class Weather
     private void processIMC(final InterModProcessEvent event)
     {
         LOGGER.info("Got IMC {}", event.getIMCStream().
-			map(m -> m.messageSupplier().get()).
+            map(m -> m.messageSupplier().get()).
                 collect(Collectors.toList()));
     }
 
@@ -209,10 +209,10 @@ public class Weather
      * @param event
      */
     private void gatherData(GatherDataEvent event) {
-		event.createProvider(WeatherRecipeProvider.Runner::new);
-		event.createProvider((output, lookupProvider) -> new LootTableProvider(output, Set.of(),
-			List.of(new LootTableProvider.SubProviderEntry(BlockLootTables::new, LootContextParamSets.BLOCK)), lookupProvider));
-		gatherClientData(event);
+        event.createProvider(WeatherRecipeProvider.Runner::new);
+        event.createProvider((output, lookupProvider) -> new LootTableProvider(output, Set.of(),
+            List.of(new LootTableProvider.SubProviderEntry(BlockLootTables::new, LootContextParamSets.BLOCK)), lookupProvider));
+        gatherClientData(event);
     }
 
     /**
@@ -223,7 +223,7 @@ public class Weather
      */
     @OnlyIn(Dist.CLIENT)
     private void gatherClientData(GatherDataEvent event) {
-		event.createProvider(ParticleRegistry::new);
-		event.createProvider(BlockAndItemProvider::new);
+        event.createProvider(ParticleRegistry::new);
+        event.createProvider(BlockAndItemProvider::new);
     }
 }

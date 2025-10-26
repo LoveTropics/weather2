@@ -157,7 +157,7 @@ public class FogAdjuster {
         updateWeatherState();
 
         //get vanilla settings
-		if (event.getType() == FogType.ATMOSPHERIC) {
+        if (event.getType() == FogType.ATMOSPHERIC) {
             fogVanilla.setFogStartSky(event.getNearPlaneDistance());
             fogVanilla.setFogEndSky(event.getFarPlaneDistance());
         } else {
@@ -166,7 +166,7 @@ public class FogAdjuster {
         }
 
         if (SceneEnhancer.isFogOverridding()) {
-			if (event.getType() == FogType.ATMOSPHERIC) {
+            if (event.getType() == FogType.ATMOSPHERIC) {
                 event.setNearPlaneDistance(activeProfile.getFogStartSky());
                 event.setFarPlaneDistance(activeProfile.getFogEndSky());
             } else {

@@ -194,9 +194,9 @@ public final class ClientWeatherHelper {
 		}
 
 		//TESTING
-		/*mc.level.getLevelData().setRaining(true);
-		mc.level.setRainLevel(1);
-		mc.level.setThunderLevel(1);*/
+        /*mc.level.getLevelData().setRaining(true);
+        mc.level.setRainLevel(1);
+        mc.level.setThunderLevel(1);*/
 	}
 
 	public void tickRainRates() {

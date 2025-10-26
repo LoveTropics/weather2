@@ -12,15 +12,15 @@ public class WeatherTab extends CreativeModeTab {
 		this.tabIcon = tabIcon;
 	}
 
-	/*WeatherTab() {
-		super(Weather.MODID);
-	}
+    /*WeatherTab() {
+        super(Weather.MODID);
+    }
 
-	@Override
-	public ItemStack makeIcon() {
-		if (tabIcon == null) {
-			tabIcon = new ItemStack(WeatherItems.WEATHER_ITEM.get());
-		}
-		return tabIcon;
-	}*/
+    @Override
+    public ItemStack makeIcon() {
+        if (tabIcon == null) {
+            tabIcon = new ItemStack(WeatherItems.WEATHER_ITEM.get());
+        }
+        return tabIcon;
+    }*/
 }

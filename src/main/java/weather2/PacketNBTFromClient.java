@@ -52,10 +52,10 @@ public record PacketNBTFromClient(CompoundTag nbt) implements PacketBase
         }
     }
 
-	/*@Override
-	public ResourceLocation id() {
-		return WatutMod.PACKET_ID_NBT_FROM_SERVER;
-	}*/
+    /*@Override
+    public ResourceLocation id() {
+        return WatutMod.PACKET_ID_NBT_FROM_SERVER;
+    }*/
 
     @Override
     public CustomPacketPayload.Type<? extends CustomPacketPayload> type() {
