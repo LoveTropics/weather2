@@ -29,7 +29,7 @@ public class WeatherManagerClient extends WeatherManager {
 	//public CloudManager cloudManager = new CloudManager();
 
 	public WeatherManagerClient(ResourceKey<Level> dimension) {
-		super(dimension);
+        setDimension(dimension);
 	}
 
 	@Override

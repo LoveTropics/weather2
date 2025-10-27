@@ -1,15 +1,19 @@
 package weather2.weathersystem;
 
 import com.corosus.coroutil.util.CULog;
+import com.mojang.datafixers.util.Pair;
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.DataResult;
+import com.mojang.serialization.DynamicOps;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.NbtOps;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.saveddata.SavedData;
+import net.minecraft.world.level.saveddata.SavedDataType;
 import net.minecraft.world.phys.Vec3;
-import weather2.IWorldData;
 import weather2.Weather;
-import weather2.WorldNBTData;
 import weather2.config.ConfigStorm;
 import weather2.config.WeatherUtilConfig;
 import weather2.weathersystem.storm.EnumWeatherObjectType;
@@ -25,8 +29,30 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-public abstract class WeatherManager implements IWorldData {
-	public final ResourceKey<Level> dimension;
+public abstract class WeatherManager extends SavedData {
+    //TODO: Ew, this is hacky
+    public static final Codec<WeatherManagerServer> CODEC = new Codec<>() {
+        @Override
+        public <T> DataResult<Pair<WeatherManagerServer, T>> decode(DynamicOps<T> ops, T input) {
+            DataResult<Pair<CompoundTag, T>> data = CompoundTag.CODEC.decode(ops, input);
+            if (data.isError()) {
+                return DataResult.error(() -> "Could not decode compound tag");
+            }
+            WeatherManagerServer weatherManager = new WeatherManagerServer();
+            weatherManager.read(data.result().get().getFirst());
+            return DataResult.success(Pair.of(weatherManager, input));
+        }
+
+        @Override
+        public <T> DataResult<T> encode(WeatherManagerServer input, DynamicOps<T> ops, T prefix) {
+            DataResult<?> result = input.save();
+            return ops.listBuilder() //TODO: This is wrong
+                .add((DataResult<T>) result)
+                .build(prefix);
+        }
+    };
+    public static final SavedDataType<WeatherManagerServer> TYPE = new SavedDataType<>(Weather.MODID + "-" + "weather_data", WeatherManagerServer::new, CODEC, null);
+    private ResourceKey<Level> dimension;
 	private final WindManager wind = new WindManager(this);
 	private List<WeatherObject> listStormObjects = new ArrayList<>();
 	public HashMap<Long, WeatherObject> lookupStormObjectsByID = new HashMap<>();
@@ -50,11 +76,15 @@ public abstract class WeatherManager implements IWorldData {
 
 	private HashMap<Long, BlockPos> lookupWeatherBlockDamageDeflector = new HashMap<>();
 
-	public WeatherManager(ResourceKey<Level> dimension) {
+    public void setDimension(ResourceKey<Level> dimension) {
 		this.dimension = dimension;
 	}
 
-	public abstract Level getWorld();
+    public ResourceKey<Level> getDimension() {
+        return dimension;
+    }
+
+    public abstract Level getWorld();
 
 	public void tick() {
 		Level world = getWorld();
@@ -378,49 +408,43 @@ public abstract class WeatherManager implements IWorldData {
 		return storms;
 	}
 
-	@Override
-	public CompoundTag save(CompoundTag data) {
+    public DataResult<?> save() {
 
-		CULog.dbg("WeatherManager save");
+        CULog.dbg("WeatherManager save");
+        CompoundTag data = new CompoundTag();
+        CompoundTag listStormsNBT = new CompoundTag();
+        for (int i = 0; i < listStormObjects.size(); i++) {
+            WeatherObject obj = listStormObjects.get(i);
+            obj.getNbtCache().setUpdateForced(true);
+            obj.write();
+            obj.getNbtCache().setUpdateForced(false);
+            listStormsNBT.put("storm_" + obj.ID, obj.getNbtCache().getNewNBT());
+        }
+        data.put("stormData", listStormsNBT);
+        CompoundTag listDeflectorsNBT = new CompoundTag();
+        int i = 0;
+        for (Map.Entry<Long, BlockPos> entry : lookupWeatherBlockDamageDeflector.entrySet()) {
+            CULog.dbg("writing out deflector to disk: " + entry.getKey());
+            listDeflectorsNBT.putLong("deflector_" + i, entry.getKey());
+            i++;
+        }
+        data.put("deflectorData", listDeflectorsNBT);
+        data.putLong("lastUsedIDStorm", WeatherObject.lastUsedStormID);
 
-		CompoundTag listStormsNBT = new CompoundTag();
-		for (int i = 0; i < listStormObjects.size(); i++) {
-			WeatherObject obj = listStormObjects.get(i);
-			obj.getNbtCache().setUpdateForced(true);
-			obj.write();
-			obj.getNbtCache().setUpdateForced(false);
-			listStormsNBT.put("storm_" + obj.ID, obj.getNbtCache().getNewNBT());
-		}
-		data.put("stormData", listStormsNBT);
-		CompoundTag listDeflectorsNBT = new CompoundTag();
-		int i = 0;
-		for (Map.Entry<Long, BlockPos> entry : lookupWeatherBlockDamageDeflector.entrySet()) {
-			CULog.dbg("writing out deflector to disk: " + entry.getKey());
-			listDeflectorsNBT.putLong("deflector_" + i, entry.getKey());
-			i++;
-		}
-		data.put("deflectorData", listDeflectorsNBT);
-		data.putLong("lastUsedIDStorm", WeatherObject.lastUsedStormID);
+        data.putLong("lastStormFormed", lastStormFormed);
 
-		data.putLong("lastStormFormed", lastStormFormed);
+        data.putLong("lastSandstormFormed", lastSandstormFormed);
+        data.putLong("lastSnowstormFormed", lastSnowstormFormed);
 
-		data.putLong("lastSandstormFormed", lastSandstormFormed);
-		data.putLong("lastSnowstormFormed", lastSnowstormFormed);
+        data.putFloat("cloudIntensity", this.cloudIntensity);
 
-		data.putFloat("cloudIntensity", this.cloudIntensity);
+        data.put("windMan", wind.write(new CompoundTag()));
+        return CompoundTag.CODEC.encode(data, NbtOps.INSTANCE, new CompoundTag());
+    }
 
-		data.put("windMan", wind.write(new CompoundTag()));
-		return data;
-	}
+    public void read(CompoundTag data) {
 
-	public void read() {
-
-		WorldNBTData worldNBTData = ((ServerLevel) getWorld()).getDataStorage().computeIfAbsent(WorldNBTData.TYPE);
-		worldNBTData.setDataHandler(this);
-
-		CULog.dbg("weather data: " + worldNBTData.getData());
-
-		CompoundTag data = worldNBTData.getData();
+        CULog.dbg("weather data: " + data);
 
 		lastStormFormed = data.getLongOr("lastStormFormed", 0);
 		lastSandstormFormed = data.getLongOr("lastSandstormFormed", 0);
@@ -510,4 +534,9 @@ public abstract class WeatherManager implements IWorldData {
 		this.lookupWeatherBlockDamageDeflector.remove(hash);
 	}
 
+    @Override
+    //backwards compat, the data is always changing
+    public boolean isDirty() {
+        return true;
+    }
 }

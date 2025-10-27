@@ -49,10 +49,10 @@ import java.util.Optional;
 import java.util.Random;
 
 public class WeatherManagerServer extends WeatherManager {
-    private final ServerLevel world;
+    private ServerLevel world;
 
-    public WeatherManagerServer(ServerLevel world) {
-        super(world.dimension());
+    public void setWorld(ServerLevel world) {
+        setDimension(world.dimension());
         this.world = world;
     }
 
@@ -606,10 +606,10 @@ public class WeatherManagerServer extends WeatherManager {
     }
 
     public void playerJoinedWorldSyncFull(ServerPlayer entP) {
-        Weather.dbg("Weather2: playerJoinedWorldSyncFull for dim: " + dimension);
+        Weather.dbg("Weather2: playerJoinedWorldSyncFull for dim: " + getDimension());
         Level world = getWorld();
         if (world != null) {
-            Weather.dbg("Weather2: playerJoinedWorldSyncFull, sending " + getStormObjects().size() + " weather objects to: " + entP.getName() + ", dim: " + dimension);
+            Weather.dbg("Weather2: playerJoinedWorldSyncFull, sending " + getStormObjects().size() + " weather objects to: " + entP.getName() + ", dim: " + getDimension());
             //sync storms
             for (int i = 0; i < getStormObjects().size(); i++) {
                 syncStormNew(getStormObjects().get(i), entP);

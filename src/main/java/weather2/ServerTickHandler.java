@@ -21,6 +21,7 @@ import net.neoforged.neoforge.event.tick.ServerTickEvent;
 import weather2.config.ClientConfigData;
 import weather2.config.ConfigMisc;
 import weather2.config.WeatherUtilConfig;
+import weather2.weathersystem.WeatherManager;
 import weather2.weathersystem.WeatherManagerServer;
 import weather2.weathersystem.storm.StormObject;
 
@@ -39,12 +40,15 @@ public class ServerTickHandler {
 		if (!world.isClientSide() && world instanceof ServerLevel) {
 			ServerLevel serverWorld = (ServerLevel) world;
 			ResourceKey<Level> dimension = serverWorld.dimension();
-			WeatherManagerServer weatherManagerServer = new WeatherManagerServer(serverWorld);
-			if (WeatherUtilConfig.listDimensionsWeather.contains(weatherManagerServer.getWorld().dimension().location().toString())) {
-				weatherManagerServer.read();
-			}
-			MANAGERS.put(dimension, weatherManagerServer);
-			MANAGERSLOOKUP.put(dimension.location().toString(), weatherManagerServer);
+            WeatherManagerServer weatherManagerServer;
+            if (!WeatherUtilConfig.listDimensionsWeather.contains(serverWorld.dimension().location().toString())) {
+                weatherManagerServer = new WeatherManagerServer();
+            } else {
+                weatherManagerServer = serverWorld.getDataStorage().get(WeatherManager.TYPE);
+            }
+            weatherManagerServer.setWorld(serverWorld);
+            MANAGERS.put(dimension, weatherManagerServer);
+            MANAGERSLOOKUP.put(dimension.location().toString(), weatherManagerServer);
 		}
 	}
 
@@ -138,7 +142,7 @@ public class ServerTickHandler {
 					wm.addStormObject(stormObject);
 					wm.syncStormNew(stormObject);
 
-					CULog.dbg("processed imc message: " + tag + " - " + msg + " - " + wm.dimension);
+                    CULog.dbg("processed imc message: " + tag + " - " + msg + " - " + wm.getDimension());
 				} else if (msg.method().equals("firenado")) {
 					StormObject stormObject = new StormObject(wm);
 
