@@ -108,7 +108,6 @@ public class Weather
         WeatherBlocks.registerHandlers(modBus);
         WeatherItems.registerHandlers(modBus);
 
-        NeoForge.EVENT_BUS.register(new EventHandlerForge());
         NeoForge.EVENT_BUS.addListener(this::registerCommands);
         //NeoForge.EVENT_BUS.register(new WeatherBlocks());
         modContainer.getEventBus().addListener(this::registerPackets);
