@@ -1,22 +1,13 @@
 package weather2.mixin.client;
 
-import com.mojang.blaze3d.vertex.PoseStack;
-import net.minecraft.client.Camera;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.particle.ParticleEngine;
-import net.minecraft.client.renderer.LevelRenderer;
-import net.minecraft.client.renderer.LightTexture;
-import net.minecraft.client.renderer.MultiBufferSource;
+import com.llamalad7.mixinextras.injector.ModifyReturnValue;
+import net.neoforged.neoforge.client.extensions.IDimensionSpecialEffectsExtension;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Redirect;
-import weather2.ClientTickHandler;
 import weather2.config.ConfigParticle;
 
-import javax.annotation.Nullable;
-
-@Mixin(LevelRenderer.class)
-public abstract class RenderParticlesOverride {
+@Mixin(IDimensionSpecialEffectsExtension.class)
+public class RenderParticlesOverride {
 
     //replaced by RenderLevelStageEvent.Stage.AFTER_PARTICLES
     /*@Redirect(method = "renderLevel",
@@ -28,15 +19,12 @@ public abstract class RenderParticlesOverride {
 
     }*/
 
-    @Redirect(method = "renderLevel",
-            at = @At(value = "INVOKE",
-                    target = "Lnet/minecraft/client/renderer/LevelRenderer;renderSnowAndRain(Lnet/minecraft/client/renderer/LightTexture;FDDD)V"))
-    public void renderSnowAndRain(LevelRenderer worldRenderer, LightTexture lightmapIn, float partialTicks, double xIn, double yIn, double zIn) {
+    @ModifyReturnValue(method = "renderSnowAndRain", at = @At("RETURN"))
+    private boolean renderSnowAndRain(boolean original) {
         //CULog.dbg("renderSnowAndRain hook");
         //stopping vanilla from running renderRainSnow
-        if (ConfigParticle.Particle_vanilla_precipitation) {
-            worldRenderer.renderSnowAndRain(lightmapIn, partialTicks, xIn, yIn, zIn);
-        }
+        //returns true to disable vanilla renderSnowAndRain
+        return !ConfigParticle.Particle_vanilla_precipitation || original;
     }
 
     /*@Redirect(method = "renderLevel",

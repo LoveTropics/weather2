@@ -14,11 +14,11 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.phys.Vec3;
 import org.joml.Vector3f;
 import weather2.ClientTickHandler;
 import weather2.Weather;
 import weather2.WeatherBlocks;
-import weather2.blockentity.AnemometerBlockEntity;
 import weather2.blockentity.WindVaneBlockEntity;
 import weather2.client.entity.model.WindVaneModel;
 import weather2.weathersystem.WeatherManagerClient;
@@ -62,11 +62,11 @@ public class WindVaneEntityRenderer<T extends BlockEntity> implements BlockEntit
     public WindVaneEntityRenderer(final BlockEntityRendererProvider.Context context) {
         super();
         this.block = WeatherBlocks.BLOCK_WIND_VANE.get();
-        this.model = new WindVaneModel<>(Minecraft.getInstance().getEntityModels().bakeLayer(WindVaneModel.LAYER_LOCATION));
+        this.model = new WindVaneModel(Minecraft.getInstance().getEntityModels().bakeLayer(WindVaneModel.LAYER_LOCATION));
     }
 
     @Override
-    public void render(T te, float partialTicks, PoseStack stack, MultiBufferSource buffer, int combinedLightIn, int combinedOverlayIn) {
+    public void render(T te, float partialTicks, PoseStack stack, MultiBufferSource buffer, int combinedLightIn, int combinedOverlayIn, Vec3 cameraPos) {
         this.model.root().getAllParts().forEach(ModelPart::resetPose);
 
         //fixes for block

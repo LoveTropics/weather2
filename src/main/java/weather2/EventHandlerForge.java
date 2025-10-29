@@ -2,7 +2,6 @@ package weather2;
 
 import com.corosus.coroutil.util.CULog;
 import com.corosus.coroutil.util.CoroUtilCompatibility;
-import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.util.Mth;
@@ -42,7 +41,7 @@ public class EventHandlerForge {
 	public void worldRenderAfterParticles(RenderLevelStageEvent.AfterParticles event) {
 		if (ConfigDebug.Particle_engine_render) {
 			//System.out.println("dsf " + event.getPartialTick().getGameTimeDeltaTicks());
-			ClientTickHandler.particleManagerExtended().render(event.getPoseStack(), null, Minecraft.getInstance().gameRenderer.lightTexture(), event.getCamera(), event.getPartialTick().getGameTimeDeltaPartialTick(false), event.getFrustum());
+            ClientTickHandler.particleManagerExtended().render(event.getCamera(), event.getPartialTick().getGameTimeDeltaTicks(), event.getLevelRenderer().renderBuffers.bufferSource(), event.getFrustum(), type -> true);
 		}
     }
 

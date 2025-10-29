@@ -2,101 +2,106 @@ package extendedrenderer.particle.entity;
 
 import com.corosus.coroutil.util.CoroUtilBlock;
 import com.corosus.coroutil.util.CoroUtilMisc;
-import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.blaze3d.vertex.*;
+import com.mojang.blaze3d.pipeline.BlendFunction;
+import com.mojang.blaze3d.pipeline.RenderPipeline;
+import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Axis;
 import extendedrenderer.particle.behavior.ParticleBehaviors;
+import net.minecraft.Util;
+import net.minecraft.client.Camera;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.particle.ParticleRenderType;
 import net.minecraft.client.particle.TextureSheetParticle;
-import net.minecraft.client.Camera;
-import net.minecraft.client.renderer.GameRenderer;
+import net.minecraft.client.renderer.RenderPipelines;
+import net.minecraft.client.renderer.RenderStateShard;
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.texture.TextureAtlas;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
-import net.minecraft.client.renderer.texture.TextureManager;
-import net.minecraft.client.multiplayer.ClientLevel;
-import net.minecraft.world.entity.Entity;
 import net.minecraft.core.BlockPos;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
-import net.minecraft.world.phys.AABB;
-import net.minecraft.world.phys.Vec3;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.levelgen.Heightmap;
+import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.Vec3;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
-import org.jetbrains.annotations.Nullable;
+import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.fml.common.EventBusSubscriber;
+import net.neoforged.neoforge.client.event.RegisterRenderPipelinesEvent;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
 import weather2.ClientTickHandler;
 import weather2.IWindHandler;
+import weather2.Weather;
 import weather2.config.ConfigParticle;
 import weather2.weathersystem.WeatherManagerClient;
 import weather2.weathersystem.wind.WindManager;
 
 import java.util.List;
-import java.util.stream.Stream;
+import java.util.function.Function;
 
 @OnlyIn(Dist.CLIENT)
-public class EntityRotFX extends TextureSheetParticle implements IWindHandler
-{
-    public static final ParticleRenderType SORTED_TRANSLUCENT = new ParticleRenderType() {
+@EventBusSubscriber(value = Dist.CLIENT)
+public class EntityRotFX extends TextureSheetParticle implements IWindHandler {
+    public static final RenderPipeline TRANSLUCENT_PARTICLE_NO_CULL_PIPELINE = RenderPipeline
+        .builder(RenderPipelines.PARTICLE_SNIPPET)
+        .withLocation(ResourceLocation.fromNamespaceAndPath(Weather.MODID, "pipeline/translucent_particle_no_cull"))
+        .withCull(false)
+        .withBlend(BlendFunction.TRANSLUCENT)
+        .build();
+    public static final RenderPipeline OPAQUE_PARTICLE_BLOCK_PIPELINE = RenderPipeline
+        .builder(RenderPipelines.PARTICLE_SNIPPET)
+        .withLocation(ResourceLocation.fromNamespaceAndPath(Weather.MODID, "pipeline/opaque_particle_block"))
+        .withDepthWrite(true)
+        .build();
+    public static final Function<ResourceLocation, RenderType> TRANSLUCENT_PARTICLE_NO_CULL_RENDER_TYPE = Util.memoize(
+        id -> RenderType.create(
+            Weather.MODID + ":translucent_particle_no_cull",
+            1536,
+            false,
+            true,
+            TRANSLUCENT_PARTICLE_NO_CULL_PIPELINE,
+            RenderType.CompositeState.builder()
+                .setTextureState(new RenderStateShard.TextureStateShard(id, false))
+                .setOutputState(RenderType.PARTICLES_TARGET)
+                .setLightmapState(RenderType.LIGHTMAP)
+                .createCompositeState(false)
+        )
+    );
+    public static final Function<ResourceLocation, RenderType> OPAQUE_PARTICLE_BLOCK_RENDER_TYPE = Util.memoize(
+        id -> RenderType.create(
+            Weather.MODID + ":block_particle",
+            1536,
+            false,
+            true,
+            OPAQUE_PARTICLE_BLOCK_PIPELINE,
+            RenderType.CompositeState.builder()
+                .setTextureState(new RenderStateShard.TextureStateShard(id, false))
+                .setOutputState(RenderType.PARTICLES_TARGET)
+                .setLightmapState(RenderType.LIGHTMAP)
+                .createCompositeState(false)
+        )
+    );
+    public static final ParticleRenderType SORTED_TRANSLUCENT = new ParticleRenderType(
+        "PARTICLE_SHEET_SORTED_TRANSLUCENT",
+        TRANSLUCENT_PARTICLE_NO_CULL_RENDER_TYPE.apply(TextureAtlas.LOCATION_PARTICLES),
+        true
+    );
+    public static final ParticleRenderType SORTED_OPAQUE_BLOCK = new ParticleRenderType(
+        "PARTICLE_BLOCK_SHEET_SORTED_OPAQUE",
+        OPAQUE_PARTICLE_BLOCK_RENDER_TYPE.apply(TextureAtlas.LOCATION_BLOCKS),
+        true
+    );
 
-        @Override
-        public @Nullable BufferBuilder begin(Tesselator tesselator, TextureManager textureManager) {
-            RenderSystem.disableCull();
-            return ParticleRenderType.PARTICLE_SHEET_TRANSLUCENT.begin(tesselator, textureManager);
-        }
+    @SubscribeEvent
+    public static void registerCustomPipelines(RegisterRenderPipelinesEvent event) {
+        event.registerPipeline(TRANSLUCENT_PARTICLE_NO_CULL_PIPELINE);
+        event.registerPipeline(OPAQUE_PARTICLE_BLOCK_PIPELINE);
+    }
 
-        /*@Override
-        public void begin(BufferBuilder p_217600_1_, TextureManager p_217600_2_) {
-            RenderSystem.disableCull();
-            ParticleRenderType.PARTICLE_SHEET_TRANSLUCENT.begin(p_217600_1_, p_217600_2_);
-        }
-
-        @Override
-        public void end(Tesselator p_217599_1_) {
-            //TODO: not possible in 1.20 now i guess, cant remember why this line was important
-            //p_217599_1_.getBuilder().setQuadSortOrigin(0, 0, 0);
-            ParticleRenderType.PARTICLE_SHEET_TRANSLUCENT.end(p_217599_1_);
-        }*/
-
-        @Override
-        public String toString() {
-            return "PARTICLE_SHEET_SORTED_TRANSLUCENT";
-        }
-    };
-    public static final ParticleRenderType SORTED_OPAQUE_BLOCK = new ParticleRenderType() {
-
-        @Override
-        public @Nullable BufferBuilder begin(Tesselator tesselator, TextureManager textureManager) {
-            RenderSystem.disableBlend();
-            RenderSystem.depthMask(true);
-            RenderSystem.setShader(GameRenderer::getParticleShader);
-            RenderSystem.setShaderTexture(0, TextureAtlas.LOCATION_BLOCKS);
-            return tesselator.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.PARTICLE);
-        }/*
-
-        @Override
-        public void begin(BufferBuilder p_217600_1_, TextureManager p_217600_2_) {
-            RenderSystem.disableBlend();
-            RenderSystem.depthMask(true);
-            RenderSystem.setShader(GameRenderer::getParticleShader);
-            RenderSystem.setShaderTexture(0, TextureAtlas.LOCATION_BLOCKS);
-            p_217600_1_.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.PARTICLE);
-        }
-
-        @Override
-        public void end(Tesselator p_217599_1_) {
-            //TODO: not possible in 1.20 now i guess, cant remember why this line was important
-            //p_217599_1_.getBuilder().setQuadSortOrigin(0, 0, 0);
-            ParticleRenderType.PARTICLE_SHEET_OPAQUE.end(p_217599_1_);
-        }*/
-
-        @Override
-        public String toString() {
-            return "PARTICLE_BLOCK_SHEET_SORTED_OPAQUE";
-        }
-    };
     public boolean weatherEffect = false;
 
     public float spawnY = -1;
@@ -456,7 +461,7 @@ public class EntityRotFX extends TextureSheetParticle implements IWindHandler
             this.remove();
         }
     }
-    
+
     /*public void setParticleTextureIndex(int par1)
     {
         this.particleTextureIndexInt = par1;
@@ -742,7 +747,7 @@ public class EntityRotFX extends TextureSheetParticle implements IWindHandler
                 + mesh.MATRIX_SIZE_FLOATS + 1 + (rgbaIndex++), this.getAlphaF());
 
         mesh.curBufferPos++;
-        
+
     }*/
 
     /*public void renderParticleForShaderTest(InstancedMeshParticle mesh, Transformation transformation, Matrix4fe viewMatrix, Entity entityIn,
@@ -784,7 +789,7 @@ public class EntityRotFX extends TextureSheetParticle implements IWindHandler
         if (x != 0.0D || y != 0.0D || z != 0.0D) {
             this.setBoundingBox(this.getBoundingBox().move(x, y, z));
             if (isUseCustomBBForRenderCulling()) {
-                this.setBoundingBoxForRender(this.getBoundingBoxForRender(1F).move(x, y, z));
+                this.setBoundingBoxForRender(this.getRenderBoundingBox(1F).move(x, y, z));
             }
             /*Vec3 pivotedPosition = getPivotedPosition(0);
             if (pivotedPosition != Vec3.ZERO) {
@@ -948,7 +953,8 @@ public class EntityRotFX extends TextureSheetParticle implements IWindHandler
         this.bbRender = p_107260_;
     }
 
-    public AABB getBoundingBoxForRender(float partialTicks) {
+    @Override
+    public AABB getRenderBoundingBox(float partialTicks) {
         if (isUseCustomBBForRenderCulling()) {
             return bbRender;
         } else {

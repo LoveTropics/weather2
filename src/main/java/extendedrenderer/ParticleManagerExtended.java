@@ -5,11 +5,8 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Queues;
-import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.blaze3d.vertex.BufferBuilder;
-import com.mojang.blaze3d.vertex.MeshData;
 import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.blaze3d.vertex.Tesselator;
+import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.logging.LogUtils;
 import extendedrenderer.particle.entity.EntityRotFX;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
@@ -26,8 +23,6 @@ import net.minecraft.client.particle.ParticleProvider;
 import net.minecraft.client.particle.ParticleRenderType;
 import net.minecraft.client.particle.SpriteSet;
 import net.minecraft.client.particle.TrackingEmitter;
-import net.minecraft.client.renderer.GameRenderer;
-import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.texture.SpriteLoader;
 import net.minecraft.client.renderer.texture.TextureAtlas;
@@ -47,7 +42,6 @@ import net.minecraft.util.profiling.Profiler;
 import net.minecraft.util.profiling.ProfilerFiller;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
-import org.joml.Matrix4fStack;
 import org.slf4j.Logger;
 
 import java.io.IOException;
@@ -58,6 +52,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Queue;
 import java.util.Set;
@@ -252,99 +247,73 @@ public class ParticleManagerExtended implements PreparableReloadListener {
       }
    }
 
-   /**@deprecated Forge: use {@link #render(PoseStack, MultiBufferSource.BufferSource, LightTexture, Camera, float, net.minecraft.client.renderer.culling.Frustum)} with Frustum as additional parameter*/
-   @Deprecated
-   public void render(PoseStack p_107337_, MultiBufferSource.BufferSource p_107338_, LightTexture p_107339_, Camera p_107340_, float p_107341_) {
-       render(p_107337_, p_107338_, p_107339_, p_107340_, p_107341_, null);
-   }
-
-   public void render(PoseStack p_107337_, MultiBufferSource.BufferSource p_107338_, LightTexture p_107339_, Camera p_107340_, float p_107341_, @Nullable net.minecraft.client.renderer.culling.Frustum clippingHelper) {
+    public void render(Camera camera, float partialTick, MultiBufferSource.BufferSource bufferSource, @Nullable net.minecraft.client.renderer.culling.Frustum frustum, java.util.function.Predicate<ParticleRenderType> renderTypePredicate) {
 	   ProfilerFiller profiler = Profiler.get();
 	   profiler.push("weather2_particle_render");
-      //if (true) return;
-      float fogStart = RenderSystem.getShaderFogStart();
-      float fogEnd = RenderSystem.getShaderFogEnd();
-      RenderSystem.setShaderFogStart(fogStart * 4);
-      RenderSystem.setShaderFogEnd(fogEnd * 4);
+//      float fogStart = RenderSystem.getShaderFogStart();
+//      float fogEnd = RenderSystem.getShaderFogEnd();
+//      RenderSystem.setShaderFogStart(fogStart * 4);
+//      RenderSystem.setShaderFogEnd(fogEnd * 4);
 
-      p_107339_.turnOnLightLayer();
-      RenderSystem.enableDepthTest();
-
-      //these didnt exist in our 1.18 modification, why?
-      RenderSystem.activeTexture(org.lwjgl.opengl.GL13.GL_TEXTURE2);
-      RenderSystem.activeTexture(org.lwjgl.opengl.GL13.GL_TEXTURE0);
-
-      //the hell is this doing???
-      //pushes new pose, multiplies it against the last one, and then applies it, then later pops it and applies
-      //wish i documented why i did this
-      //TODO: 1.21 figure out the purpose of this
-      //PoseStack posestack = RenderSystem.getModelViewStack();
-      Matrix4fStack matrix4fStack = RenderSystem.getModelViewStack();
-      //posestack.pushPose();
-      matrix4fStack.pushMatrix();
-      //posestack.mulPoseMatrix(p_107337_.last().pose());
-      matrix4fStack.mul(p_107337_.last().pose());
-      RenderSystem.applyModelViewMatrix();
-
-      RenderSystem.disableCull();
-      int particleCount = 0;
-
-      for(ParticleRenderType particlerendertype : this.particles.keySet()) { // Forge: allow custom IParticleRenderType's
-		  profiler.push(particlerendertype.toString());
-         if (particlerendertype == ParticleRenderType.NO_RENDER) continue;
-         Iterable<Particle> iterable = this.particles.get(particlerendertype);
-         if (iterable != null) {
-            RenderSystem.setShader(GameRenderer::getParticleShader);
-            Tesselator tesselator = Tesselator.getInstance();
-            BufferBuilder bufferbuilder = particlerendertype.begin(tesselator, this.textureManager);
-
-
-            for(Particle particle : iterable) {
-
-               if (particle instanceof EntityRotFX) {
-                  if (clippingHelper != null && /*particle.shouldCull() && */!clippingHelper.isVisible(((EntityRotFX)particle).getBoundingBoxForRender(p_107341_)))
-                     continue;
-               } else {
-                  if (clippingHelper != null && /*particle.shouldCull() && */!clippingHelper.isVisible(particle.getBoundingBox()))
-                     continue;
-               }
-
-               try {
-                  particle.render(bufferbuilder, p_107340_, p_107341_);
-               } catch (Throwable throwable) {
-                  CrashReport crashreport = CrashReport.forThrowable(throwable, "Rendering Particle");
-                  CrashReportCategory crashreportcategory = crashreport.addCategory("Particle being rendered");
-                  crashreportcategory.setDetail("Particle", particle::toString);
-                  crashreportcategory.setDetail("Particle Type", particlerendertype::toString);
-                  throw new ReportedException(crashreport);
-               }
+        for (ParticleRenderType particlerendertype : this.particles.keySet()) { // Neo: allow custom IParticleRenderType's
+            if (particlerendertype == ParticleRenderType.NO_RENDER || particlerendertype == ParticleRenderType.CUSTOM || !renderTypePredicate.test(particlerendertype)) continue;
+            Queue<Particle> queue = this.particles.get(particlerendertype);
+            if (queue != null && !queue.isEmpty()) {
+                renderParticleType(camera, partialTick, bufferSource, particlerendertype, queue, frustum);
             }
+        }
 
-            //particlerendertype.end(tesselator);
-            MeshData meshdata = bufferbuilder.build();
-            if (meshdata != null) {
-               BufferUploader.drawWithShader(meshdata);
-            }
-         }
-		  profiler.pop();
-      }
+        Queue<Particle> queue1 = this.particles.get(ParticleRenderType.CUSTOM);
+        if (queue1 != null && !queue1.isEmpty()) {
+            renderCustomParticles(camera, partialTick, bufferSource, queue1, frustum);
+        }
 
-      //TODO: 1.21 figure out the purpose of this
-      /*posestack.popPose();
-      RenderSystem.applyModelViewMatrix();*/
-      matrix4fStack.popMatrix();
-      RenderSystem.applyModelViewMatrix();
+        bufferSource.endBatch();
 
-      RenderSystem.depthMask(true);
-      RenderSystem.disableBlend();
-      p_107339_.turnOffLightLayer();
-
-      RenderSystem.setShaderFogStart(fogStart);
-      RenderSystem.setShaderFogEnd(fogEnd);
+//      RenderSystem.setShaderFogStart(fogStart);
+//      RenderSystem.setShaderFogEnd(fogEnd);
 	   profiler.pop();
    }
 
-   public void setLevel(@Nullable ClientLevel p_107343_) {
+    private static void renderParticleType(
+        Camera camera, float partialTick, MultiBufferSource.BufferSource bufferSource, ParticleRenderType particleType, Queue<Particle> particles, @Nullable net.minecraft.client.renderer.culling.Frustum frustum
+    ) {
+        VertexConsumer vertexconsumer = bufferSource.getBuffer(Objects.requireNonNull(particleType.renderType()));
+
+        for (Particle particle : particles) {
+            if (frustum != null && !frustum.isVisible(particle.getRenderBoundingBox(partialTick))) continue;
+            try {
+                particle.render(vertexconsumer, camera, partialTick);
+            }
+            catch (Throwable throwable) {
+                CrashReport crashreport = CrashReport.forThrowable(throwable, "Rendering Particle");
+                CrashReportCategory crashreportcategory = crashreport.addCategory("Particle being rendered");
+                crashreportcategory.setDetail("Particle", particle::toString);
+                crashreportcategory.setDetail("Particle Type", particleType::toString);
+                throw new ReportedException(crashreport);
+            }
+        }
+    }
+
+    private static void renderCustomParticles(Camera camera, float partialTick, MultiBufferSource.BufferSource bufferSource, Queue<Particle> particles, @Nullable net.minecraft.client.renderer.culling.Frustum frustum) {
+        PoseStack posestack = new PoseStack();
+
+        for (Particle particle : particles) {
+            if (frustum != null && !frustum.isVisible(particle.getRenderBoundingBox(partialTick))) continue;
+            try {
+                particle.renderCustom(posestack, bufferSource, camera, partialTick);
+            }
+            catch (Throwable throwable) {
+                CrashReport crashreport = CrashReport.forThrowable(throwable, "Rendering Particle");
+                CrashReportCategory crashreportcategory = crashreport.addCategory("Particle being rendered");
+                crashreportcategory.setDetail("Particle", particle::toString);
+                crashreportcategory.setDetail("Particle Type", "Custom");
+                throw new ReportedException(crashreport);
+            }
+        }
+    }
+
+    public void setLevel(@Nullable ClientLevel p_107343_) {
       this.level = p_107343_;
       this.clearParticles();
       this.trackingEmitters.clear();

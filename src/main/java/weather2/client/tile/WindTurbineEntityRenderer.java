@@ -14,19 +14,13 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import org.joml.Vector3f;
-import weather2.ClientTickHandler;
+import net.minecraft.world.phys.Vec3;
 import weather2.Weather;
 import weather2.WeatherBlocks;
 import weather2.blockentity.WindTurbineBlockEntity;
-import weather2.blockentity.WindVaneBlockEntity;
 import weather2.client.entity.model.WindTurbineModel;
-import weather2.client.entity.model.WindVaneModel;
-import weather2.weathersystem.WeatherManagerClient;
-import weather2.weathersystem.wind.WindManager;
 
 import java.util.Map;
-import java.util.Random;
 
 public class WindTurbineEntityRenderer<T extends BlockEntity> implements BlockEntityRenderer<T> {
 
@@ -63,11 +57,11 @@ public class WindTurbineEntityRenderer<T extends BlockEntity> implements BlockEn
     public WindTurbineEntityRenderer(final BlockEntityRendererProvider.Context context) {
         super();
         this.block = WeatherBlocks.BLOCK_WIND_TURBINE.get();
-        this.model = new WindTurbineModel<>(Minecraft.getInstance().getEntityModels().bakeLayer(WindTurbineModel.LAYER_LOCATION));
+        this.model = new WindTurbineModel(Minecraft.getInstance().getEntityModels().bakeLayer(WindTurbineModel.LAYER_LOCATION));
     }
 
     @Override
-    public void render(T te, float partialTicks, PoseStack stack, MultiBufferSource buffer, int combinedLightIn, int combinedOverlayIn) {
+    public void render(T te, float partialTicks, PoseStack stack, MultiBufferSource buffer, int combinedLightIn, int combinedOverlayIn, Vec3 cameraPos) {
         this.model.root().getAllParts().forEach(ModelPart::resetPose);
 
         //fixes for block

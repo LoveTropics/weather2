@@ -80,7 +80,7 @@ public class PivotingParticle extends ParticleTexFX {
     }
 
     @Override
-    public AABB getBoundingBoxForRender(float partialTicks) {
+    public AABB getRenderBoundingBox(float partialTicks) {
         return getBoundingBox().move(getPivotedPosition(partialTicks));
     }
 

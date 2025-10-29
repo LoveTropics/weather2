@@ -2,32 +2,25 @@ package weather2.client.entity.model;// Made with Blockbench 4.8.3
 // Exported for Minecraft version 1.17 or later with Mojang mappings
 // Paste this class into your mod and generate all required imports
 
-
-import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.blaze3d.vertex.VertexConsumer;
-import net.minecraft.client.model.HierarchicalModel;
+import net.minecraft.client.model.Model;
 import net.minecraft.client.model.geom.ModelLayerLocation;
 import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.client.model.geom.PartPose;
-import net.minecraft.client.model.geom.builders.*;
+import net.minecraft.client.model.geom.builders.CubeDeformation;
+import net.minecraft.client.model.geom.builders.CubeListBuilder;
+import net.minecraft.client.model.geom.builders.LayerDefinition;
+import net.minecraft.client.model.geom.builders.MeshDefinition;
+import net.minecraft.client.model.geom.builders.PartDefinition;
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.entity.Entity;
 import weather2.Weather;
-import weather2.blockentity.AnemometerBlockEntity;
-import weather2.blockentity.WindVaneBlockEntity;
 
-public class WindVaneModel<T extends Entity> extends HierarchicalModel<T> {
+public class WindVaneModel extends Model {
     // This layer location should be baked with EntityRendererProvider.Context in the entity renderer and passed into this model's constructor
     public static final ModelLayerLocation LAYER_LOCATION = new ModelLayerLocation(ResourceLocation.fromNamespaceAndPath(Weather.MODID, "wind_vane"), "main");
-    private final ModelPart root;
 
     public WindVaneModel(ModelPart root) {
-        this.root = root;
-    }
-
-    @Override
-    public ModelPart root() {
-        return this.root;
+        super(root, RenderType::entityCutoutNoCull);
     }
 
     public static LayerDefinition createBodyLayer() {
@@ -76,15 +69,5 @@ public class WindVaneModel<T extends Entity> extends HierarchicalModel<T> {
             .texOffs(5, 28).addBox(-0.05F, -1.0F, -6.0F, 0.05F, 2.0F, 2.0F, new CubeDeformation(0.0F)), PartPose.offsetAndRotation(0.0F, 4.0F, 0.0F, 0.0F, 1.5708F, 0.0F));
 
         return LayerDefinition.create(meshdefinition, 32, 32);
-    }
-
-    @Override
-    public void setupAnim(T entity, float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch) {
-
-    }
-
-    @Override
-    public void renderToBuffer(PoseStack poseStack, VertexConsumer buffer, int packedLight, int packedOverlay, int color) {
-        root.render(poseStack, buffer, packedLight, packedOverlay, color);
     }
 }
