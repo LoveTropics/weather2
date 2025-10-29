@@ -7,7 +7,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import weather2.config.ConfigParticle;
 
 @Mixin(IDimensionSpecialEffectsExtension.class)
-public class RenderParticlesOverride {
+public interface RenderParticlesOverride {
 
     //replaced by RenderLevelStageEvent.Stage.AFTER_PARTICLES
     /*@Redirect(method = "renderLevel",
@@ -20,7 +20,7 @@ public class RenderParticlesOverride {
     }*/
 
     @ModifyReturnValue(method = "renderSnowAndRain", at = @At("RETURN"))
-    private boolean renderSnowAndRain(boolean original) {
+    default boolean renderSnowAndRain(boolean original) {
         //CULog.dbg("renderSnowAndRain hook");
         //stopping vanilla from running renderRainSnow
         //returns true to disable vanilla renderSnowAndRain
