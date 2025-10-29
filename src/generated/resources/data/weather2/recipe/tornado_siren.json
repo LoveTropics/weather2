@@ -2,15 +2,9 @@
   "type": "minecraft:crafting_shaped",
   "category": "misc",
   "key": {
-    "D": {
-      "item": "minecraft:redstone"
-    },
-    "I": {
-      "item": "weather2:tornado_sensor"
-    },
-    "X": {
-      "item": "minecraft:iron_ingot"
-    }
+    "D": "minecraft:redstone",
+    "I": "weather2:tornado_sensor",
+    "X": "minecraft:iron_ingot"
   },
   "pattern": [
     "XDX",

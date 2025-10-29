@@ -44,7 +44,7 @@ public class ServerTickHandler {
             if (!WeatherUtilConfig.listDimensionsWeather.contains(serverWorld.dimension().location().toString())) {
                 weatherManagerServer = new WeatherManagerServer();
             } else {
-                weatherManagerServer = serverWorld.getDataStorage().get(WeatherManager.TYPE);
+                weatherManagerServer = serverWorld.getDataStorage().computeIfAbsent(WeatherManager.TYPE);
             }
             weatherManagerServer.setWorld(serverWorld);
             MANAGERS.put(dimension, weatherManagerServer);

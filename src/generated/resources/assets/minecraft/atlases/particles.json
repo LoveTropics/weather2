@@ -22,14 +22,6 @@
     },
     {
       "type": "minecraft:single",
-      "resource": "coroutil:particles/chicken"
-    },
-    {
-      "type": "minecraft:single",
-      "resource": "coroutil:particles/potato"
-    },
-    {
-      "type": "minecraft:single",
       "resource": "coroutil:particles/leaf"
     },
     {

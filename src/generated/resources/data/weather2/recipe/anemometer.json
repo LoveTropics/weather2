@@ -2,12 +2,8 @@
   "type": "minecraft:crafting_shaped",
   "category": "misc",
   "key": {
-    "D": {
-      "item": "minecraft:redstone"
-    },
-    "X": {
-      "item": "weather2:weather_item"
-    }
+    "D": "minecraft:redstone",
+    "X": "weather2:weather_item"
   },
   "pattern": [
     "X X",
