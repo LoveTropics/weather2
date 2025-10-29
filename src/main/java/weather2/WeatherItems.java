@@ -1,26 +1,24 @@
 package weather2;
 
-import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.world.item.BlockItem;
-import net.minecraft.world.item.Item;
 import net.neoforged.bus.api.IEventBus;
-import net.neoforged.neoforge.registries.DeferredHolder;
+import net.neoforged.neoforge.registries.DeferredItem;
 import net.neoforged.neoforge.registries.DeferredRegister;
 import weather2.item.WeatherItem;
 
 public class WeatherItems {
 
-    private static final DeferredRegister<Item> ITEMS = DeferredRegister.create(BuiltInRegistries.ITEM, Weather.MODID);
+    private static final DeferredRegister.Items ITEMS = DeferredRegister.createItems(Weather.MODID);
 
-    public static final DeferredHolder<Item, Item> WEATHER_ITEM = ITEMS.register(WeatherBlocks.WEATHER_ITEM, () -> new WeatherItem(new Item.Properties().stacksTo(64)));
-    public static final DeferredHolder<Item, Item> BLOCK_DEFLECTOR_ITEM = WeatherItems.ITEMS.register(WeatherBlocks.DEFLECTOR, () -> new BlockItem(WeatherBlocks.BLOCK_DEFLECTOR.get(), new Item.Properties()));
-    public static final DeferredHolder<Item, Item> BLOCK_TORNADO_SIREN_ITEM = ITEMS.register(WeatherBlocks.TORNADO_SIREN, () -> new BlockItem(WeatherBlocks.BLOCK_TORNADO_SIREN.get(), new Item.Properties()));
-    public static final DeferredHolder<Item, Item> BLOCK_TORNADO_SENSOR_ITEM = ITEMS.register(WeatherBlocks.TORNADO_SENSOR, () -> new BlockItem(WeatherBlocks.BLOCK_TORNADO_SENSOR.get(), new Item.Properties()));
-    public static final DeferredHolder<Item, Item> BLOCK_SAND_LAYER_ITEM = ITEMS.register(WeatherBlocks.SAND_LAYER, () -> new BlockItem(WeatherBlocks.BLOCK_SAND_LAYER.get(), new Item.Properties()));
-    public static final DeferredHolder<Item, Item> BLOCK_FORECAST_ITEM = ITEMS.register(WeatherBlocks.WEATHER_FORECAST, () -> new BlockItem(WeatherBlocks.BLOCK_FORECAST.get(), new Item.Properties()));
-    public static final DeferredHolder<Item, Item> BLOCK_ANEMOMETER_ITEM = ITEMS.register(WeatherBlocks.ANEMOMETER, () -> new BlockItem(WeatherBlocks.BLOCK_ANEMOMETER.get(), new Item.Properties()));
-    public static final DeferredHolder<Item, Item> BLOCK_WIND_VANE_ITEM = ITEMS.register(WeatherBlocks.WIND_VANE, () -> new BlockItem(WeatherBlocks.BLOCK_WIND_VANE.get(), new Item.Properties()));
-    public static final DeferredHolder<Item, Item> BLOCK_WIND_TURBINE_ITEM = ITEMS.register(WeatherBlocks.WIND_TURBINE, () -> new BlockItem(WeatherBlocks.BLOCK_WIND_TURBINE.get(), new Item.Properties()));
+    public static final DeferredItem<WeatherItem> WEATHER_ITEM = ITEMS.registerItem(WeatherBlocks.WEATHER_ITEM, WeatherItem::new);
+    public static final DeferredItem<BlockItem> BLOCK_DEFLECTOR_ITEM = ITEMS.registerSimpleBlockItem(WeatherBlocks.BLOCK_DEFLECTOR);
+    public static final DeferredItem<BlockItem> BLOCK_TORNADO_SIREN_ITEM = ITEMS.registerSimpleBlockItem(WeatherBlocks.BLOCK_TORNADO_SIREN);
+    public static final DeferredItem<BlockItem> BLOCK_TORNADO_SENSOR_ITEM = ITEMS.registerSimpleBlockItem(WeatherBlocks.BLOCK_TORNADO_SENSOR);
+    public static final DeferredItem<BlockItem> BLOCK_SAND_LAYER_ITEM = ITEMS.registerSimpleBlockItem(WeatherBlocks.BLOCK_SAND_LAYER);
+    public static final DeferredItem<BlockItem> BLOCK_FORECAST_ITEM = ITEMS.registerSimpleBlockItem(WeatherBlocks.BLOCK_FORECAST);
+    public static final DeferredItem<BlockItem> BLOCK_ANEMOMETER_ITEM = ITEMS.registerSimpleBlockItem(WeatherBlocks.BLOCK_ANEMOMETER);
+    public static final DeferredItem<BlockItem> BLOCK_WIND_VANE_ITEM = ITEMS.registerSimpleBlockItem(WeatherBlocks.BLOCK_WIND_VANE);
+    public static final DeferredItem<BlockItem> BLOCK_WIND_TURBINE_ITEM = ITEMS.registerSimpleBlockItem(WeatherBlocks.BLOCK_WIND_TURBINE);
 
     public static void registerHandlers(IEventBus modBus) {
         ITEMS.register(modBus);

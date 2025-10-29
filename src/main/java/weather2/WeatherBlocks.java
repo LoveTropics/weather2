@@ -1,7 +1,6 @@
 package weather2;
 
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.entity.BlockEntityType;
@@ -9,6 +8,7 @@ import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.material.MapColor;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.common.Mod;
+import net.neoforged.neoforge.registries.DeferredBlock;
 import net.neoforged.neoforge.registries.DeferredRegister;
 import weather2.block.AnemometerBlock;
 import weather2.block.DeflectorBlock;
@@ -46,18 +46,18 @@ public class WeatherBlocks {
     public static final String POCKET_SAND = "pocket_sand";
     public static final String WIND_TURBINE = "wind_turbine";
 
-    private static final DeferredRegister<Block> BLOCKS = DeferredRegister.create(BuiltInRegistries.BLOCK, Weather.MODID);
+    private static final DeferredRegister.Blocks BLOCKS = DeferredRegister.createBlocks(Weather.MODID);
     private static final DeferredRegister<BlockEntityType<?>> BLOCK_ENTITIES = DeferredRegister.create(BuiltInRegistries.BLOCK_ENTITY_TYPE, Weather.MODID);
 
-    public static final Supplier<SandLayerBlock> BLOCK_SAND_LAYER = BLOCKS.register(SAND_LAYER, () -> new SandLayerBlock(BlockBehaviour.Properties.ofFullCopy(Blocks.DIRT).mapColor(MapColor.SAND).strength(0.1F).sound(SoundType.SAND)));
-    public static final Supplier<DeflectorBlock> BLOCK_DEFLECTOR = BLOCKS.register(DEFLECTOR, () -> new DeflectorBlock(BlockBehaviour.Properties.ofFullCopy(Blocks.DIRT).mapColor(MapColor.STONE).strength(0.5F, 6F).sound(SoundType.STONE)));
-    public static final Supplier<ForecastBlock> BLOCK_FORECAST = BLOCKS.register(WEATHER_FORECAST, () -> new ForecastBlock(BlockBehaviour.Properties.of().mapColor(MapColor.STONE).strength(0.5F, 6F).sound(SoundType.STONE)));
-    public static final Supplier<SensorBlock> BLOCK_TORNADO_SENSOR = BLOCKS.register(TORNADO_SENSOR, () -> new SensorBlock(BlockBehaviour.Properties.of().mapColor(MapColor.STONE).strength(0.5F, 6F).sound(SoundType.STONE)));
-    public static final Supplier<AnemometerBlock> BLOCK_ANEMOMETER = BLOCKS.register(ANEMOMETER, () -> new AnemometerBlock(BlockBehaviour.Properties.of().mapColor(MapColor.STONE).strength(0.5F, 6F).sound(SoundType.STONE)));
-    public static final Supplier<WindVaneBlock> BLOCK_WIND_VANE = BLOCKS.register(WIND_VANE, () -> new WindVaneBlock(BlockBehaviour.Properties.of().mapColor(MapColor.STONE).strength(0.5F, 6F).sound(SoundType.STONE)));
-    public static final Supplier<SirenBlock> BLOCK_TORNADO_SIREN = BLOCKS.register(TORNADO_SIREN, () -> new SirenBlock(BlockBehaviour.Properties.of().mapColor(MapColor.STONE).strength(0.5F, 6F).sound(SoundType.STONE)));
-    public static final Supplier<WindTurbineBlock> BLOCK_WIND_TURBINE = BLOCKS.register(WIND_TURBINE, () -> new WindTurbineBlock(BlockBehaviour.Properties.of().mapColor(MapColor.STONE).strength(0.5F, 6F).sound(SoundType.STONE)));
-    //public static final Supplier<WeatherMachineBlock> BLOCK_WEATHER_MACHINE = BLOCKS.register(WEATHER_MACHINE, () -> new WeatherMachineBlock(BlockBehaviour.Properties.of(Material.STONE).strength(0.5F, 6F).sound(SoundType.STONE)));
+    public static final DeferredBlock<SandLayerBlock> BLOCK_SAND_LAYER = BLOCKS.registerBlock(SAND_LAYER, SandLayerBlock::new, BlockBehaviour.Properties.ofFullCopy(Blocks.DIRT).mapColor(MapColor.SAND).strength(0.1F).sound(SoundType.SAND));
+    public static final DeferredBlock<DeflectorBlock> BLOCK_DEFLECTOR = BLOCKS.registerBlock(DEFLECTOR, DeflectorBlock::new, BlockBehaviour.Properties.ofFullCopy(Blocks.DIRT).mapColor(MapColor.STONE).strength(0.5F, 6F).sound(SoundType.STONE));
+    public static final DeferredBlock<ForecastBlock> BLOCK_FORECAST = BLOCKS.registerBlock(WEATHER_FORECAST, ForecastBlock::new, BlockBehaviour.Properties.of().mapColor(MapColor.STONE).strength(0.5F, 6F).sound(SoundType.STONE));
+    public static final DeferredBlock<SensorBlock> BLOCK_TORNADO_SENSOR = BLOCKS.registerBlock(TORNADO_SENSOR, SensorBlock::new, BlockBehaviour.Properties.of().mapColor(MapColor.STONE).strength(0.5F, 6F).sound(SoundType.STONE));
+    public static final DeferredBlock<AnemometerBlock> BLOCK_ANEMOMETER = BLOCKS.registerBlock(ANEMOMETER, AnemometerBlock::new, BlockBehaviour.Properties.of().mapColor(MapColor.STONE).strength(0.5F, 6F).sound(SoundType.STONE));
+    public static final DeferredBlock<WindVaneBlock> BLOCK_WIND_VANE = BLOCKS.registerBlock(WIND_VANE, WindVaneBlock::new, BlockBehaviour.Properties.of().mapColor(MapColor.STONE).strength(0.5F, 6F).sound(SoundType.STONE));
+    public static final DeferredBlock<SirenBlock> BLOCK_TORNADO_SIREN = BLOCKS.registerBlock(TORNADO_SIREN, SirenBlock::new, BlockBehaviour.Properties.of().mapColor(MapColor.STONE).strength(0.5F, 6F).sound(SoundType.STONE));
+    public static final DeferredBlock<WindTurbineBlock> BLOCK_WIND_TURBINE = BLOCKS.registerBlock(WIND_TURBINE, WindTurbineBlock::new, BlockBehaviour.Properties.of().mapColor(MapColor.STONE).strength(0.5F, 6F).sound(SoundType.STONE));
+    //public static final Supplier<WeatherMachineBlock> BLOCK_WEATHER_MACHINE = BLOCKS.registerBlock(WEATHER_MACHINE, WeatherMachineBlock::new, BlockBehaviour.Properties.of(Material.STONE).strength(0.5F, 6F).sound(SoundType.STONE));
 
     @SuppressWarnings("ConstantConditions")
     public static final Supplier<BlockEntityType<DeflectorBlockEntity>> BLOCK_ENTITY_DEFLECTOR = BLOCK_ENTITIES.register(DEFLECTOR, () ->
