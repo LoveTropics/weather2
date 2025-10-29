@@ -208,7 +208,7 @@ public class Weather
      *
      * @param event
      */
-    private void gatherData(GatherDataEvent event) {
+    private void gatherData(GatherDataEvent.Client event) {
         event.createProvider(WeatherRecipeProvider.Runner::new);
         event.createProvider((output, lookupProvider) -> new LootTableProvider(output, Set.of(),
             List.of(new LootTableProvider.SubProviderEntry(BlockLootTables::new, LootContextParamSets.BLOCK)), lookupProvider));
