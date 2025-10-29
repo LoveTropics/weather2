@@ -40,8 +40,6 @@ import net.minecraft.util.GsonHelper;
 import net.minecraft.util.RandomSource;
 import net.minecraft.util.profiling.Profiler;
 import net.minecraft.util.profiling.ProfilerFiller;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.api.distmarker.OnlyIn;
 import org.slf4j.Logger;
 
 import java.io.IOException;
@@ -60,7 +58,6 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
 import java.util.stream.Collectors;
 
-@OnlyIn(Dist.CLIENT)
 public class ParticleManagerExtended implements PreparableReloadListener {
    private static final Logger LOGGER = LogUtils.getLogger();
    private static final FileToIdConverter PARTICLE_LISTER = FileToIdConverter.json("particles");
@@ -87,7 +84,6 @@ public class ParticleManagerExtended implements PreparableReloadListener {
 
 	@Override
 	public CompletableFuture<Void> reload(PreparationBarrier p_107305_, ResourceManager p_107306_, Executor p_107309_, Executor p_107310_) {
-      @OnlyIn(Dist.CLIENT)
       record ParticleDefinition(ResourceLocation id, Optional<List<ResourceLocation>> sprites) {
       }
       CompletableFuture<List<ParticleDefinition>> completablefuture = CompletableFuture.supplyAsync(() -> {
@@ -334,7 +330,6 @@ public class ParticleManagerExtended implements PreparableReloadListener {
       this.trackedParticleCounts.clear();
    }
 
-	@OnlyIn(Dist.CLIENT)
    static class MutableSpriteSet implements SpriteSet {
       private List<TextureAtlasSprite> sprites;
 

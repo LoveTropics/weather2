@@ -53,7 +53,7 @@ public abstract class WeatherManager extends SavedData {
     };
     public static final SavedDataType<WeatherManagerServer> TYPE = new SavedDataType<>(Weather.MODID + "-" + "weather_data", WeatherManagerServer::new, CODEC, null);
     private ResourceKey<Level> dimension;
-	private final WindManager wind = new WindManager(this);
+    private WindManager wind;
 	private List<WeatherObject> listStormObjects = new ArrayList<>();
 	public HashMap<Long, WeatherObject> lookupStormObjectsByID = new HashMap<>();
 
@@ -75,6 +75,10 @@ public abstract class WeatherManager extends SavedData {
 	public float vanillaRainAmountOnServer = 0;
 
 	private HashMap<Long, BlockPos> lookupWeatherBlockDamageDeflector = new HashMap<>();
+
+    public void setWind(WindManager windManager) {
+        wind = windManager;
+    }
 
     public void setDimension(ResourceKey<Level> dimension) {
 		this.dimension = dimension;

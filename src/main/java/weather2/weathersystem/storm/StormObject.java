@@ -10,7 +10,6 @@ import extendedrenderer.particle.behavior.ParticleBehaviorFog;
 import extendedrenderer.particle.entity.EntityRotFX;
 import extendedrenderer.particle.entity.ParticleCrossSection;
 import extendedrenderer.particle.entity.ParticleCube;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
@@ -32,8 +31,6 @@ import net.minecraft.world.level.levelgen.Heightmap;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.Shapes;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.api.distmarker.OnlyIn;
 import net.neoforged.fml.LogicalSide;
 import net.neoforged.fml.util.thread.EffectiveSide;
 import weather2.EntityRegistry;
@@ -46,6 +43,7 @@ import weather2.config.ConfigStorm;
 import weather2.config.ConfigTornado;
 import weather2.config.WeatherUtilConfig;
 import weather2.util.CachedNBTTagCompound;
+import weather2.util.ClientUtil;
 import weather2.util.WeatherUtil;
 import weather2.util.WeatherUtilBlock;
 import weather2.util.WeatherUtilEntity;
@@ -54,6 +52,7 @@ import weather2.weathersystem.WeatherManagerServer;
 import weather2.weathersystem.tornado.ActiveTornadoConfig;
 import weather2.weathersystem.tornado.simple.Layer;
 import weather2.weathersystem.tornado.simple.TornadoFunnelSimple;
+import weather2.weathersystem.tornado.simple.TornadoFunnelSimpleClient;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -79,24 +78,16 @@ public class StormObject extends WeatherObject {
 	public String spawnerUUID = "";
 
 	//newer cloud managing list for more strict render optimized positioning
-	@OnlyIn(Dist.CLIENT)
 	public HashMap<Integer, EntityRotFX> lookupParticlesCloud;
 
-	@OnlyIn(Dist.CLIENT)
 	public HashMap<Integer, EntityRotFX> lookupParticlesCloudLower;
 
-	@OnlyIn(Dist.CLIENT)
 	public HashMap<Integer, EntityRotFX> lookupParticlesFunnel;
 
-	@OnlyIn(Dist.CLIENT)
 	public List<EntityRotFX> listParticlesCloud;
-	@OnlyIn(Dist.CLIENT)
 	public List<EntityRotFX> listParticlesGround;
-	@OnlyIn(Dist.CLIENT)
 	public List<EntityRotFX> listParticlesFunnel;
-	@OnlyIn(Dist.CLIENT)
 	public List<EntityRotFX> listParticlesDebris;
-	@OnlyIn(Dist.CLIENT)
 	public ParticleBehaviorFog particleBehaviorFog;
 
 	public int sizeMaxFunnelParticles = 600;
@@ -534,7 +525,6 @@ public class StormObject extends WeatherObject {
 		return getNbtCache().getNewNBT();
 	}
 
-	@OnlyIn(Dist.CLIENT)
 	public void tickRender(float partialTick) {
 		super.tickRender(partialTick);
 
@@ -659,7 +649,11 @@ public class StormObject extends WeatherObject {
 				.setEntityPullDistXZ(120)
 				.setEntityPullDistXZForY(90);
 		}
-		tornadoFunnelSimple = new TornadoFunnelSimple(activeTornadoConfig, this);
+        if (manager.getWorld().isClientSide()) {
+            tornadoFunnelSimple = new TornadoFunnelSimpleClient(activeTornadoConfig, this);
+        } else {
+            tornadoFunnelSimple = new TornadoFunnelSimple(activeTornadoConfig, this);
+        }
 	}
 
 	public void tick() {
@@ -1720,7 +1714,6 @@ public class StormObject extends WeatherObject {
 		levelCurStagesIntensity = 0;
 	}
 
-	@OnlyIn(Dist.CLIENT)
 	public void tickClient() {
 
 		if (false && ConfigCoroUtil.useLoggingDebug && SceneEnhancer.particleBehavior != null) {
@@ -1745,12 +1738,12 @@ public class StormObject extends WeatherObject {
 			particleBehaviorFog = new ParticleBehaviorFog(new Vec3(pos.x, pos.y, pos.z));
 			//particleBehaviorFog.sourceEntity = this;
 		} else {
-			if (!Minecraft.getInstance().isPaused()) {
+            if (!ClientUtil.isPaused()) {
 				particleBehaviorFog.tickUpdateList();
 			}
 		}
 
-		Player entP = Minecraft.getInstance().player;
+        Player entP = ClientUtil.getClientPlayer();
 
 		spinSpeed = 0.02D;
 		double spinSpeedMax = 0.4D;
@@ -2817,16 +2810,14 @@ public class StormObject extends WeatherObject {
 		CoroUtilEntOrParticle.setMotionZ(entity, CoroUtilEntOrParticle.getMotionZ(entity) + f2);
     }
 
-	@OnlyIn(Dist.CLIENT)
 	public EntityRotFX spawnFogParticle(double x, double y, double z, int parRenderOrder) {
 		return spawnFogParticle(x, y, z, parRenderOrder, ParticleRegistry.cloud256);
 	}
 
-	@OnlyIn(Dist.CLIENT)
     public EntityRotFX spawnFogParticle(double x, double y, double z, int parRenderOrder, TextureAtlasSprite tex) {
     	double speed = 0D;
 		Random rand = new Random();
-    	EntityRotFX entityfx = particleBehaviorFog.spawnNewParticleIconFX(Minecraft.getInstance().level, tex, x, y, z, (rand.nextDouble() - rand.nextDouble()) * speed, 0.0D/*(rand.nextDouble() - rand.nextDouble()) * speed*/, (rand.nextDouble() - rand.nextDouble()) * speed, parRenderOrder);
+        EntityRotFX entityfx = particleBehaviorFog.spawnNewParticleIconFX(manager.getWorld(), tex, x, y, z, (rand.nextDouble() - rand.nextDouble()) * speed, 0.0D/*(rand.nextDouble() - rand.nextDouble()) * speed*/, (rand.nextDouble() - rand.nextDouble()) * speed, parRenderOrder);
 		particleBehaviorFog.initParticle(entityfx);
 
 		//potato
@@ -2926,7 +2917,6 @@ public class StormObject extends WeatherObject {
 		}
 	}
 
-	@OnlyIn(Dist.CLIENT)
 	@Override
 	public void cleanupClient() {
 		super.cleanupClient();

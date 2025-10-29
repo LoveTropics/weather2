@@ -3,7 +3,6 @@ package weather2;
 import com.corosus.coroutil.util.CULog;
 import extendedrenderer.ParticleManagerExtended;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.screens.BackupConfirmScreen;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.util.Mth;
@@ -11,7 +10,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.fml.common.Mod;
+import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.client.event.ClientTickEvent;
 import weather2.client.SceneEnhancer;
 import weather2.config.ClientConfigData;
@@ -20,7 +19,7 @@ import weather2.util.WeatherUtil;
 import weather2.util.WindReader;
 import weather2.weathersystem.WeatherManagerClient;
 
-
+@EventBusSubscriber(Dist.CLIENT)
 public class ClientTickHandler
 {
 	public static final ClientTickHandler INSTANCE = new ClientTickHandler();

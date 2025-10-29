@@ -26,11 +26,6 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.levelgen.Heightmap;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.api.distmarker.OnlyIn;
-import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.fml.common.EventBusSubscriber;
-import net.neoforged.neoforge.client.event.RegisterRenderPipelinesEvent;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
 import weather2.ClientTickHandler;
@@ -43,8 +38,6 @@ import weather2.weathersystem.wind.WindManager;
 import java.util.List;
 import java.util.function.Function;
 
-@OnlyIn(Dist.CLIENT)
-@EventBusSubscriber(value = Dist.CLIENT)
 public class EntityRotFX extends TextureSheetParticle implements IWindHandler {
     public static final RenderPipeline TRANSLUCENT_PARTICLE_NO_CULL_PIPELINE = RenderPipeline
         .builder(RenderPipelines.PARTICLE_SNIPPET)
@@ -95,12 +88,6 @@ public class EntityRotFX extends TextureSheetParticle implements IWindHandler {
         OPAQUE_PARTICLE_BLOCK_RENDER_TYPE.apply(TextureAtlas.LOCATION_BLOCKS),
         true
     );
-
-    @SubscribeEvent
-    public static void registerCustomPipelines(RegisterRenderPipelinesEvent event) {
-        event.registerPipeline(TRANSLUCENT_PARTICLE_NO_CULL_PIPELINE);
-        event.registerPipeline(OPAQUE_PARTICLE_BLOCK_PIPELINE);
-    }
 
     public boolean weatherEffect = false;
 

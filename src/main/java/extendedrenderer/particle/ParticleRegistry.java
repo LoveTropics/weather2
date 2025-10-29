@@ -7,7 +7,9 @@ import net.minecraft.client.renderer.texture.atlas.sources.SingleFile;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.data.PackOutput;
 import net.minecraft.resources.ResourceLocation;
+import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.client.data.SpriteSourceProvider;
 import net.neoforged.neoforge.client.event.TextureAtlasStitchedEvent;
 import weather2.Weather;
@@ -17,6 +19,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
+@EventBusSubscriber(Dist.CLIENT)
 public class ParticleRegistry extends SpriteSourceProvider {
 
     public static TextureAtlasSprite squareGrey;

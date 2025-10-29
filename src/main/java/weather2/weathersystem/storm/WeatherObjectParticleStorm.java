@@ -10,8 +10,6 @@ import net.minecraft.world.level.biome.Biomes;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.api.distmarker.OnlyIn;
 import weather2.WeatherBlocks;
 import weather2.config.ConfigSand;
 import weather2.config.ConfigSnow;
@@ -122,11 +120,6 @@ public class WeatherObjectParticleStorm extends WeatherObject {
 		} else {
 			return 1F - (age / (maxAge / 2) - 1F);
 		}
-	}
-
-	@OnlyIn(Dist.CLIENT)
-	public void tickClient() {
-
 	}
 
 	public Block getBlockForBuildup() {
@@ -241,17 +234,6 @@ public class WeatherObjectParticleStorm extends WeatherObject {
 		nbt.putDouble("vecY", motion.y);
 		nbt.putDouble("vecZ", motion.z);
 
-	}
-
-	@Override
-	public void cleanup() {
-		super.cleanup();
-	}
-
-	@OnlyIn(Dist.CLIENT)
-	@Override
-	public void cleanupClient() {
-		super.cleanupClient();
 	}
 
 	public StormType getType() {

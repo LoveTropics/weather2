@@ -1,41 +1,32 @@
 package weather2.util;
 
+import extendedrenderer.particle.entity.EntityRotFX;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.particle.Particle;
+import net.minecraft.client.particle.ParticleEngine;
+import net.minecraft.client.particle.ParticleRenderType;
+import net.minecraft.core.BlockPos;
+import net.minecraft.util.Mth;
+
 import java.lang.reflect.Field;
-import java.util.ArrayDeque;
 import java.util.Map;
 import java.util.Queue;
 import java.util.Random;
 
-import com.corosus.coroutil.util.CoroUtilEntOrParticle;
-import com.google.common.collect.Maps;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.particle.ParticleRenderType;
-import net.minecraft.client.particle.Particle;
-import net.minecraft.client.particle.ParticleEngine;
-import net.minecraft.core.BlockPos;
-import net.minecraft.util.Mth;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.api.distmarker.OnlyIn;
-import extendedrenderer.particle.entity.EntityRotFX;
-import extendedrenderer.particle.entity.ParticleTexFX;
-import weather2.IWindHandler;
-
 public class WeatherUtilParticle {
     //public static ArrayDeque<Particle>[][] fxLayers;
     public static Map<ParticleRenderType, Queue<Particle>> fxLayers;
-    
+
     public static int effLeafID = 0;
     public static int effRainID = 1;
     public static int effWindID = 2;
     public static int effSnowID = 3;
     /*public static int effSandID = 4;
     public static int effWind2ID = 2;*/
-    
+
     public static Random rand = new Random();
     //public static int rainDrops = 20;
-    
-    
-    
+
     //weather2: not sure what will happen to this in 1.7, copied over for convenience
     public static int getParticleAge(Particle ent)
     {
@@ -50,7 +41,6 @@ public class WeatherUtilParticle {
         //OldUtil.setPrivateValueBoth(Particle.class, ent, "age", "age", val);
     }
 
-    @OnlyIn(Dist.CLIENT)
     public static void getFXLayers()
     {
         //fxLayers
@@ -79,7 +69,6 @@ public class WeatherUtilParticle {
         }
     }
 
-    @OnlyIn(Dist.CLIENT)
     public static float getParticleWeight(EntityRotFX entity1)
     {
         //commented out for weather2 copy
@@ -88,14 +77,15 @@ public class WeatherUtilParticle {
             return 1.1F;
         }*/
 
-        if (entity1 instanceof IWindHandler) {
-            return ((IWindHandler) entity1).getWindWeight();
+        //this was instanceof IWindHandler before, which is always true for EntityRotFX
+        if (entity1 != null) {
+            return entity1.getWindWeight();
         }
 
-        if (entity1 instanceof ParticleTexFX)
-        {
-            return 5.0F + ((float)entity1.getAge() / 200);
-        }
+//        if (entity1 instanceof ParticleTexFX)
+//        {
+//            return 5.0F + ((float)entity1.getAge() / 200);
+//        }
 
         //commented out for weather2 copy
         /*if (entity1 instanceof EntityWindFX)
@@ -103,10 +93,10 @@ public class WeatherUtilParticle {
             return 1.4F + ((float)entity1.getAge() / 200);
         }*/
 
-        if (entity1 instanceof Particle)
-        {
-            return 5.0F + ((float)entity1.getAge() / 200);
-        }
+//        if (entity1 instanceof Particle)
+//        {
+//            return 5.0F + ((float)entity1.getAge() / 200);
+//        }
 
         return -1;
     }
@@ -114,7 +104,7 @@ public class WeatherUtilParticle {
     public static BlockPos getPos(Particle particle) {
         return new BlockPos(Mth.floor(particle.x), Mth.floor(particle.y), Mth.floor(Mth.floor(particle.z)));
     }
-    
+
     /*@SideOnly(Side.CLIENT)
     public static void shakeTrees(int range)
     {

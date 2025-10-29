@@ -6,15 +6,12 @@ import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.api.distmarker.OnlyIn;
 import org.joml.Matrix4f;
 import weather2.client.entity.render.state.LightningBoltWeatherNewRenderState;
 import weather2.weathersystem.storm.LightningBoltWeatherNew;
 
 import java.util.Random;
 
-@OnlyIn(Dist.CLIENT)
 public class LightningBoltWeatherNewRenderer extends EntityRenderer<LightningBoltWeatherNew, LightningBoltWeatherNewRenderState> {
    public LightningBoltWeatherNewRenderer(EntityRendererProvider.Context p_174286_) {
       super(p_174286_);

@@ -1,26 +1,18 @@
 package weather2.weathersystem.storm;
 
-import java.util.List;
-import java.util.Random;
-import java.util.stream.Collectors;
-
 import com.corosus.coroutil.util.CoroUtilBlock;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.Holder;
-import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.core.registries.Registries;
-import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.biome.Biome;
-import net.minecraft.world.level.biome.Biomes;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.api.distmarker.OnlyIn;
+import net.minecraft.world.phys.Vec3;
 import weather2.WeatherBlocks;
 import weather2.config.ConfigSand;
 import weather2.util.CachedNBTTagCompound;
 import weather2.util.WeatherUtilBlock;
 import weather2.weathersystem.WeatherManager;
 import weather2.weathersystem.wind.WindManager;
+
+import java.util.Random;
 
 public class WeatherObjectSandstormOld extends WeatherObject {
 
@@ -83,11 +75,6 @@ public class WeatherObjectSandstormOld extends WeatherObject {
 		} else {
 			return 1F - (age / (maxAge / 2) - 1F);
 		}
-	}
-
-	@OnlyIn(Dist.CLIENT)
-	public void tickClient() {
-
 	}
 
 	public void tickBlockSandBuildup() {
@@ -178,17 +165,6 @@ public class WeatherObjectSandstormOld extends WeatherObject {
 		nbt.putDouble("vecY", motion.y);
 		nbt.putDouble("vecZ", motion.z);
 
-	}
-
-	@Override
-	public void cleanup() {
-		super.cleanup();
-	}
-
-	@OnlyIn(Dist.CLIENT)
-	@Override
-	public void cleanupClient() {
-		super.cleanupClient();
 	}
 
 }

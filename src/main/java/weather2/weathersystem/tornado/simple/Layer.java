@@ -2,8 +2,6 @@ package weather2.weathersystem.tornado.simple;
 
 import extendedrenderer.particle.entity.PivotingParticle;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.api.distmarker.OnlyIn;
 import net.neoforged.fml.LogicalSide;
 import net.neoforged.fml.util.thread.EffectiveSide;
 
@@ -12,9 +10,7 @@ import java.util.List;
 
 public class Layer {
 
-    @OnlyIn(Dist.CLIENT)
     private List<PivotingParticle> listParticles;
-    @OnlyIn(Dist.CLIENT)
     private List<PivotingParticle> listParticlesExtra;
     private Vec3 pos = Vec3.ZERO;
     private float rotation;
@@ -27,28 +23,23 @@ public class Layer {
         }
     }
 
-    @OnlyIn(Dist.CLIENT)
     public void initClient() {
         listParticles = new ArrayList<>();
         listParticlesExtra = new ArrayList<>();
     }
 
-    @OnlyIn(Dist.CLIENT)
     public List<PivotingParticle> getListParticles() {
         return listParticles;
     }
 
-    @OnlyIn(Dist.CLIENT)
     public void setListParticles(List<PivotingParticle> listParticles) {
         this.listParticles = listParticles;
     }
 
-    @OnlyIn(Dist.CLIENT)
     public List<PivotingParticle> getListParticlesExtra() {
         return listParticlesExtra;
     }
 
-    @OnlyIn(Dist.CLIENT)
     public void setListParticlesExtra(List<PivotingParticle> listParticlesExtra) {
         this.listParticlesExtra = listParticlesExtra;
     }

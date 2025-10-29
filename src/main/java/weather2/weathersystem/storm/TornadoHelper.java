@@ -2,7 +2,6 @@ package weather2.weathersystem.storm;
 
 import com.corosus.coroutil.util.CoroUtilBlock;
 import com.mojang.authlib.GameProfile;
-import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerLevel;
@@ -27,8 +26,6 @@ import net.minecraft.world.level.levelgen.Heightmap;
 import net.minecraft.world.level.material.MapColor;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.api.distmarker.OnlyIn;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.common.util.FakePlayerFactory;
 import net.neoforged.neoforge.event.level.BlockEvent;
@@ -39,6 +36,7 @@ import weather2.config.ConfigMisc;
 import weather2.config.ConfigSound;
 import weather2.config.ConfigStorm;
 import weather2.config.ConfigTornado;
+import weather2.util.ClientUtil;
 import weather2.util.WeatherUtil;
 import weather2.util.WeatherUtilBlock;
 import weather2.util.WeatherUtilEntity;
@@ -599,7 +597,6 @@ public class TornadoHelper {
 
 	}
 
-	@OnlyIn(Dist.CLIENT)
 	public boolean canGrabEntityClient(Entity ent) {
 		ClientConfigData clientConfig = ClientTickHandler.clientConfigData;
 		if (ent instanceof Player) {
@@ -731,13 +728,13 @@ public class TornadoHelper {
         return Mth.sqrt((float) (var7 * var7/* + var9 * var9*/ + var11 * var11));
     }
 
-	@OnlyIn(Dist.CLIENT)
     public void soundUpdates(boolean playFarSound, boolean playNearSound)
     {
 		if (storm.isPet()) return;
-		Minecraft mc = Minecraft.getInstance();
 
-		if (mc.player == null)
+        Player player = ClientUtil.getClientPlayer();
+
+        if (player == null)
         {
             return;
         }
@@ -748,7 +745,7 @@ public class TornadoHelper {
         if (storm.stormType == storm.TYPE_WATER) {
 			close = 200;
         }
-        Vec3 plPos = new Vec3(mc.player.getX(), mc.player.getY(), mc.player.getZ());
+        Vec3 plPos = new Vec3(player.getX(), player.getY(), player.getZ());
 
 		float quietTornadoTweak = 1F;
 		float quietAmbientTweak = 1F;
@@ -787,20 +784,20 @@ public class TornadoHelper {
         if (distToPlayer < far)
         {
             if (playFarSound) {
-				if (mc.level.getGameTime() % 40 == 0) {
-					isOutsideCached = WeatherUtilEntity.isPosOutside(mc.level,
-						new Vec3(mc.player.getPosition(1).x() + 0.5F, mc.player.getPosition(1).y() + 0.5F, mc.player.getPosition(1).z() + 0.5F));
+                if (storm.manager.getWorld().getGameTime() % 40 == 0) {
+                    isOutsideCached = WeatherUtilEntity.isPosOutside(storm.manager.getWorld(),
+                        new Vec3(player.getPosition(1).x() + 0.5F, player.getPosition(1).y() + 0.5F, player.getPosition(1).z() + 0.5F));
 				}
 				if (isOutsideCached) {
-					tryPlaySound(WeatherUtilSound.snd_wind_far, 2, mc.player, (float) (volScaleFar * quietAmbientTweak * ConfigSound.windyStormVolume), far);
+                    tryPlaySound(WeatherUtilSound.snd_wind_far, 2, player, (float) (volScaleFar * quietAmbientTweak * ConfigSound.windyStormVolume), far);
 				}
 			}
 
-            if (playNearSound) tryPlaySound(WeatherUtilSound.snd_wind_close, 1, mc.player, (float)(volScaleClose * quietTornadoTweak * ConfigSound.tornadoWindVolume), close);
+            if (playNearSound) tryPlaySound(WeatherUtilSound.snd_wind_close, 1, player, (float) (volScaleClose * quietTornadoTweak * ConfigSound.tornadoWindVolume), close);
 
             if (storm.levelCurIntensityStage >= storm.STATE_FORMING && storm.stormType == storm.TYPE_LAND)
             {
-                tryPlaySound(WeatherUtilSound.snd_tornado_dmg_close, 0, mc.player, (float)(volScaleClose * quietTornadoTweak * ConfigSound.tornadoDamageVolume), close);
+                tryPlaySound(WeatherUtilSound.snd_tornado_dmg_close, 0, player, (float) (volScaleClose * quietTornadoTweak * ConfigSound.tornadoDamageVolume), close);
             }
         }
     }

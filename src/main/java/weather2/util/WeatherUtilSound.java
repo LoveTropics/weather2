@@ -1,11 +1,9 @@
 package weather2.util;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.sounds.SoundSource;
 import net.minecraft.sounds.SoundEvent;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.api.distmarker.OnlyIn;
 import weather2.SoundRegistry;
 import weather2.client.MovingSoundStreamingSource;
 import weather2.weathersystem.storm.StormObject;
@@ -32,7 +30,7 @@ public class WeatherUtilSound {
      */
     public static int snd_rand[] = new int[6];
     public static long soundTimer[] = new long[6];
-    
+
     public static void init() {
         Random rand = new Random();
         snd_tornado_dmg_close[0] = "destruction_0_";
@@ -80,7 +78,6 @@ public class WeatherUtilSound {
         soundToLength.put("siren_sandstorm_5_extra", 1282);
     }
 
-    @OnlyIn(Dist.CLIENT)
     public static void playNonMovingSound(Vec3 parPos, String var1, float parVolume, float parPitch, float parCutOffRange)
     {
         //String prefix = "streaming.";
@@ -91,7 +88,6 @@ public class WeatherUtilSound {
         Minecraft.getInstance().getSoundManager().play(sound);
     }
 
-    @OnlyIn(Dist.CLIENT)
     public static void playMovingSound(StormObject parStorm, String var1, float parVolume, float parPitch, float parCutOffRange)
     {
         //String prefix = "streaming.";
@@ -112,7 +108,6 @@ public class WeatherUtilSound {
 
     }
 
-    @OnlyIn(Dist.CLIENT)
     public static void playPlayerLockedSound(Vec3 parPos, String var1, float var5, float var6)
     {
         SoundEvent event = SoundRegistry.get(var1);

@@ -1,11 +1,8 @@
 package extendedrenderer.particle.entity;
 
-import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.multiplayer.ClientLevel;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.api.distmarker.OnlyIn;
+import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 
-@OnlyIn(Dist.CLIENT)
 public class ParticleTexFX extends EntityRotFX {
 
 	public ParticleTexFX(ClientLevel worldIn, double posXIn, double posYIn, double posZIn, double mX, double mY, double mZ, TextureAtlasSprite par8Item)

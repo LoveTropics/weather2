@@ -6,8 +6,6 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.api.distmarker.OnlyIn;
 import weather2.ClientTickHandler;
 import weather2.WeatherBlocks;
 import weather2.config.ConfigMisc;
@@ -16,8 +14,6 @@ import weather2.config.ConfigSound;
 import weather2.util.WeatherUtilSound;
 import weather2.weathersystem.storm.StormObject;
 import weather2.weathersystem.storm.WeatherObjectParticleStorm;
-
-import java.util.List;
 
 public class SirenBlockEntity extends BlockEntity {
 
@@ -37,7 +33,6 @@ public class SirenBlockEntity extends BlockEntity {
         }
     }
 
-    @OnlyIn(Dist.CLIENT)
     public void tickClient() {
         if (this.lastPlayTime < System.currentTimeMillis())
         {

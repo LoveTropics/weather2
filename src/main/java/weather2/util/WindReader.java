@@ -1,15 +1,12 @@
 package weather2.util;
 
+import javax.annotation.Nullable;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.api.distmarker.OnlyIn;
 import weather2.ClientTickHandler;
 import weather2.ServerTickHandler;
 import weather2.weathersystem.WeatherManager;
-
-import javax.annotation.Nullable;
 
 public class WindReader {
     public static float getWindAngle(Level world) {
@@ -47,7 +44,6 @@ public class WindReader {
         }
     }
 
-    @OnlyIn(Dist.CLIENT)
     private static WeatherManager getWeatherManagerClient() {
         return ClientTickHandler.weatherManager;
     }

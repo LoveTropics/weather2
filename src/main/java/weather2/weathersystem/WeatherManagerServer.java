@@ -52,6 +52,7 @@ public class WeatherManagerServer extends WeatherManager {
     private ServerLevel world;
 
     public void setWorld(ServerLevel world) {
+        setWind(new WindManager(this));
         setDimension(world.dimension());
         this.world = world;
     }

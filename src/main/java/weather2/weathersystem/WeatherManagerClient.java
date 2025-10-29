@@ -10,8 +10,6 @@ import net.minecraft.nbt.NbtUtils;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.api.distmarker.OnlyIn;
 import weather2.ClientTickHandler;
 import weather2.Weather;
 import weather2.client.SceneEnhancer;
@@ -20,15 +18,16 @@ import weather2.weathersystem.storm.EnumWeatherObjectType;
 import weather2.weathersystem.storm.StormObject;
 import weather2.weathersystem.storm.WeatherObject;
 import weather2.weathersystem.storm.WeatherObjectParticleStorm;
+import weather2.weathersystem.wind.WindManagerClient;
 
 import java.util.Random;
 
-@OnlyIn(Dist.CLIENT)
 public class WeatherManagerClient extends WeatherManager {
 
 	//public CloudManager cloudManager = new CloudManager();
 
 	public WeatherManagerClient(ResourceKey<Level> dimension) {
+        setWind(new WindManagerClient(this));
         setDimension(dimension);
 	}
 

@@ -12,17 +12,13 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.CreativeModeTabs;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParamSets;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.api.distmarker.OnlyIn;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.ModList;
 import net.neoforged.fml.common.Mod;
-import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
 import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.neoforged.fml.event.lifecycle.InterModProcessEvent;
-import net.neoforged.fml.loading.FMLEnvironment;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.data.event.GatherDataEvent;
 import net.neoforged.neoforge.event.BuildCreativeModeTabContentsEvent;
@@ -48,7 +44,6 @@ import weather2.config.ConfigWind;
 import weather2.data.BlockAndItemProvider;
 import weather2.data.BlockLootTables;
 import weather2.data.WeatherRecipeProvider;
-import weather2.util.WeatherUtilSound;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -105,7 +100,6 @@ public class Weather
         NeoForge.EVENT_BUS.addListener(this::serverStart);
         NeoForge.EVENT_BUS.register(ServerTickHandler.class);
         CREATIVE_MODE_TABS.register(modBus);
-        modBus.addListener(this::clientSetup);
         modBus.addListener(this::gatherData);
         modBus.addListener(this::processIMC);
         modBus.addListener(this::addCreative);
@@ -134,14 +128,6 @@ public class Weather
         //WeatherUtilConfig.nbtLoadDataAll();
 
         SoundRegistry.init();
-
-        if (FMLEnvironment.dist.isClient()) {
-            modBus.addListener(ParticleRegistry::getRegisteredParticles);
-            modBus.addListener(ClientRegistry::clientSetup);
-            modBus.addListener(ClientRegistry::registerRenderers);
-            modBus.addListener(ClientRegistry::registerLayerDefinitions);
-            NeoForge.EVENT_BUS.addListener(ClientTickHandler::tick);
-        }
     }
 
     public void registerPackets(final RegisterPayloadHandlersEvent event) {
@@ -162,11 +148,6 @@ public class Weather
 
     private void setup(final FMLCommonSetupEvent event) {
         //WeatherNetworkingOld.register();
-    }
-
-    private void clientSetup(FMLClientSetupEvent event) {
-        WeatherUtilSound.init();
-
     }
 
     private void processIMC(final InterModProcessEvent event)
@@ -221,7 +202,6 @@ public class Weather
      *
      * @param event
      */
-    @OnlyIn(Dist.CLIENT)
     private void gatherClientData(GatherDataEvent event) {
         event.createProvider(ParticleRegistry::new);
         event.createProvider(BlockAndItemProvider::new);

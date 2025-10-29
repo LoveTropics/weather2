@@ -47,8 +47,6 @@ import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.level.material.MapColor;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.VoxelShape;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.api.distmarker.OnlyIn;
 import net.neoforged.neoforge.client.event.RenderLevelStageEvent;
 import weather2.ClientTickHandler;
 import weather2.ClientWeatherHelper;
@@ -83,7 +81,6 @@ import java.util.List;
 import java.util.Queue;
 import java.util.Random;
 
-@OnlyIn(Dist.CLIENT)
 public class SceneEnhancer implements Runnable {
 
 	private static final double PRECIPITATION_PARTICLE_EFFECT_RATE = 0.7;
@@ -380,7 +377,7 @@ public class SceneEnhancer implements Runnable {
 	}
 
 	//Threaded function
-    @OnlyIn(Dist.CLIENT)
+
     public static void tryAmbientSounds()
     {
 		Minecraft client = Minecraft.getInstance();
@@ -1386,7 +1383,6 @@ public class SceneEnhancer implements Runnable {
 		return null;
 	}
 
-	@OnlyIn(Dist.CLIENT)
     public static void tryWind(Level world)
     {
 		Minecraft client = Minecraft.getInstance();
@@ -1429,13 +1425,11 @@ public class SceneEnhancer implements Runnable {
 
 	//Thread safe functions
 
-	@OnlyIn(Dist.CLIENT)
-	private static Block getBlock(Level parWorld, BlockPos pos)
+    private static Block getBlock(Level parWorld, BlockPos pos)
 	{
 		return getBlock(parWorld, pos.getX(), pos.getY(), pos.getZ());
 	}
 
-    @OnlyIn(Dist.CLIENT)
     private static Block getBlock(Level parWorld, int x, int y, int z)
     {
         try
@@ -1453,14 +1447,12 @@ public class SceneEnhancer implements Runnable {
         }
     }
 
-	@OnlyIn(Dist.CLIENT)
-	private static BlockState getBlockState(Level parWorld, BlockPos pos)
+    private static BlockState getBlockState(Level parWorld, BlockPos pos)
 	{
 		return getBlockState(parWorld, pos.getX(), pos.getY(), pos.getZ());
 	}
 
-	@OnlyIn(Dist.CLIENT)
-	private static BlockState getBlockState(Level parWorld, int x, int y, int z)
+    private static BlockState getBlockState(Level parWorld, int x, int y, int z)
 	{
 		try
 		{

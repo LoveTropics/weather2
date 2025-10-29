@@ -1,9 +1,5 @@
 package extendedrenderer.particle.behavior;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
-
 import com.corosus.coroutil.util.CoroUtilBlock;
 import com.corosus.coroutil.util.CoroUtilMisc;
 import extendedrenderer.particle.entity.EntityRotFX;
@@ -19,15 +15,16 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.api.distmarker.OnlyIn;
 import weather2.ClientTickHandler;
 import weather2.ClientWeatherProxy;
 import weather2.client.SceneEnhancer;
 import weather2.datatypes.PrecipitationType;
 import weather2.util.WeatherUtilParticle;
 
-@OnlyIn(Dist.CLIENT)
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
+
 public class ParticleBehaviors {
 
     public List<EntityRotFX> particles = new ArrayList<EntityRotFX>();
