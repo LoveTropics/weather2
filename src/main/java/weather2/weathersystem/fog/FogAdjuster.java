@@ -79,7 +79,7 @@ public class FogAdjuster {
         fogHeatwave = new FogProfile(new Vector3f(0.5F, 0.2F, 0.1F), 0, 75);
         fogSandstorm = new FogProfile(new Vector3f(0.7F, 0.5F, 0.2F), 0, 18 * distAmp);
         fogSnowstorm = new FogProfile(new Vector3f(0.7F, 0.7F, 0.7F), 0, 20 * distAmp);
-        fogVanilla = new FogProfile(new Vector3f(-1F, -1F, -1F), -1, -1);
+        fogVanilla = new FogProfile(new Vector3f(1F, 1F, 1F), 0, 100000); //TODO: Probably hacky fix, but seems to work. Previous values (all -1) would cause blackness
     }
 
     public void tickGame(ClientWeatherProxy weather) {
