@@ -10,7 +10,7 @@ public class ServerWeatherProxy {
         if (isWeatherEffectsServerSideControlled()) {
             //System.out.println("server getWindSpeed" + ServerWeatherIntegration.getWindSpeed(level));
             //return 1f;//ServerWeatherIntegration.getWindSpeed(level);
-            return ServerWeatherIntegration.getWindSpeed(level);
+            return ServerWeatherIntegration.get().getWindSpeed(level);
         } else {
             return -1;
         }
@@ -18,13 +18,13 @@ public class ServerWeatherProxy {
 
     public static StormState getSandstormForEverywhere(ServerLevel level) {
         if (isWeatherEffectsServerSideControlled()) {
-            return ServerWeatherIntegration.getSandstormForEverywhere(level);
+            return ServerWeatherIntegration.get().getSandstormForEverywhere(level);
         } else { return null; }
     }
 
     public static StormState getSnowstormForEverywhere(ServerLevel level) {
         if (isWeatherEffectsServerSideControlled()) {
-            return ServerWeatherIntegration.getSnowstormForEverywhere(level);
+            return ServerWeatherIntegration.get().getSnowstormForEverywhere(level);
         } else { return null; }
     }
 

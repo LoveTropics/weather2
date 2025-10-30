@@ -60,6 +60,7 @@ public class Weather
 
     public static final String MODID = "weather2";
     public static final boolean LTMINIGAMES_LOADED = ModList.get().isLoaded("ltminigames");
+    public static final boolean LTWEATHER_LOADED = ModList.get().isLoaded("ltweather");
 
     public static boolean initProperNeededForWorld = true;
 
@@ -174,6 +175,10 @@ public class Weather
 
     public static boolean isLoveTropicsInstalled() {
         return LTMINIGAMES_LOADED;
+    }
+
+    public static boolean isLoveTropicsWeatherInstalled() {
+        return LTWEATHER_LOADED;
     }
 
     private void registerCommands(RegisterCommandsEvent event) {

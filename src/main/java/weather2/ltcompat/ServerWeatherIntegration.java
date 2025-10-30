@@ -1,38 +1,53 @@
 package weather2.ltcompat;
 
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.util.Tuple;
+import weather2.LoveTropicsIntegration;
+import weather2.Weather;
 import weather2.datatypes.StormState;
 
-public class ServerWeatherIntegration {
+public final class ServerWeatherIntegration {
+    private static ServerWeatherValues instance;
 
-    public static float getWindSpeed(ServerLevel level) {
-        return 0;
+    private ServerWeatherIntegration() {
     }
 
-    public static StormState getSandstormForEverywhere(ServerLevel level) {
-        return null;
+    public static ServerWeatherValues get() {
+        if (instance == null) {
+            if (Weather.isLoveTropicsWeatherInstalled()) {
+                instance = LoveTropicsIntegration.getServerWeatherValues();
+            } else {
+                instance = ServerWeatherValues.DEFAULT;
+            }
+        }
+        return instance;
     }
 
-    public static StormState getSnowstormForEverywhere(ServerLevel level) {
-        return null;
+    public static void reset() {
+        instance = null;
     }
 
-    /**
-     * TODO: for LT, turn back on when LT is needed, activates dependency on LTWeather
-     */
-    /*public static float getWindSpeed(ServerLevel level) {
-        return TypeBridge.getWindSpeed(level);
+    public interface ServerWeatherValues {
+        ServerWeatherValues DEFAULT = new ServerWeatherValues() {
+            @Override
+            public float getWindSpeed(ServerLevel level) {
+                return 0;
+            }
+
+            @Override
+            public StormState getSandstormForEverywhere(ServerLevel level) {
+                return null;
+            }
+
+            @Override
+            public StormState getSnowstormForEverywhere(ServerLevel level) {
+                return null;
+            }
+        };
+
+        float getWindSpeed(ServerLevel level);
+
+        StormState getSandstormForEverywhere(ServerLevel level);
+
+        StormState getSnowstormForEverywhere(ServerLevel level);
     }
-
-    public static StormState getSandstormForEverywhere(ServerLevel level) {
-        Tuple<Integer, Integer> data = TypeBridge.getSandstormData(level);
-        return data != null ? new StormState(data.getA(), data.getB()) : null;
-    }
-
-    public static StormState getSnowstormForEverywhere(ServerLevel level) {
-        Tuple<Integer, Integer> data = TypeBridge.getSnowstormData(level);
-        return data != null ? new StormState(data.getA(), data.getB()) : null;
-    }*/
-
 }

@@ -1,85 +1,87 @@
 package weather2.ltcompat;
 
+import weather2.LoveTropicsIntegration;
+import weather2.Weather;
 import weather2.datatypes.PrecipitationType;
 
 public final class ClientWeatherIntegration {
-    private static ClientWeatherIntegration instance = new ClientWeatherIntegration();
+    private static ClientWeatherValues instance;
 
     private ClientWeatherIntegration() {
     }
 
-    public static ClientWeatherIntegration get() {
+    public static ClientWeatherValues get() {
+        if (instance == null) {
+            if (Weather.isLoveTropicsWeatherInstalled()) {
+                instance = LoveTropicsIntegration.getClientWeatherValues();
+            } else {
+                instance = ClientWeatherValues.DEFAULT;
+            }
+        }
         return instance;
     }
 
     public static void reset() {
-        instance = new ClientWeatherIntegration();
+        instance = null;
     }
 
-    public float getRainAmount() {
-        return 0;
-    }
+    public interface ClientWeatherValues {
+        ClientWeatherValues DEFAULT = new ClientWeatherValues() {
+            @Override
+            public float getRainAmount() {
+                return 0;
+            }
 
-    public float getVanillaRainAmount() {
-        return 0;
-    }
+            @Override
+            public float getVanillaRainAmount() {
+                return 0;
+            }
 
-    public PrecipitationType getPrecipitationType() {
-        return PrecipitationType.VALUES[0];
-    }
+            @Override
+            public PrecipitationType getPrecipitationType() {
+                return PrecipitationType.VALUES[0];
+            }
 
-    public float getWindSpeed() {
-        return 0;
-    }
+            @Override
+            public float getWindSpeed() {
+                return 0;
+            }
 
-    public boolean isHeatwave() {
-        return false;
-    }
+            @Override
+            public boolean isHeatwave() {
+                return false;
+            }
 
-    public boolean isSandstorm() {
-        return false;
-    }
+            @Override
+            public boolean isSandstorm() {
+                return false;
+            }
 
-    public boolean isSnowstorm() {
-        return false;
-    }
+            @Override
+            public boolean isSnowstorm() {
+                return false;
+            }
 
-    public boolean hasWeather() {
-        return false;
-    }
+            @Override
+            public boolean hasWeather() {
+                return false;
+            }
+        };
 
-    /**
-     * TODO: for LT, turn back on when LT is needed, activates dependency on LTWeather
-     */
-    /*public float getRainAmount() {
-        return ClientWeather.get().getRainAmount();
-    }
+        float getRainAmount();
 
-    public float getVanillaRainAmount() {
-        return ClientWeather.get().getVanillaRainAmount();
-    }
+        float getVanillaRainAmount();
 
-    public PrecipitationType getPrecipitationType() {
-        return PrecipitationType.VALUES[TypeBridge.getPrecipitationTypeOrdinal(ClientWeather.get())];
-    }
+        PrecipitationType getPrecipitationType();
 
-    public float getWindSpeed() {
-        return ClientWeather.get().getWindSpeed();
-    }
+        float getWindSpeed();
 
-    public boolean isHeatwave() {
-        return ClientWeather.get().isHeatwave();
-    }
+        boolean isHeatwave();
 
-    public boolean isSandstorm() {
-        return ClientWeather.get().isSandstorm();
-    }
+        boolean isSandstorm();
 
-    public boolean isSnowstorm() {
-        return ClientWeather.get().isSnowstorm();
-    }
+        boolean isSnowstorm();
 
-    public boolean hasWeather() {
-        return ClientWeather.get().hasWeather();
-    }*/
+        boolean hasWeather();
+    }
 }
