@@ -1,6 +1,8 @@
 package weather2.weathersystem.storm;
 
 import net.minecraft.world.phys.Vec3;
+import net.neoforged.fml.LogicalSide;
+import net.neoforged.fml.util.thread.EffectiveSide;
 import weather2.util.CachedNBTTagCompound;
 import weather2.weathersystem.WeatherManager;
 
@@ -62,7 +64,7 @@ public class WeatherObject {
 
 		//cleanup memory
 		//if (FMLCommonHandler.instance().getEffectiveSide() == Dist.CLIENT/*manager.getWorld().isRemote*/) {
-        if (manager.getWorld().isClientSide()) {
+		if (EffectiveSide.get().equals(LogicalSide.CLIENT)) {
 			cleanupClient();
 		}
 
