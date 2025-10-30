@@ -59,6 +59,19 @@ neoForge {
             systemProperty 'neoforge.enabledGameTestNamespaces', project.mod_id
         }
 
+        client2 {
+            client()
+
+            dependencies {
+                //runtime "com.github.stephengold:Libbulletjme:17.4.0"
+                programArguments.addAll('--username', 'Dev2')
+                //runtime project.configurations.libraries
+            }
+
+            // Comma-separated list of namespaces to load gametests from. Empty = all namespaces.
+            systemProperty 'neoforge.enabledGameTestNamespaces', project.mod_id
+        }
+
         server {
             server()
             programArgument '--nogui'
