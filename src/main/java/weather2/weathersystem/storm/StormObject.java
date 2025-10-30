@@ -34,6 +34,7 @@ import net.minecraft.world.phys.shapes.Shapes;
 import net.neoforged.fml.LogicalSide;
 import net.neoforged.fml.util.thread.EffectiveSide;
 import weather2.EntityRegistry;
+import weather2.LoveTropicsIntegration;
 import weather2.ServerTickHandler;
 import weather2.Weather;
 import weather2.client.SceneEnhancer;
@@ -2448,20 +2449,14 @@ public class StormObject extends WeatherObject {
 				}
 			}
 
-			if (entHeightFromBase > 90) {
+            if (entHeightFromBase > 90 && isSharknado()) {
 				if (Weather.isLoveTropicsInstalled()) {
-					//TODO: for LT, reenable or make it a soft dependency somehow
-					/*if (isSharknado() && entity instanceof SharkEntity) {
-						entity.getPersistentData().putBoolean("tornado_shoot", true);
-					}*/
-					if (isSharknado() && entity instanceof Dolphin) {
-						entity.getPersistentData().putBoolean("tornado_shoot", true);
-					}
-				} else {
-					if (isSharknado() && entity instanceof Dolphin) {
-						entity.getPersistentData().putBoolean("tornado_shoot", true);
-					}
-				}
+                    if (LoveTropicsIntegration.isShark(entity)) {
+                        entity.getPersistentData().putBoolean("tornado_shoot", true);
+                    }
+                } else if (entity instanceof Dolphin) {
+                    entity.getPersistentData().putBoolean("tornado_shoot", true);
+                }
 			}
 		}
 
