@@ -1,0 +1,6 @@
+{
+	"model": {
+		"type": "minecraft:model",
+		"model": "weather2:block/tornado_siren_manual"
+	}
+}

@@ -1,0 +1,6 @@
+{
+	"model": {
+		"type": "minecraft:model",
+		"model": "weather2:item/sand_layer_placeable"
+	}
+}
