@@ -7,6 +7,7 @@ import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.animal.Dolphin;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
+import weather2.LoveTropicsIntegration;
 import weather2.Weather;
 import weather2.weathersystem.storm.StormObject;
 import weather2.weathersystem.tornado.ActiveTornadoConfig;
@@ -115,11 +116,7 @@ public class TornadoFunnelSimple {
                 if (level.getGameTime() % 20 == 0) {
                     Entity ent = null;
                     if (Weather.isLoveTropicsInstalled()) {
-                        /*EntityType type = BuiltInRegistries.ENTITY_TYPE.get(ResourceLocation.parse("tropicraft:hammerhead"));
-                        if (type != null) {
-                            ent = new SharkEntity(type, level);
-                        }*/
-
+                        ent = LoveTropicsIntegration.createShark(level);
                     }
                     if (ent == null) {
                         if (Weather.isLoveTropicsInstalled()) {

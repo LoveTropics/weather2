@@ -150,6 +150,7 @@ dependencies {
     // implementation "blank:coolmod-${mc_version}:${coolmod_version}"
 
     implementation "curse.maven:fusion-connected-textures-854949:${fusion_version}"
+    compileOnly ("com.tterrag.registrate:Registrate-LT:${registrate_version}")
     implementation ("com.lovetropics.ltweather:ltweather-neoforge:${ltweather_version}")
     implementation ("com.lovetropics.ltextras:LTExtras:${ltextras_version}")
     implementation ("com.tropicraft:Tropicraft:${tropicraft_version}")

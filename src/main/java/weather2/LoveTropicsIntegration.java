@@ -5,6 +5,9 @@ import com.lovetropics.weather.TypeBridge;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.Tuple;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntitySpawnReason;
+import net.minecraft.world.level.Level;
+import net.tropicraft.core.common.entity.TropicraftEntities;
 import net.tropicraft.core.common.entity.underdasea.SharkEntity;
 import weather2.datatypes.PrecipitationType;
 import weather2.datatypes.StormState;
@@ -85,5 +88,9 @@ public class LoveTropicsIntegration {
 
     public static boolean isShark(Entity entity) {
         return entity instanceof SharkEntity;
+    }
+
+    public static SharkEntity createShark(Level level) {
+        return TropicraftEntities.HAMMERHEAD.create(level, EntitySpawnReason.EVENT);
     }
 }
