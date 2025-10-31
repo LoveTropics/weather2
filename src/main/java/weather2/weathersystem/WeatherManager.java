@@ -1,14 +1,11 @@
 package weather2.weathersystem;
 
 import com.corosus.coroutil.util.CULog;
-import com.mojang.datafixers.util.Pair;
 import com.mojang.serialization.Codec;
-import com.mojang.serialization.DataResult;
-import com.mojang.serialization.DynamicOps;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.NbtOps;
 import net.minecraft.resources.ResourceKey;
+import net.minecraft.util.ExtraCodecs;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.saveddata.SavedData;
 import net.minecraft.world.level.saveddata.SavedDataType;
@@ -30,30 +27,13 @@ import java.util.List;
 import java.util.Map;
 
 public abstract class WeatherManager extends SavedData {
-    //TODO: Ew, this is hacky
-    public static final Codec<WeatherManagerServer> CODEC = new Codec<>() {
-        @Override
-        public <T> DataResult<Pair<WeatherManagerServer, T>> decode(DynamicOps<T> ops, T input) {
-            DataResult<Pair<CompoundTag, T>> data = CompoundTag.CODEC.decode(ops, input);
-            if (data.isError()) {
-                return DataResult.error(() -> "Could not decode compound tag");
-            }
-            WeatherManagerServer weatherManager = new WeatherManagerServer();
-            weatherManager.read(data.result().get().getFirst());
-            return DataResult.success(Pair.of(weatherManager, input));
-        }
-
-        @Override
-        public <T> DataResult<T> encode(WeatherManagerServer input, DynamicOps<T> ops, T prefix) {
-            DataResult<?> result = input.save();
-            return ops.listBuilder() //TODO: This is wrong
-                .add((DataResult<T>) result)
-                .build(prefix);
-        }
-    };
+    public static final Codec<WeatherManagerServer> CODEC = ExtraCodecs.NBT.xmap(
+        in -> (WeatherManagerServer) new WeatherManagerServer().read((CompoundTag) in),
+        WeatherManager::save
+    );
     public static final SavedDataType<WeatherManagerServer> TYPE = new SavedDataType<>(Weather.MODID + "-" + "weather_data", WeatherManagerServer::new, CODEC, null);
     private ResourceKey<Level> dimension;
-    private WindManager wind;
+    protected WindManager wind;
 	private List<WeatherObject> listStormObjects = new ArrayList<>();
 	public HashMap<Long, WeatherObject> lookupStormObjectsByID = new HashMap<>();
 
@@ -412,7 +392,7 @@ public abstract class WeatherManager extends SavedData {
 		return storms;
 	}
 
-    public DataResult<?> save() {
+    public CompoundTag save() {
 
         CULog.dbg("WeatherManager save");
         CompoundTag data = new CompoundTag();
@@ -442,11 +422,13 @@ public abstract class WeatherManager extends SavedData {
 
         data.putFloat("cloudIntensity", this.cloudIntensity);
 
-        data.put("windMan", wind.write(new CompoundTag()));
-        return CompoundTag.CODEC.encode(data, NbtOps.INSTANCE, new CompoundTag());
+        if (wind != null) {
+            data.put("windMan", wind.write(new CompoundTag()));
+        }
+        return data;
     }
 
-    public void read(CompoundTag data) {
+    public WeatherManager read(CompoundTag data) {
 
         CULog.dbg("weather data: " + data);
 
@@ -458,7 +440,11 @@ public abstract class WeatherManager extends SavedData {
 
 		WeatherObject.lastUsedStormID = data.getLongOr("lastUsedIDStorm", 0);
 
-		wind.read(data.getCompoundOrEmpty("windMan"));
+        if (wind == null) {
+            setWind(new WindManager(this));
+        }
+
+        wind.read(data.getCompoundOrEmpty("windMan"));
 
 		CompoundTag nbtStorms = data.getCompoundOrEmpty("stormData");
 
@@ -514,6 +500,7 @@ public abstract class WeatherManager extends SavedData {
 		}
 
 		CULog.dbg("reloaded weather objects: " + listStormObjects.size());
+        return this;
 	}
 
 	public WindManager getWindManager() {
