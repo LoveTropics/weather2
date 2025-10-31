@@ -237,16 +237,14 @@ public class StormObject extends WeatherObject {
 		pos = new Vec3(0, static_YPos_layer0, 0);
 		maxSize = ConfigStorm.Storm_MaxRadius;
 
-		if (parManager.getWorld().isClientSide()) {
-			listParticlesCloud = new ArrayList<>();
-			listParticlesFunnel = new ArrayList<>();
-			listParticlesDebris = new ArrayList<>();
-			listParticlesGround = new ArrayList<>();
-			lookupParticlesCloud = new HashMap<>();
-			lookupParticlesCloudLower = new HashMap<>();
-			lookupParticlesFunnel = new HashMap<>();
-			//renderBlock = new RenderCubeCloud();
-		}
+        listParticlesCloud = new ArrayList<>();
+        listParticlesFunnel = new ArrayList<>();
+        listParticlesDebris = new ArrayList<>();
+        listParticlesGround = new ArrayList<>();
+        lookupParticlesCloud = new HashMap<>();
+        lookupParticlesCloudLower = new HashMap<>();
+        lookupParticlesFunnel = new HashMap<>();
+        //renderBlock = new RenderCubeCloud();
 	}
 
 	public void initFirstTime() {

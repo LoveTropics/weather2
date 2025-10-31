@@ -478,7 +478,7 @@ public abstract class WeatherManager extends SavedData {
 			addStormObject(wo);
 
 			//TODO: possibly unneeded/redundant/bug inducing, packets will be sent upon request from client
-			((WeatherManagerServer) (this)).syncStormNew(wo);
+            //((WeatherManagerServer) (this)).syncStormNew(wo);
             /*} else {
                 System.out.println("WARNING: trying to load storm objects for missing dimension: " + dimension);
             }*/
