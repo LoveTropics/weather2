@@ -1,5 +1,6 @@
 package weather2;
 
+import extendedrenderer.ParticleManagerExtended;
 import net.minecraft.world.entity.Entity;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.EventPriority;
@@ -25,7 +26,10 @@ public class ClientEventHandler {
     public static void worldRenderAfterParticles(RenderLevelStageEvent.AfterParticles event) {
         if (ConfigDebug.Particle_engine_render) {
             //System.out.println("dsf " + event.getPartialTick().getGameTimeDeltaTicks());
-            ClientTickHandler.particleManagerExtended().render(event.getCamera(), event.getPartialTick().getGameTimeDeltaTicks(), event.getLevelRenderer().renderBuffers.bufferSource(), event.getFrustum(), type -> true);
+            ParticleManagerExtended particleManagerExtended = ClientTickHandler.particleManagerExtended();
+            if (particleManagerExtended != null) {
+                particleManagerExtended.render(event.getCamera(), event.getPartialTick().getGameTimeDeltaTicks(), event.getLevelRenderer().renderBuffers.bufferSource(), event.getFrustum(), type -> true);
+            }
         }
     }
 
