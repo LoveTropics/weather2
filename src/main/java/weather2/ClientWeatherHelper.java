@@ -1,6 +1,5 @@
 package weather2;
 
-import com.corosus.coroutil.util.CULog;
 import net.minecraft.client.Minecraft;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.Vec3;
@@ -165,25 +164,21 @@ public final class ClientWeatherHelper {
 		ClientTickHandler.getClientWeather();
 		ClientWeatherProxy weather = ClientWeatherProxy.get();
 		float rainAmount = weather.getVanillaRainAmount();
-		float visualDarknessAmplifier = 0.5F;
 		//using 1F to make shaders happy
-		visualDarknessAmplifier = 1F;
+		float visualDarknessAmplifier = 1F;
 		//CULog.dbg("rainAmount: " + rainAmount);
 		if (!ConfigMisc.Aesthetic_Only_Mode) {
 			if (precipitating) {
-				mc.level.getLevelData().setRaining(rainAmount > 0);
 				mc.level.setRainLevel(rainAmount * visualDarknessAmplifier);
 				mc.level.setThunderLevel(rainAmount * visualDarknessAmplifier);
 
 			} else {
 				//TODO: i think these glitch out and trigger on world load if it was already raining, will think its false for a sec and lock sky visual to off
 				if (!ClientTickHandler.clientConfigData.overcastMode) {
-					mc.level.getLevelData().setRaining(false);
 					mc.level.setRainLevel(0);
 					mc.level.setThunderLevel(0);
 				} else {
 					if (ClientTickHandler.weatherManager.isVanillaRainActiveOnServer) {
-						mc.level.getLevelData().setRaining(true);
 						mc.level.setRainLevel(rainAmount * visualDarknessAmplifier);
 						mc.level.setThunderLevel(rainAmount * visualDarknessAmplifier);
 					} else {

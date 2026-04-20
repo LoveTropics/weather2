@@ -3,6 +3,8 @@ package extendedrenderer.particle.entity;
 import com.corosus.coroutil.util.CoroUtilBlock;
 import com.corosus.coroutil.util.CoroUtilMisc;
 import com.mojang.blaze3d.pipeline.BlendFunction;
+import com.mojang.blaze3d.pipeline.ColorTargetState;
+import com.mojang.blaze3d.pipeline.DepthStencilState;
 import com.mojang.blaze3d.pipeline.RenderPipeline;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Axis;
@@ -10,17 +12,13 @@ import extendedrenderer.particle.behavior.ParticleBehaviors;
 import net.minecraft.client.Camera;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
-import net.minecraft.client.particle.ParticleRenderType;
-import net.minecraft.client.particle.TextureSheetParticle;
+import net.minecraft.client.particle.SingleQuadParticle;
 import net.minecraft.client.renderer.RenderPipelines;
-import net.minecraft.client.renderer.RenderStateShard;
-import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.texture.TextureAtlas;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.core.BlockPos;
 import net.minecraft.resources.Identifier;
 import net.minecraft.util.Mth;
-import net.minecraft.util.Util;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.levelgen.Heightmap;
@@ -36,57 +34,29 @@ import weather2.weathersystem.WeatherManagerClient;
 import weather2.weathersystem.wind.WindManager;
 
 import java.util.List;
-import java.util.function.Function;
+import java.util.Optional;
 
-public class EntityRotFX extends TextureSheetParticle implements IWindHandler {
+public class EntityRotFX extends SingleQuadParticle implements IWindHandler {
     public static final RenderPipeline TRANSLUCENT_PARTICLE_NO_CULL_PIPELINE = RenderPipeline
         .builder(RenderPipelines.PARTICLE_SNIPPET)
         .withLocation(Identifier.fromNamespaceAndPath(Weather.MODID, "pipeline/translucent_particle_no_cull"))
+        .withColorTargetState(new ColorTargetState(Optional.of(BlendFunction.TRANSLUCENT), ColorTargetState.WRITE_ALL))
         .withCull(false)
-        .withBlend(BlendFunction.TRANSLUCENT)
         .build();
     public static final RenderPipeline OPAQUE_PARTICLE_BLOCK_PIPELINE = RenderPipeline
         .builder(RenderPipelines.PARTICLE_SNIPPET)
         .withLocation(Identifier.fromNamespaceAndPath(Weather.MODID, "pipeline/opaque_particle_block"))
-        .withDepthWrite(true)
+        .withDepthStencilState(DepthStencilState.DEFAULT)
         .build();
-    public static final Function<Identifier, RenderType> TRANSLUCENT_PARTICLE_NO_CULL_RENDER_TYPE = Util.memoize(
-        id -> RenderType.create(
-            Weather.MODID + ":translucent_particle_no_cull",
-            1536,
-            false,
-            true,
-            TRANSLUCENT_PARTICLE_NO_CULL_PIPELINE,
-            RenderType.CompositeState.builder()
-                .setTextureState(new RenderStateShard.TextureStateShard(id, false))
-                .setOutputState(RenderType.PARTICLES_TARGET)
-                .setLightmapState(RenderType.LIGHTMAP)
-                .createCompositeState(false)
-        )
+    public static final Layer SORTED_TRANSLUCENT = new Layer(
+        true,
+        TextureAtlas.LOCATION_PARTICLES,
+        TRANSLUCENT_PARTICLE_NO_CULL_PIPELINE
     );
-    public static final Function<Identifier, RenderType> OPAQUE_PARTICLE_BLOCK_RENDER_TYPE = Util.memoize(
-        id -> RenderType.create(
-            Weather.MODID + ":block_particle",
-            1536,
-            false,
-            true,
-            OPAQUE_PARTICLE_BLOCK_PIPELINE,
-            RenderType.CompositeState.builder()
-                .setTextureState(new RenderStateShard.TextureStateShard(id, false))
-                .setOutputState(RenderType.PARTICLES_TARGET)
-                .setLightmapState(RenderType.LIGHTMAP)
-                .createCompositeState(false)
-        )
-    );
-    public static final ParticleRenderType SORTED_TRANSLUCENT = new ParticleRenderType(
-        "PARTICLE_SHEET_SORTED_TRANSLUCENT",
-        TRANSLUCENT_PARTICLE_NO_CULL_RENDER_TYPE.apply(TextureAtlas.LOCATION_PARTICLES),
-        true
-    );
-    public static final ParticleRenderType SORTED_OPAQUE_BLOCK = new ParticleRenderType(
-        "PARTICLE_BLOCK_SHEET_SORTED_OPAQUE",
-        OPAQUE_PARTICLE_BLOCK_RENDER_TYPE.apply(TextureAtlas.LOCATION_BLOCKS),
-        true
+    public static final Layer SORTED_OPAQUE_BLOCK = new Layer(
+        false,
+        TextureAtlas.LOCATION_BLOCKS,
+        OPAQUE_PARTICLE_BLOCK_PIPELINE
     );
 
     public boolean weatherEffect = false;
@@ -210,9 +180,9 @@ public class EntityRotFX extends TextureSheetParticle implements IWindHandler {
     private float renderDistanceCull = -1;
     private boolean useDynamicWindSpeed = true;
 
-    public EntityRotFX(ClientLevel par1World, double par2, double par4, double par6, double par8, double par10, double par12)
+    public EntityRotFX(ClientLevel par1World, double par2, double par4, double par6, double par8, double par10, double par12, TextureAtlasSprite sprite)
     {
-        super(par1World, par2, par4, par6, par8, par10, par12);
+        super(par1World, par2, par4, par6, par8, par10, par12, sprite);
         setSize(0.3F, 0.3F);
         //this.isImmuneToFire = true;
         //this.setMaxAge(100);
@@ -639,7 +609,7 @@ public class EntityRotFX extends TextureSheetParticle implements IWindHandler {
     @Override
     public void render(VertexConsumer buffer, Camera renderInfo, float partialTicks) {
 
-        Vec3 Vector3d = renderInfo.getPosition();
+        Vec3 Vector3d = renderInfo.position();
         Vec3 pivotedPosition = getPivotedPosition(partialTicks);
         float f = (float)(Mth.lerp(partialTicks, this.xo, this.x) + pivotedPosition.x - Vector3d.x());
         float f1 = (float)(Mth.lerp(partialTicks, this.yo, this.y) + pivotedPosition.y - Vector3d.y());
@@ -651,7 +621,7 @@ public class EntityRotFX extends TextureSheetParticle implements IWindHandler {
             // override rotations
             quaternion = new Quaternionf(0, 0, 0, 1);
             if (facePlayerYaw) {
-                quaternion.mul(Axis.YP.rotationDegrees(-renderInfo.getYRot()));
+                quaternion.mul(Axis.YP.rotationDegrees(-renderInfo.yRot()));
             } else {
                 quaternion.mul(Axis.YP.rotationDegrees(Mth.lerp(partialTicks, this.prevRotationYaw, rotationYaw)));
             }
@@ -883,13 +853,8 @@ public class EntityRotFX extends TextureSheetParticle implements IWindHandler {
     }
 
     @Override
-    public ParticleRenderType getRenderType() {
+    public Layer getLayer() {
         return SORTED_TRANSLUCENT;
-    }
-
-    @Override
-    public void setSprite(TextureAtlasSprite sprite) {
-        super.setSprite(sprite);
     }
 
     public TextureAtlasSprite getSprite() {

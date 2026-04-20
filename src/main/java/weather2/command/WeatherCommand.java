@@ -7,6 +7,7 @@ import com.mojang.brigadier.arguments.FloatArgumentType;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.context.CommandContext;
 import net.minecraft.commands.CommandSourceStack;
+import net.minecraft.commands.Commands;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.phys.Vec3;
 import weather2.ServerTickHandler;
@@ -25,13 +26,13 @@ public class WeatherCommand {
     public static void register(final CommandDispatcher<CommandSourceStack> dispatcher) {
         dispatcher.register(
             literal("weather2")
-                .then(literal("kill_all_storms").requires(s -> s.hasPermission(2)).executes(c -> {
+                .then(literal("kill_all_storms").requires(Commands.hasPermission(Commands.LEVEL_GAMEMASTERS)).executes(c -> {
                     WeatherManagerServer wm = ServerTickHandler.getWeatherManagerFor(c.getSource().getLevel().dimension());
                     wm.clearAllStorms();
                     c.getSource().sendSuccess(() -> Component.literal("Killed all storms"), true);
                     return Command.SINGLE_SUCCESS;
                 }))
-                .then(literal("debug").requires(s -> s.hasPermission(2))
+                .then(literal("debug").requires(Commands.hasPermission(Commands.LEVEL_GAMEMASTERS))
                     .then(literal("print_grab_list").executes(c -> {
                         WeatherUtil.testAllBlocks();
                         c.getSource().sendSuccess(() -> Component.literal("Tornado grab list printed to debug.log"), true);
@@ -45,7 +46,7 @@ public class WeatherCommand {
                         return Command.SINGLE_SUCCESS;
                     }))
                 )
-                .then(literal("wind_event").requires(s -> s.hasPermission(2))
+                .then(literal("wind_event").requires(Commands.hasPermission(Commands.LEVEL_GAMEMASTERS))
                     .then(literal("clear").executes(c -> {
                         WeatherManagerServer wm = ServerTickHandler.getWeatherManagerFor(c.getSource().getLevel().dimension());
                         wm.getWindManager().stopLowWindEvent();
@@ -69,7 +70,7 @@ public class WeatherCommand {
                         return Command.SINGLE_SUCCESS;
                     }))
                 )
-                .then(literal("wind_angle").requires(s -> s.hasPermission(2))
+                .then(literal("wind_angle").requires(Commands.hasPermission(Commands.LEVEL_GAMEMASTERS))
                     .then(argument("angle", IntegerArgumentType.integer(0, 359)).executes(c -> {
                         int angle = IntegerArgumentType.getInteger(c, "angle");
                         WeatherManagerServer wm = ServerTickHandler.getWeatherManagerFor(c.getSource().getLevel().dimension());
@@ -78,7 +79,7 @@ public class WeatherCommand {
                         return Command.SINGLE_SUCCESS;
                     }))
                 )
-                .then(literal("wind_speed").requires(s -> s.hasPermission(2))
+                .then(literal("wind_speed").requires(Commands.hasPermission(Commands.LEVEL_GAMEMASTERS))
                     .then(argument("speed", FloatArgumentType.floatArg(0, 1.5F)).executes(c -> {
                         float speed = FloatArgumentType.getFloat(c, "speed");
                         WeatherManagerServer wm = ServerTickHandler.getWeatherManagerFor(c.getSource().getLevel().dimension());
@@ -87,7 +88,7 @@ public class WeatherCommand {
                         return Command.SINGLE_SUCCESS;
                     }))
                 )
-                .then(literal("server_precipitation").requires(s -> s.hasPermission(2))
+                .then(literal("server_precipitation").requires(Commands.hasPermission(Commands.LEVEL_GAMEMASTERS))
                     .then(argument("amount", FloatArgumentType.floatArg(0, 1.0F)).executes(c -> {
                         float amount = FloatArgumentType.getFloat(c, "amount");
                         WeatherManagerServer wm = ServerTickHandler.getWeatherManagerFor(c.getSource().getLevel().dimension());
@@ -100,7 +101,7 @@ public class WeatherCommand {
                         return Command.SINGLE_SUCCESS;
                     }))
                 )
-                .then(literal("summon").requires(s -> s.hasPermission(2)).requires(s -> WeatherUtilConfig.listDimensionsWeather.contains(s.getLevel().dimension().identifier().toString()))
+                .then(literal("summon").requires(Commands.hasPermission(Commands.LEVEL_GAMEMASTERS)).requires(s -> WeatherUtilConfig.listDimensionsWeather.contains(s.getLevel().dimension().identifier().toString()))
                     .then(literal("storm_rain").executes(c -> {
                         StormObject stormObject = summonStorm(c, StormObject.STATE_NORMAL);
 

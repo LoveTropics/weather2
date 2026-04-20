@@ -5,6 +5,7 @@ import net.minecraft.client.renderer.texture.TextureAtlas;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.renderer.texture.atlas.sources.SingleFile;
 import net.minecraft.core.HolderLookup;
+import net.minecraft.data.AtlasIds;
 import net.minecraft.data.PackOutput;
 import net.minecraft.resources.Identifier;
 import net.neoforged.api.distmarker.Dist;
@@ -130,7 +131,7 @@ public class ParticleRegistry extends SpriteSourceProvider {
     }
 
     public void addSprite(Identifier res) {
-        atlas(SpriteSourceProvider.PARTICLES_ATLAS).addSource(new SingleFile(res, Optional.empty()));
+        atlas(AtlasIds.PARTICLES).addSource(new SingleFile(res, Optional.empty()));
     }
 
     @SubscribeEvent

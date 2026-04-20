@@ -1,9 +1,8 @@
 package weather2.energy;
 
-import net.minecraft.nbt.CompoundTag;
-import net.neoforged.neoforge.energy.EnergyStorage;
+import net.neoforged.neoforge.transfer.energy.SimpleEnergyHandler;
 
-public class EnergyManager extends EnergyStorage {
+public class EnergyManager extends SimpleEnergyHandler {
     private boolean canExtract = true;
 
     public EnergyManager(int maxTransfer, int capacity) {
@@ -30,7 +29,7 @@ public class EnergyManager extends EnergyStorage {
     }*/
 
     public int getMaxEnergyReceived() {
-        return this.maxReceive;
+        return this.maxInsert;
     }
 
     /**

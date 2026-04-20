@@ -5,12 +5,11 @@ import com.corosus.coroutil.util.CoroUtilParticle;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Axis;
 import net.minecraft.client.Camera;
-import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.multiplayer.ClientLevel;
-import net.minecraft.core.BlockPos;
+import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.util.Mth;
-import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.level.levelgen.Heightmap;
+import net.minecraft.world.phys.Vec3;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
 import weather2.ClientTickHandler;
@@ -90,7 +89,7 @@ public class ParticleTexExtraRender extends ParticleTexFX {
     @Override
     public void render(VertexConsumer buffer, Camera renderInfo, float partialTicks) {
         //override rotations
-        Vec3 Vector3d = renderInfo.getPosition();
+        Vec3 Vector3d = renderInfo.position();
         Quaternionf quaternion;
         if (this.facePlayer || (this.rotationPitch == 0 && this.rotationYaw == 0)) {
            quaternion = renderInfo.rotation();

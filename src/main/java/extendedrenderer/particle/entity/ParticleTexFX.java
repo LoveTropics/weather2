@@ -7,8 +7,7 @@ public class ParticleTexFX extends EntityRotFX {
 
 	public ParticleTexFX(ClientLevel worldIn, double posXIn, double posYIn, double posZIn, double mX, double mY, double mZ, TextureAtlasSprite par8Item)
     {
-        super(worldIn, posXIn, posYIn, posZIn, mX, mY-0.5, mZ);
-        this.setSprite(par8Item);
+        super(worldIn, posXIn, posYIn, posZIn, mX, mY - 0.5, mZ, par8Item);
         //this.setParticleTexture(Minecraft.getInstance().getItemRenderer().getItemModelMesher().getParticleIcon(Items.IRON_AXE, 0));
         this.rCol = 1.0F;
         this.gCol = 1.0F;

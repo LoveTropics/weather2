@@ -23,7 +23,7 @@ public class ClientEventHandler {
     }
 
     @SubscribeEvent
-    public static void worldRenderAfterParticles(RenderLevelStageEvent.AfterParticles event) {
+    public static void worldRenderAfterParticles(RenderLevelStageEvent.AfterTranslucentParticles event) {
         if (ConfigDebug.Particle_engine_render) {
             //System.out.println("dsf " + event.getPartialTick().getGameTimeDeltaTicks());
             ParticleManagerExtended particleManagerExtended = ClientTickHandler.particleManagerExtended();

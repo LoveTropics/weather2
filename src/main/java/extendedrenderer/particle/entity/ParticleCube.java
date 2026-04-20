@@ -61,7 +61,7 @@ public class ParticleCube extends ParticleTexFX {
 	@Override
 	public void render(VertexConsumer buffer, Camera renderInfo, float partialTicks) {
 		//if (true) return;
-		Vec3 pos = renderInfo.getPosition();
+		Vec3 pos = renderInfo.position();
 		float f = (float) (Mth.lerp(partialTicks, this.xo, this.x) - pos.x());
 		float f1 = (float) (Mth.lerp(partialTicks, this.yo, this.y) - pos.y());
 		float f2 = (float) (Mth.lerp(partialTicks, this.zo, this.z) - pos.z());
@@ -72,7 +72,7 @@ public class ParticleCube extends ParticleTexFX {
 			// override rotations
 			quaternion = new Quaternionf(0, 0, 0, 1);
 			if (facePlayerYaw) {
-				quaternion.mul(Axis.YP.rotationDegrees(-renderInfo.getYRot()));
+				quaternion.mul(Axis.YP.rotationDegrees(-renderInfo.yRot()));
 			} else {
 				quaternion.mul(Axis.YP.rotationDegrees(Mth.lerp(partialTicks, this.prevRotationYaw, rotationYaw)));
 			}

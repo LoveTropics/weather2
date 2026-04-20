@@ -21,7 +21,6 @@ import net.minecraft.world.level.block.LightningRodBlock;
 import net.minecraft.world.level.block.WeatheringCopper;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.gameevent.GameEvent;
-import net.minecraft.world.level.gamerules.GameRules;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
 import net.minecraft.world.phys.AABB;
@@ -160,8 +159,8 @@ public class LightningBoltWeather extends Entity {
    }
 
    private void spawnFire(int p_20871_) {
-	   if (!this.visualOnly && level() instanceof ServerLevel level && level.getGameRules().getBoolean(GameRules.RULE_DOFIRETICK)) {
-         BlockPos blockpos = this.blockPosition();
+      BlockPos blockpos = this.blockPosition();
+      if (!this.visualOnly && level() instanceof ServerLevel level && level.canSpreadFireAround(blockpos)) {
          BlockState blockstate = BaseFireBlock.getState(this.level(), blockpos);
 		   if (level.getBlockState(blockpos).isAir() && blockstate.canSurvive(level, blockpos)) {
 			   level.setBlockAndUpdate(blockpos, blockstate);

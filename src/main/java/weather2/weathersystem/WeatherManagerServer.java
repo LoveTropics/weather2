@@ -23,6 +23,7 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.chunk.LevelChunk;
+import net.minecraft.world.level.saveddata.WeatherData;
 import net.minecraft.world.phys.Vec3;
 import weather2.ServerWeatherProxy;
 import weather2.Weather;
@@ -270,14 +271,14 @@ public class WeatherManagerServer extends WeatherManager {
             maxStack = 4;
         }
         if (world.getGameTime() % rate == 0) {
-            List<ChunkHolder> list = Lists.newArrayList(((ServerLevel) world).getChunkSource().chunkMap.getChunks());
+            List<ChunkHolder> list = Lists.newArrayList(((ServerLevel) world).getChunkSource().chunkMap.visibleChunkMap.values());
             Collections.shuffle(list);
             list.forEach((p_241099_7_) -> {
                 //Optional<LevelChunk> optional = p_241099_7_.getTickingChunkFuture().getNow(ChunkHolder.UNLOADED_LEVEL_CHUNK).;
                 LevelChunk chunk = p_241099_7_.getTickingChunk();
                 if (chunk != null) {
                     for (int i = 0; i < 10; i++) {
-                        BlockPos blockPos = new BlockPos((chunk.getPos().x * 16) + rand.nextInt(16), 0, (chunk.getPos().z * 16) + rand.nextInt(16));
+                        BlockPos blockPos = new BlockPos((chunk.getPos().x() * 16) + rand.nextInt(16), 0, (chunk.getPos().z() * 16) + rand.nextInt(16));
                         int y = WeatherUtilBlock.getPrecipitationHeightSafe(world, blockPos).getY();
                         Vec3 pos = new Vec3(blockPos.getX(), y, blockPos.getZ());
                         WeatherUtilBlock.fillAgainstWallSmoothly(world, pos, angle, 15, 2, block, maxStack);
@@ -317,20 +318,21 @@ public class WeatherManagerServer extends WeatherManager {
         if (world != null) {
             if (!ConfigMisc.overcastMode) {
                 if (ConfigMisc.lockServerWeatherMode != -1) {
-                    world.serverLevelData.setRaining(ConfigMisc.lockServerWeatherMode == 1);
-                    world.serverLevelData.setThundering(ConfigMisc.lockServerWeatherMode == 1);
+                    WeatherData weatherData = world.getWeatherData();
+                    weatherData.setRaining(ConfigMisc.lockServerWeatherMode == 1);
+                    weatherData.setThundering(ConfigMisc.lockServerWeatherMode == 1);
                 }
             }
 
             if (ConfigStorm.preventServerThunderstorms && !ConfigMisc.Aesthetic_Only_Mode) {
-                world.serverLevelData.setThundering(false);
+                world.getWeatherData().setThundering(false);
             }
 
             //if (ConfigMisc.overcastMode) {
             if (world.getGameTime() % 40 == 0) {
                 isVanillaRainActiveOnServer = world.isRaining();
                 isVanillaThunderActiveOnServer = world.isThundering();
-                vanillaRainTimeOnServer = world.serverLevelData.getRainTime();
+                vanillaRainTimeOnServer = world.getWeatherData().getRainTime();
                 float minRain = 0;
                 float maxRain = 0;
                 if (world.isThundering()) {

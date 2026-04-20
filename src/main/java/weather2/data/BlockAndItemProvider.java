@@ -2,6 +2,7 @@ package weather2.data;
 
 import net.minecraft.client.renderer.texture.atlas.sources.SingleFile;
 import net.minecraft.core.HolderLookup;
+import net.minecraft.data.AtlasIds;
 import net.minecraft.data.PackOutput;
 import net.minecraft.resources.Identifier;
 import net.neoforged.neoforge.client.data.SpriteSourceProvider;
@@ -34,10 +35,10 @@ public class BlockAndItemProvider extends SpriteSourceProvider {
     }
 
     public void addSpriteBlock(String textureName) {
-        atlas(SpriteSourceProvider.BLOCKS_ATLAS).addSource(new SingleFile(Identifier.parse(Weather.MODID + ":blocks/" + textureName), Optional.empty()));
+        atlas(AtlasIds.BLOCKS).addSource(new SingleFile(Identifier.fromNamespaceAndPath(Weather.MODID, "blocks/" + textureName), Optional.empty()));
     }
 
     public void addSpriteItem(String textureName) {
-        atlas(SpriteSourceProvider.BLOCKS_ATLAS).addSource(new SingleFile(Identifier.parse(Weather.MODID + ":items/" + textureName), Optional.empty()));
+        atlas(AtlasIds.BLOCKS).addSource(new SingleFile(Identifier.fromNamespaceAndPath(Weather.MODID, "items/" + textureName), Optional.empty()));
     }
 }

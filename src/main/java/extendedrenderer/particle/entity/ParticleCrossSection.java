@@ -3,11 +3,11 @@ package extendedrenderer.particle.entity;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Axis;
 import net.minecraft.client.Camera;
-import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.multiplayer.ClientLevel;
+import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.util.Mth;
-import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.phys.Vec3;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
 
@@ -22,7 +22,7 @@ public class ParticleCrossSection extends ParticleTexFX {
     @Override
     public void render(VertexConsumer buffer, Camera renderInfo, float partialTicks) {
 
-        Vec3 Vector3d = renderInfo.getPosition();
+        Vec3 Vector3d = renderInfo.position();
         float f = (float) (Mth.lerp(partialTicks, this.xo, this.x) - Vector3d.x());
         float f1 = (float) (Mth.lerp(partialTicks, this.yo, this.y) - Vector3d.y());
         float f2 = (float) (Mth.lerp(partialTicks, this.zo, this.z) - Vector3d.z());
@@ -33,7 +33,7 @@ public class ParticleCrossSection extends ParticleTexFX {
             // override rotations
             quaternion = new Quaternionf(0, 0, 0, 1);
             if (facePlayerYaw) {
-                quaternion.mul(Axis.YP.rotationDegrees(-renderInfo.getYRot()));
+                quaternion.mul(Axis.YP.rotationDegrees(-renderInfo.yRot()));
             } else {
                 quaternion.mul(Axis.YP.rotationDegrees(Mth.lerp(partialTicks, this.prevRotationYaw, rotationYaw)));
             }
