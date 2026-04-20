@@ -7,9 +7,6 @@ import com.mojang.brigadier.arguments.FloatArgumentType;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.context.CommandContext;
 import net.minecraft.commands.CommandSourceStack;
-import net.minecraft.commands.arguments.RangeArgument;
-import net.minecraft.core.BlockPos;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.phys.Vec3;
 import weather2.ServerTickHandler;
@@ -103,7 +100,7 @@ public class WeatherCommand {
                         return Command.SINGLE_SUCCESS;
                     }))
                 )
-                .then(literal("summon").requires(s -> s.hasPermission(2)).requires(s -> WeatherUtilConfig.listDimensionsWeather.contains(s.getLevel().dimension().location().toString()))
+                .then(literal("summon").requires(s -> s.hasPermission(2)).requires(s -> WeatherUtilConfig.listDimensionsWeather.contains(s.getLevel().dimension().identifier().toString()))
                     .then(literal("storm_rain").executes(c -> {
                         StormObject stormObject = summonStorm(c, StormObject.STATE_NORMAL);
 
@@ -253,7 +250,7 @@ public class WeatherCommand {
                                         tag.putInt("time_ticks", 1200);
                                         tag.putBoolean("baby", false);
                                         tag.putBoolean("sharknado", true);
-                                        tag.putString("dimension", c.getSource().getEntity().getLevel().dimension().location().toString());
+                                        tag.putString("dimension", c.getSource().getEntity().getLevel().dimension().identifier().toString());
                                         return tag;
                                     });
 

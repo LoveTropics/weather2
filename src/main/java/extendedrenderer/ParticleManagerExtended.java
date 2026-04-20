@@ -32,7 +32,7 @@ import net.minecraft.core.particles.ParticleGroup;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.FileToIdConverter;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.packs.resources.PreparableReloadListener;
 import net.minecraft.server.packs.resources.Resource;
 import net.minecraft.server.packs.resources.ResourceManager;
@@ -61,7 +61,7 @@ import java.util.stream.Collectors;
 public class ParticleManagerExtended implements PreparableReloadListener {
    private static final Logger LOGGER = LogUtils.getLogger();
    private static final FileToIdConverter PARTICLE_LISTER = FileToIdConverter.json("particles");
-   private static final ResourceLocation PARTICLES_ATLAS_INFO = ResourceLocation.withDefaultNamespace("particles");
+    private static final Identifier PARTICLES_ATLAS_INFO = Identifier.withDefaultNamespace("particles");
    private static final int MAX_PARTICLES_PER_LAYER = 16384;
 	private static final List<ParticleRenderType> RENDER_ORDER = ImmutableList.of(ParticleRenderType.TERRAIN_SHEET, ParticleRenderType.PARTICLE_SHEET_OPAQUE, ParticleRenderType.PARTICLE_SHEET_TRANSLUCENT, ParticleRenderType.CUSTOM, ParticleRenderType.CUSTOM, EntityRotFX.SORTED_OPAQUE_BLOCK, EntityRotFX.SORTED_TRANSLUCENT);
    protected ClientLevel level;
@@ -69,9 +69,9 @@ public class ParticleManagerExtended implements PreparableReloadListener {
    private final Queue<TrackingEmitter> trackingEmitters = Queues.newArrayDeque();
    private final TextureManager textureManager;
    private final RandomSource random = RandomSource.create();
-   private final Map<ResourceLocation, ParticleProvider<?>> providers = new java.util.HashMap<>();
+    private final Map<Identifier, ParticleProvider<?>> providers = new java.util.HashMap<>();
    private final Queue<Particle> particlesToAdd = Queues.newArrayDeque();
-   private final Map<ResourceLocation, ParticleManagerExtended.MutableSpriteSet> spriteSets = Maps.newHashMap();
+    private final Map<Identifier, ParticleManagerExtended.MutableSpriteSet> spriteSets = Maps.newHashMap();
    private final TextureAtlas textureAtlas;
    private final Object2IntOpenHashMap<ParticleGroup> trackedParticleCounts = new Object2IntOpenHashMap<>();
 
@@ -84,14 +84,14 @@ public class ParticleManagerExtended implements PreparableReloadListener {
 
 	@Override
 	public CompletableFuture<Void> reload(PreparationBarrier p_107305_, ResourceManager p_107306_, Executor p_107309_, Executor p_107310_) {
-      record ParticleDefinition(ResourceLocation id, Optional<List<ResourceLocation>> sprites) {
+        record ParticleDefinition(Identifier id, Optional<List<Identifier>> sprites) {
       }
       CompletableFuture<List<ParticleDefinition>> completablefuture = CompletableFuture.supplyAsync(() -> {
          return PARTICLE_LISTER.listMatchingResources(p_107306_);
       }, p_107309_).thenCompose((p_247914_) -> {
          List<CompletableFuture<ParticleDefinition>> list = new ArrayList<>(p_247914_.size());
          p_247914_.forEach((p_247903_, p_247904_) -> {
-            ResourceLocation resourcelocation = PARTICLE_LISTER.fileToId(p_247903_);
+             Identifier resourcelocation = PARTICLE_LISTER.fileToId(p_247903_);
             list.add(CompletableFuture.supplyAsync(() -> {
                return new ParticleDefinition(resourcelocation, this.loadParticleDescription(resourcelocation, p_247904_));
             }, p_107309_));
@@ -107,14 +107,14 @@ public class ParticleManagerExtended implements PreparableReloadListener {
          SpriteLoader.Preparations spriteloader$preparations = completablefuture1.join();
          this.textureAtlas.upload(spriteloader$preparations);
 		  profiler.popPush("bindSpriteSets");
-         Set<ResourceLocation> set = new HashSet<>();
+          Set<Identifier> set = new HashSet<>();
          TextureAtlasSprite textureatlassprite = spriteloader$preparations.missing();
          completablefuture.join().forEach((p_247911_) -> {
-            Optional<List<ResourceLocation>> optional = p_247911_.sprites();
+             Optional<List<Identifier>> optional = p_247911_.sprites();
             if (!optional.isEmpty()) {
                List<TextureAtlasSprite> list = new ArrayList<>();
 
-               for(ResourceLocation resourcelocation : optional.get()) {
+                for (Identifier resourcelocation : optional.get()) {
                   TextureAtlasSprite textureatlassprite1 = spriteloader$preparations.regions().get(resourcelocation);
                   if (textureatlassprite1 == null) {
                      set.add(resourcelocation);
@@ -132,7 +132,7 @@ public class ParticleManagerExtended implements PreparableReloadListener {
             }
          });
          if (!set.isEmpty()) {
-            LOGGER.warn("Missing particle sprites: {}", set.stream().sorted().map(ResourceLocation::toString).collect(Collectors.joining(",")));
+             LOGGER.warn("Missing particle sprites: {}", set.stream().sorted().map(Identifier::toString).collect(Collectors.joining(",")));
          }
 
 		  profiler.pop();
@@ -144,7 +144,7 @@ public class ParticleManagerExtended implements PreparableReloadListener {
       this.textureAtlas.clearTextureData();
    }
 
-   private Optional<List<ResourceLocation>> loadParticleDescription(ResourceLocation p_250648_, Resource p_248793_) {
+    private Optional<List<Identifier>> loadParticleDescription(Identifier p_250648_, Resource p_248793_) {
       if (!this.spriteSets.containsKey(p_250648_)) {
          LOGGER.debug("Redundant texture list for particle: {}", (Object)p_250648_);
          return Optional.empty();

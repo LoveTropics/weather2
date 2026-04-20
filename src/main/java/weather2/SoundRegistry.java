@@ -1,11 +1,11 @@
 package weather2;
 
-import java.util.HashMap;
-
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.sounds.SoundEvent;
 import net.neoforged.neoforge.registries.DeferredRegister;
+
+import java.util.HashMap;
 
 public class SoundRegistry {
 
@@ -49,7 +49,7 @@ public class SoundRegistry {
 	}
 
 	public static void register(String soundPath) {
-		ResourceLocation resLoc = ResourceLocation.fromNamespaceAndPath(Weather.MODID, soundPath);
+        Identifier resLoc = Identifier.fromNamespaceAndPath(Weather.MODID, soundPath);
 		//SoundEvent event = new SoundEvent(resLoc).setRegistryName(resLoc);
 		SoundEvent event = SoundEvent.createVariableRangeEvent(resLoc);
 		//TODO: WIP SoundEvent event = SoundEvent.createVariableRangeEvent(resLoc).setRegistryName(resLoc);
@@ -57,7 +57,7 @@ public class SoundRegistry {
 		SOUND_EVENTS.register(
 			soundPath, // must match the resource location on the next line
 			() -> {
-				//SoundEvent event = SoundEvent.createVariableRangeEvent(ResourceLocation.fromNamespaceAndPath(Weather.MODID, soundPath));
+                //SoundEvent event = SoundEvent.createVariableRangeEvent(Identifier.fromNamespaceAndPath(Weather.MODID, soundPath));
 				lookupStringToEvent.put(soundPath, event);
 				return event;
 			});

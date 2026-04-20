@@ -1283,7 +1283,7 @@ public class StormObject extends WeatherObject {
             }
 
 			if (((ConfigMisc.overcastMode && manager.getWorld().isRaining()) || !ConfigMisc.overcastMode)
-				&& WeatherUtilConfig.listDimensionsStorms.contains(manager.getWorld().dimension().location().toString()) && tryFormStorm) {
+				&& WeatherUtilConfig.listDimensionsStorms.contains(manager.getWorld().dimension().identifier().toString()) && tryFormStorm) {
 				int stormFrontCollideDist = ConfigStorm.Storm_Deadly_CollideDistance;
 				int randomChanceOfCollide = ConfigStorm.Player_Storm_Deadly_OddsTo1;
 				int randomChanceOfCollideLand = ConfigStorm.Player_Storm_Deadly_OddsTo1_Land_Based;
@@ -1506,7 +1506,7 @@ public class StormObject extends WeatherObject {
 
 		//tick this more often for smoother forming on the client side (packet sync rate is 2 so 2 is good enough here)
 		if (world.getGameTime() % 2 == 0) {
-			if (((ConfigMisc.overcastMode && manager.getWorld().isRaining()) || !ConfigMisc.overcastMode) && WeatherUtilConfig.listDimensionsStorms.contains(manager.getWorld().dimension().location().toString())/* && tryFormStorm*/) {
+			if (((ConfigMisc.overcastMode && manager.getWorld().isRaining()) || !ConfigMisc.overcastMode) && WeatherUtilConfig.listDimensionsStorms.contains(manager.getWorld().dimension().identifier().toString())/* && tryFormStorm*/) {
 				if (isRealStorm() && !hasStormPeaked) {
 
 					//speed up forming and greater progression when past forming state

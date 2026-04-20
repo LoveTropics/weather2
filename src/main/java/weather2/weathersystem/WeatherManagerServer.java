@@ -193,7 +193,7 @@ public class WeatherManagerServer extends WeatherManager {
 
                 //cloud formation spawning - REFINE ME!
                 boolean spawnClouds = true;
-                if (spawnClouds && !Weather.isLoveTropicsInstalled() && !ConfigMisc.Aesthetic_Only_Mode && WeatherUtilConfig.shouldTickClouds(world.dimension().location().toString())) {
+                if (spawnClouds && !Weather.isLoveTropicsInstalled() && !ConfigMisc.Aesthetic_Only_Mode && WeatherUtilConfig.shouldTickClouds(world.dimension().identifier().toString())) {
                     for (int i = 0; i < world.players().size(); i++) {
                         Player entP = world.players().get(i);
 
@@ -223,7 +223,7 @@ public class WeatherManagerServer extends WeatherManager {
             }
 
             //if dimension can have storms, tick sandstorm spawning every 10 seconds
-            if (!Weather.isLoveTropicsInstalled() && WeatherUtilConfig.listDimensionsStorms.contains(world.dimension().location().toString()) && world.getGameTime() % 200 == 0 && windMan.isHighWindEventActive()) {
+            if (!Weather.isLoveTropicsInstalled() && WeatherUtilConfig.listDimensionsStorms.contains(world.dimension().identifier().toString()) && world.getGameTime() % 200 == 0 && windMan.isHighWindEventActive()) {
                 if (!ConfigSand.Storm_NoSandstorms) {
                     tryParticleStorm(world, WeatherObjectParticleStorm.StormType.SANDSTORM);
                 }

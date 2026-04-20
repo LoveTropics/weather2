@@ -2,8 +2,8 @@ package weather2;
 
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
+import net.minecraft.resources.Identifier;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.MobCategory;
 import net.neoforged.fml.ModContainer;
@@ -30,7 +30,7 @@ public class EntityRegistry {
             .sized(0.0F, 0.0F)
             .clientTrackingRange(16)
             .updateInterval(Integer.MAX_VALUE)
-		.build(ResourceKey.create(Registries.ENTITY_TYPE, ResourceLocation.fromNamespaceAndPath(Weather.MODID, "gateway"))));
+        .build(ResourceKey.create(Registries.ENTITY_TYPE, Identifier.fromNamespaceAndPath(Weather.MODID, "gateway"))));
     /*
     @SubscribeEvent
     public static void registerEntity(RegistryEvent.Register<EntityType<?>> e) {

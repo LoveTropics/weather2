@@ -19,7 +19,7 @@ import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.texture.TextureAtlas;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.core.BlockPos;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.Level;
@@ -41,16 +41,16 @@ import java.util.function.Function;
 public class EntityRotFX extends TextureSheetParticle implements IWindHandler {
     public static final RenderPipeline TRANSLUCENT_PARTICLE_NO_CULL_PIPELINE = RenderPipeline
         .builder(RenderPipelines.PARTICLE_SNIPPET)
-        .withLocation(ResourceLocation.fromNamespaceAndPath(Weather.MODID, "pipeline/translucent_particle_no_cull"))
+        .withLocation(Identifier.fromNamespaceAndPath(Weather.MODID, "pipeline/translucent_particle_no_cull"))
         .withCull(false)
         .withBlend(BlendFunction.TRANSLUCENT)
         .build();
     public static final RenderPipeline OPAQUE_PARTICLE_BLOCK_PIPELINE = RenderPipeline
         .builder(RenderPipelines.PARTICLE_SNIPPET)
-        .withLocation(ResourceLocation.fromNamespaceAndPath(Weather.MODID, "pipeline/opaque_particle_block"))
+        .withLocation(Identifier.fromNamespaceAndPath(Weather.MODID, "pipeline/opaque_particle_block"))
         .withDepthWrite(true)
         .build();
-    public static final Function<ResourceLocation, RenderType> TRANSLUCENT_PARTICLE_NO_CULL_RENDER_TYPE = Util.memoize(
+    public static final Function<Identifier, RenderType> TRANSLUCENT_PARTICLE_NO_CULL_RENDER_TYPE = Util.memoize(
         id -> RenderType.create(
             Weather.MODID + ":translucent_particle_no_cull",
             1536,
@@ -64,7 +64,7 @@ public class EntityRotFX extends TextureSheetParticle implements IWindHandler {
                 .createCompositeState(false)
         )
     );
-    public static final Function<ResourceLocation, RenderType> OPAQUE_PARTICLE_BLOCK_RENDER_TYPE = Util.memoize(
+    public static final Function<Identifier, RenderType> OPAQUE_PARTICLE_BLOCK_RENDER_TYPE = Util.memoize(
         id -> RenderType.create(
             Weather.MODID + ":block_particle",
             1536,

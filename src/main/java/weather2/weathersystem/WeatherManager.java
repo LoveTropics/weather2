@@ -94,7 +94,7 @@ public abstract class WeatherManager extends SavedData {
 			}
 
 			//tick wind, always tick if love tropics installed, so the override on wind speed updates correctly
-			if (Weather.isLoveTropicsInstalled() || WeatherUtilConfig.listDimensionsWindEffects.contains(getWorld().dimension().location().toString())) {
+			if (Weather.isLoveTropicsInstalled() || WeatherUtilConfig.listDimensionsWindEffects.contains(getWorld().dimension().identifier().toString())) {
 				wind.tick();
 			}
 		}

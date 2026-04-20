@@ -82,7 +82,7 @@ public class WeatherUtilSound {
     {
         //String prefix = "streaming.";
         String affix = ".ogg";
-        //ResourceLocation res = new ResourceLocation(var1);
+        //Identifier res = new Identifier(var1);
         SoundEvent event = SoundRegistry.get(var1);
         MovingSoundStreamingSource sound = new MovingSoundStreamingSource(parPos, event, SoundSource.WEATHER, parVolume, parPitch, parCutOffRange);
         Minecraft.getInstance().getSoundManager().play(sound);
@@ -93,7 +93,7 @@ public class WeatherUtilSound {
         //String prefix = "streaming.";
         String affix = ".ogg";
 
-        //ResourceLocation res = new ResourceLocation(var1);
+        //Identifier res = new Identifier(var1);
         SoundEvent event = SoundRegistry.get(var1);
 
         try {

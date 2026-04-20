@@ -41,14 +41,14 @@ public class ServerTickHandler {
 			ServerLevel serverWorld = (ServerLevel) world;
 			ResourceKey<Level> dimension = serverWorld.dimension();
             WeatherManagerServer weatherManagerServer;
-            if (!WeatherUtilConfig.listDimensionsWeather.contains(serverWorld.dimension().location().toString())) {
+			if (!WeatherUtilConfig.listDimensionsWeather.contains(serverWorld.dimension().identifier().toString())) {
                 weatherManagerServer = new WeatherManagerServer();
             } else {
                 weatherManagerServer = serverWorld.getDataStorage().computeIfAbsent(WeatherManager.TYPE);
             }
             weatherManagerServer.setWorld(serverWorld);
             MANAGERS.put(dimension, weatherManagerServer);
-            MANAGERSLOOKUP.put(dimension.location().toString(), weatherManagerServer);
+			MANAGERSLOOKUP.put(dimension.identifier().toString(), weatherManagerServer);
 		}
 	}
 
@@ -66,7 +66,7 @@ public class ServerTickHandler {
 	public static void tickServer(ServerTickEvent.Pre event) {
 		for (WeatherManagerServer manager : MANAGERS.values()) {
 			//for non whitelisted dimensions i chose to still tick the manager, and also register it, so it can get cleaned up if people spawn stuff or change config
-			//if (WeatherUtilConfig.listDimensionsWeather.contains(manager.getWorld().dimension().location().toString())) {
+			//if (WeatherUtilConfig.listDimensionsWeather.contains(manager.getWorld().dimension().identifier().toString())) {
 			manager.tick();
 			//}
 		}

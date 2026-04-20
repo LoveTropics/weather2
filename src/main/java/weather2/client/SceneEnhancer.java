@@ -25,7 +25,7 @@ import net.minecraft.core.Direction;
 import net.minecraft.core.Vec3i;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.core.particles.ParticleTypes;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ParticleStatus;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
@@ -103,8 +103,8 @@ public class SceneEnhancer implements Runnable {
 
 	private static final List<BlockPos> listPosRandom = new ArrayList<>();
 
-	public static final ResourceLocation RAIN_TEXTURES_GREEN = ResourceLocation.fromNamespaceAndPath(Weather.MODID, "textures/environment/rain_green.png");
-	public static final ResourceLocation RAIN_TEXTURES = ResourceLocation.fromNamespaceAndPath("minecraft", "textures/environment/rain.png");
+	public static final Identifier RAIN_TEXTURES_GREEN = Identifier.fromNamespaceAndPath(Weather.MODID, "textures/environment/rain_green.png");
+	public static final Identifier RAIN_TEXTURES = Identifier.fromNamespaceAndPath("minecraft", "textures/environment/rain.png");
 
 	public static boolean FORCE_ON_DEBUG_TESTING = false;
 
