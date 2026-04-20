@@ -70,7 +70,7 @@ public class ForecastBlock extends Block {
 			}
             int count = 0;
             for (int i = 0; i < 100000; i++) {
-                if (p_60504_.random.nextInt(1000) == 0) {
+                if (p_60504_.getRandom().nextInt(1000) == 0) {
                     count++;
                 }
             }

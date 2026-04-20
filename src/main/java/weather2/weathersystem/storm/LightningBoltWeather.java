@@ -180,26 +180,26 @@ public class LightningBoltWeather extends Entity {
       }
    }
 
-   private static void clearCopperOnLightningStrike(Level p_147151_, BlockPos p_147152_) {
-      BlockState blockstate = p_147151_.getBlockState(p_147152_);
+   private static void clearCopperOnLightningStrike(Level level, BlockPos p_147152_) {
+      BlockState blockstate = level.getBlockState(p_147152_);
       BlockPos blockpos;
       BlockState blockstate1;
       if (blockstate.is(Blocks.LIGHTNING_ROD)) {
          blockpos = p_147152_.relative(blockstate.getValue(LightningRodBlock.FACING).getOpposite());
-         blockstate1 = p_147151_.getBlockState(blockpos);
+         blockstate1 = level.getBlockState(blockpos);
       } else {
          blockpos = p_147152_;
          blockstate1 = blockstate;
       }
 
       if (blockstate1.getBlock() instanceof WeatheringCopper) {
-         p_147151_.setBlockAndUpdate(blockpos, WeatheringCopper.getFirst(p_147151_.getBlockState(blockpos)));
+         level.setBlockAndUpdate(blockpos, WeatheringCopper.getFirst(level.getBlockState(blockpos)));
          BlockPos.MutableBlockPos blockpos$mutableblockpos = p_147152_.mutable();
-         int i = p_147151_.random.nextInt(3) + 3;
+         int i = level.getRandom().nextInt(3) + 3;
 
          for(int j = 0; j < i; ++j) {
-            int k = p_147151_.random.nextInt(8) + 1;
-            randomWalkCleaningCopper(p_147151_, blockpos, blockpos$mutableblockpos, k);
+            int k = level.getRandom().nextInt(8) + 1;
+            randomWalkCleaningCopper(level, blockpos, blockpos$mutableblockpos, k);
          }
 
       }
@@ -220,7 +220,7 @@ public class LightningBoltWeather extends Entity {
    }
 
    private static Optional<BlockPos> randomStepCleaningCopper(Level p_147154_, BlockPos p_147155_) {
-      for(BlockPos blockpos : BlockPos.randomInCube(p_147154_.random, 10, p_147155_, 1)) {
+      for (BlockPos blockpos : BlockPos.randomInCube(p_147154_.getRandom(), 10, p_147155_, 1)) {
          BlockState blockstate = p_147154_.getBlockState(blockpos);
          if (blockstate.getBlock() instanceof WeatheringCopper) {
             WeatheringCopper.getPrevious(blockstate).ifPresent((p_147144_) -> {

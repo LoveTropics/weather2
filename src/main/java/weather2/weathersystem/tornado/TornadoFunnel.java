@@ -7,15 +7,19 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.core.BlockPos;
 import net.minecraft.util.Mth;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.phys.Vec3;
 import org.joml.Matrix3f;
 import org.joml.Quaternionf;
 import org.joml.Vector3d;
 import org.joml.Vector3f;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Random;
 
 /**
  * To contain the full funnel, with each component piece
@@ -130,18 +134,20 @@ public class TornadoFunnel {
                 piece.listParticles.remove(piece.listParticles.size() - 1);
             }*/
 
-            if (piece.bezierCurve == null || entP.level().getGameTime() % 40 == 0) {
+            Level level = entP.level();
+            RandomSource random = level.getRandom();
+            if (piece.bezierCurve == null || level.getGameTime() % 40 == 0) {
                 Vector3f[] vecs = new Vector3f[4];
                 for (int ii = 0; ii < vecs.length; ii++) {
-                    vecs[ii] = new Vector3f(entP.level().random.nextFloat(), entP.level().random.nextFloat(), entP.level().random.nextFloat());
+                    vecs[ii] = new Vector3f(random.nextFloat(), random.nextFloat(), random.nextFloat());
                 }
                 piece.bezierCurve = new CubicBezierCurve(vecs);
             }
 
-            if (bezierCurve == null || entP.level().getGameTime() % 40 == 0) {
+            if (bezierCurve == null || level.getGameTime() % 40 == 0) {
                 Vector3f[] vecs = new Vector3f[4];
                 for (int ii = 0; ii < vecs.length; ii++) {
-                    vecs[ii] = new Vector3f(entP.level().random.nextFloat(), entP.level().random.nextFloat(), entP.level().random.nextFloat());
+                    vecs[ii] = new Vector3f(random.nextFloat(), random.nextFloat(), random.nextFloat());
                 }
                 bezierCurve = new CubicBezierCurve(vecs);
             }
@@ -153,7 +159,7 @@ public class TornadoFunnel {
 
                 //pos = world.getPrecipitationHeight(pos).add(0, 1, 0);
 
-                ClientLevel world = (ClientLevel)entP.level();
+                ClientLevel world = (ClientLevel) level;
 
                 ParticleTexFX particleTest = new ParticleTexFX(world, pos.getX() + rand.nextFloat(),
                         pos.getY(),
@@ -164,7 +170,7 @@ public class TornadoFunnel {
                 particleTest.setParticleSpeed(0, 0, 0);
                 particleTest.setScale(0.1F);
                 //particleTest.setColor(0.1F * (particles.size() % particleCountCircle), 0, 0);
-                particleTest.setColor(world.random.nextFloat(), world.random.nextFloat(), world.random.nextFloat());
+                particleTest.setColor(world.getRandom().nextFloat(), world.getRandom().nextFloat(), world.getRandom().nextFloat());
                 particleTest.setGravity(0);
                 /*if (piece.listParticles.size() < particleCountCircle * 5) {
                     particleTest.setColor(1, 1, 1);

@@ -172,7 +172,7 @@ public class TornadoFunnelSimpleClient extends TornadoFunnelSimple {
                     }
 
                     float baseBright = 0.8F;
-                    float randFloat = (level.random.nextFloat() * 0.2F);
+                    float randFloat = (level.getRandom().nextFloat() * 0.2F);
                     float finalBright = Math.min(1F, baseBright + randFloat);
                     particle.setColor(finalBright, finalBright, finalBright);
                 }
@@ -266,20 +266,20 @@ public class TornadoFunnelSimpleClient extends TornadoFunnelSimple {
         particle.setScale(0.1F);
         particle.setScale(5F);
         particle.setScale(15F);
-        //particle.setColor(world.random.nextFloat(), world.random.nextFloat(), world.random.nextFloat());
+        //particle.setColor(world.getRandom().nextFloat(), world.getRandom().nextFloat(), world.getRandom().nextFloat());
         if (!stormObject.isFirenado) {
             float baseBright = 0.3F;
-            float randFloat = (world.random.nextFloat() * 0.6F);
+            float randFloat = (world.getRandom().nextFloat() * 0.6F);
             float finalBright = Math.min(1F, baseBright + randFloat);
             particle.setColor(finalBright - 0.2F, finalBright - 0.2F, finalBright - 0.2F);
         } else {
             float baseBright = 0.6F;
-            float randFloat = (world.random.nextFloat() * 0.3F);
+            float randFloat = (world.getRandom().nextFloat() * 0.3F);
             float finalBright = Math.min(1F, baseBright + randFloat);
             particle.setColor(finalBright - 0.2F, finalBright - 0.2F, finalBright - 0.2F);
         }
         particle.setGravity(0);
-        particle.rotationYaw = world.random.nextFloat() * 360;
+        particle.rotationYaw = world.getRandom().nextFloat() * 360;
         particle.setRenderDistanceCull(renderDistCutoff);
         return particle;
     }

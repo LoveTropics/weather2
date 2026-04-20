@@ -199,10 +199,10 @@ public class LightningBoltWeatherNew extends Entity {
       if (blockstate1.getBlock() instanceof WeatheringCopper) {
          p_147151_.setBlockAndUpdate(blockpos, WeatheringCopper.getFirst(p_147151_.getBlockState(blockpos)));
          BlockPos.MutableBlockPos blockpos$mutableblockpos = p_147152_.mutable();
-         int i = p_147151_.random.nextInt(3) + 3;
+         int i = p_147151_.getRandom().nextInt(3) + 3;
 
          for(int j = 0; j < i; ++j) {
-            int k = p_147151_.random.nextInt(8) + 1;
+            int k = p_147151_.getRandom().nextInt(8) + 1;
             randomWalkCleaningCopper(p_147151_, blockpos, blockpos$mutableblockpos, k);
          }
 
@@ -223,14 +223,14 @@ public class LightningBoltWeatherNew extends Entity {
 
    }
 
-   private static Optional<BlockPos> randomStepCleaningCopper(Level p_147154_, BlockPos p_147155_) {
-      for(BlockPos blockpos : BlockPos.randomInCube(p_147154_.random, 10, p_147155_, 1)) {
-         BlockState blockstate = p_147154_.getBlockState(blockpos);
+   private static Optional<BlockPos> randomStepCleaningCopper(Level level, BlockPos p_147155_) {
+      for (BlockPos blockpos : BlockPos.randomInCube(level.getRandom(), 10, p_147155_, 1)) {
+         BlockState blockstate = level.getBlockState(blockpos);
          if (blockstate.getBlock() instanceof WeatheringCopper) {
             WeatheringCopper.getPrevious(blockstate).ifPresent((p_147144_) -> {
-               p_147154_.setBlockAndUpdate(blockpos, p_147144_);
+               level.setBlockAndUpdate(blockpos, p_147144_);
             });
-            p_147154_.levelEvent(3002, blockpos, -1);
+            level.levelEvent(3002, blockpos, -1);
             return Optional.of(blockpos);
          }
       }
