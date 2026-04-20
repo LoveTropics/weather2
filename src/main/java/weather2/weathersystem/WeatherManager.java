@@ -85,7 +85,7 @@ public abstract class WeatherManager extends SavedData {
 					if (!so.isDead) {
 						so.tick();
 					} else {
-						if (getWorld().isClientSide) {
+						if (getWorld().isClientSide()) {
 							Weather.dbg("WARNING!!! - detected isDead storm object still in client side list, had to remove storm object with ID " + so.ID + " from client side, wasnt properly isDead via main channels");
 							removeStormObject(so.ID);
 						}

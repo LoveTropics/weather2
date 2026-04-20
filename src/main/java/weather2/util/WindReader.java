@@ -37,7 +37,7 @@ public class WindReader {
     }
 
     public static WeatherManager getWeatherManagerFor(Level world) {
-        if (world.isClientSide) {
+        if (world.isClientSide()) {
             return getWeatherManagerClient();
         } else {
             return ServerTickHandler.getWeatherManagerFor((world.dimension()));

@@ -23,10 +23,10 @@ public class EventHandlerForge {
 	@SubscribeEvent
     public static void onEntityLivingUpdate(EntityTickEvent.Pre event) {
 		Entity ent = event.getEntity();
-		if (ent.level().isClientSide && (ent instanceof Player && ((Player) ent).isLocalPlayer())) {
+		if (ent.level().isClientSide() && (ent instanceof Player && ((Player) ent).isLocalPlayer())) {
             ClientEventHandler.onClientPlayerUpdate(event);
 		}
-        /*if (!ent.level.isClientSide && ent instanceof Player) {
+        /*if (!ent.level.isClientSide() && ent instanceof Player) {
             onServerPlayerUpdate(event);
         }*/
 	}

@@ -40,9 +40,9 @@ public class ForecastBlock extends Block {
         return use(state, level, pos, player, InteractionHand.MAIN_HAND, hitResult);
     }
 
-    public InteractionResult use(BlockState p_60503_, Level p_60504_, BlockPos p_60505_, Player p_60506_, InteractionHand p_60507_, BlockHitResult p_60508_) {
+    public InteractionResult use(BlockState p_60503_, Level level, BlockPos p_60505_, Player p_60506_, InteractionHand p_60507_, BlockHitResult p_60508_) {
 
-        if (!p_60504_.isClientSide) {
+        if (!level.isClientSide()) {
             WeatherManagerServer wm = ServerTickHandler.getWeatherManagerFor(p_60506_.level().dimension());
             float chance = wm.getBiomeBasedStormSpawnChanceInArea(new BlockPos(p_60506_.blockPosition()));
             float chanceEvery10Days = 0;
@@ -70,7 +70,7 @@ public class ForecastBlock extends Block {
 			}
             int count = 0;
             for (int i = 0; i < 100000; i++) {
-                if (p_60504_.getRandom().nextInt(1000) == 0) {
+                if (level.getRandom().nextInt(1000) == 0) {
                     count++;
                 }
             }

@@ -32,7 +32,7 @@ public class WindVaneBlockEntity extends BlockEntity {
 	}
 
 	public void tick(Level level, BlockPos pos, BlockState state) {
-		if (!level.isClientSide) {
+		if (!level.isClientSide()) {
 
 		} else {
 			if (level.getGameTime() % 40 == 0) {

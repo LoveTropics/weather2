@@ -1,14 +1,10 @@
 package weather2.blockentity;
 
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.Direction;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import weather2.WeatherBlocks;
 import weather2.config.ConfigWind;
 import weather2.util.WeatherUtilEntity;
@@ -71,7 +67,7 @@ public class WindTurbineBlockEntity extends BlockEntity {
                 }
             }
         }
-        if (!level.isClientSide) {
+        if (!level.isClientSide()) {
             if (isOutsideCached) {
                 //TODO: 1.21 capabilities
                 //this.energyManager.addEnergy((int) (maxNormalGenerated * lastWindSpeed));

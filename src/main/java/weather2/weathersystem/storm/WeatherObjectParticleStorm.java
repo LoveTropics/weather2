@@ -154,7 +154,7 @@ public class WeatherObjectParticleStorm extends WeatherObject {
 		//delay = 1;
 
 		//sand block buildup
-		if (!world.isClientSide) {
+		if (!world.isClientSide()) {
 			if (getBlockForBuildup() != null) {
 				if (world.getGameTime() % delay == 0) {
 

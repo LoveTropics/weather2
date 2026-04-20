@@ -130,7 +130,7 @@ public class WeatherUtil {
 
     public static boolean isPausedSideSafe(Level world) {
         //return false if server side because it cant be paused legit
-        if (!world.isClientSide) return false;
+        if (!world.isClientSide()) return false;
         return isPausedForClient();
     }
 

@@ -89,7 +89,7 @@ public class WeatherObjectSandstormOld extends WeatherObject {
 		int loop = (int) ((float) ConfigSand.Sandstorm_Sand_Buildup_LoopAmountBase * getIntensity());
 
 		//sand block buildup
-		if (!world.isClientSide) {
+		if (!world.isClientSide()) {
 			if (world.getGameTime() % delay == 0) {
 
 				for (int i = 0; i < loop; i++) {

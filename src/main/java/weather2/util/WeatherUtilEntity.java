@@ -176,7 +176,7 @@ public class WeatherUtilEntity {
         if (EffectiveSide.get().equals(LogicalSide.SERVER)) {
             return false;
         }
-        if (!world.isClientSide) return false;
+        if (!world.isClientSide()) return false;
         return isParticleRotClientCheck(obj);
     }
 

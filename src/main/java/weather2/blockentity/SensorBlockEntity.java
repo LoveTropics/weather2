@@ -24,7 +24,7 @@ public class SensorBlockEntity extends BlockEntity {
     }
 
     public static void tick(Level level, BlockPos pos2, BlockState state, SensorBlockEntity entity) {
-        if (!level.isClientSide && level.getGameTime() % 100 == 0) {
+        if (!level.isClientSide() && level.getGameTime() % 100 == 0) {
             WeatherManagerServer wm = ServerTickHandler.getWeatherManagerFor(level);
             if (wm != null) {
                 Vec3 pos = new Vec3(pos2.getX(), pos2.getY(), pos2.getZ());

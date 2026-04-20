@@ -1,14 +1,11 @@
 package weather2.blockentity;
 
 import net.minecraft.core.BlockPos;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.util.Mth;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
 import weather2.WeatherBlocks;
-import weather2.block.AnemometerBlock;
 import weather2.util.WeatherUtilEntity;
 import weather2.util.WindReader;
 
@@ -35,9 +32,7 @@ public class AnemometerBlockEntity extends BlockEntity {
     }
 
     public void tick(Level level, BlockPos pos, BlockState state) {
-        if (!level.isClientSide) {
-
-        } else {
+        if (level.isClientSide()) {
             if (level.getGameTime() % 40 == 0) {
                 isOutsideCached = WeatherUtilEntity.isPosOutside(level, new Vec3(getBlockPos().getX() + 0.5F, getBlockPos().getY() + 0.5F, getBlockPos().getZ() + 0.5F), false, true);
             }
