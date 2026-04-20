@@ -11,7 +11,7 @@ import net.minecraft.client.model.geom.builders.CubeListBuilder;
 import net.minecraft.client.model.geom.builders.LayerDefinition;
 import net.minecraft.client.model.geom.builders.MeshDefinition;
 import net.minecraft.client.model.geom.builders.PartDefinition;
-import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.resources.Identifier;
 import weather2.Weather;
 
@@ -20,7 +20,7 @@ public class WindVaneModel extends Model {
     public static final ModelLayerLocation LAYER_LOCATION = new ModelLayerLocation(Identifier.fromNamespaceAndPath(Weather.MODID, "wind_vane"), "main");
 
     public WindVaneModel(ModelPart root) {
-        super(root, RenderType::entityCutoutNoCull);
+        super(root, RenderTypes::entityCutout);
     }
 
     public static LayerDefinition createBodyLayer() {

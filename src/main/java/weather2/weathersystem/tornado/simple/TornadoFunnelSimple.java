@@ -4,7 +4,7 @@ import com.corosus.coroutil.util.CULog;
 import extendedrenderer.particle.entity.PivotingParticle;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.entity.animal.Dolphin;
+import net.minecraft.world.entity.animal.dolphin.Dolphin;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 import weather2.LoveTropicsIntegration;

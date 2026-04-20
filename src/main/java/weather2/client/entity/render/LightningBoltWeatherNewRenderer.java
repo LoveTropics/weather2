@@ -3,9 +3,9 @@ package weather2.client.entity.render;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
+import net.minecraft.client.renderer.rendertype.RenderTypes;
 import org.joml.Matrix4f;
 import weather2.client.entity.render.state.LightningBoltWeatherNewRenderState;
 import weather2.weathersystem.storm.LightningBoltWeatherNew;
@@ -48,7 +48,7 @@ public class LightningBoltWeatherNewRenderer extends EntityRenderer<LightningBol
          f1 += (float)(random.nextInt(11) - 5);
 	  }
 
-		VertexConsumer vertexconsumer = p_115270_.getBuffer(RenderType.lightning());
+        VertexConsumer vertexconsumer = p_115270_.getBuffer(RenderTypes.lightning());
       Matrix4f matrix4f = p_115269_.last().pose();
 
       for(int j = 0; j < 4; ++j) {

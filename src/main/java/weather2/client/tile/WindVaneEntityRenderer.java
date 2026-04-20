@@ -9,7 +9,7 @@ import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.client.renderer.texture.TextureAtlas;
-import net.minecraft.client.resources.model.Material;
+import net.minecraft.client.resources.model.sprite.SpriteId;
 import net.minecraft.resources.Identifier;
 import net.minecraft.util.Mth;
 import net.minecraft.world.level.block.Block;
@@ -30,14 +30,14 @@ import java.util.Random;
 public class WindVaneEntityRenderer<T extends BlockEntity> implements BlockEntityRenderer<T> {
 
     private static Map<String, Identifier> resLocMap = Maps.newHashMap();
-    private static Map<String, Material> materialMap = Maps.newHashMap();
+    private static Map<String, SpriteId> materialMap = Maps.newHashMap();
 
-    public static Material getTEMaterial(final String path) {
+    public static SpriteId getTEMaterial(final String path) {
         return materialMap.computeIfAbsent(path, m -> createTEMaterial(path));
     }
 
-    private static Material createTEMaterial(final String path) {
-        return new Material(TextureAtlas.LOCATION_BLOCKS, getTextureTE(path));
+    private static SpriteId createTEMaterial(final String path) {
+        return new SpriteId(TextureAtlas.LOCATION_BLOCKS, getTextureTE(path));
     }
 
     public static Identifier getTextureTE(String path) {
@@ -52,7 +52,7 @@ public class WindVaneEntityRenderer<T extends BlockEntity> implements BlockEntit
         return Identifier.fromNamespaceAndPath(Weather.MODID, path);
     }
 
-    public static void renderModel(final Material material, final Model model, PoseStack stack, MultiBufferSource buffer, int combinedLightIn, int combinedOverlayIn) {
+    public static void renderModel(final SpriteId material, final Model model, PoseStack stack, MultiBufferSource buffer, int combinedLightIn, int combinedOverlayIn) {
         model.renderToBuffer(stack, buffer.getBuffer(model.renderType(material.texture())), combinedLightIn, combinedOverlayIn, -1);
     }
 

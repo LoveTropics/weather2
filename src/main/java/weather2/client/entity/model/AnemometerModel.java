@@ -11,16 +11,16 @@ import net.minecraft.client.model.geom.builders.CubeListBuilder;
 import net.minecraft.client.model.geom.builders.LayerDefinition;
 import net.minecraft.client.model.geom.builders.MeshDefinition;
 import net.minecraft.client.model.geom.builders.PartDefinition;
-import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.resources.Identifier;
 import weather2.Weather;
 
 public class AnemometerModel extends Model {
 	// This layer location should be baked with EntityRendererProvider.Context in the entity renderer and passed into this model's constructor
-    public static final ModelLayerLocation LAYER_LOCATION = new ModelLayerLocation(Identifier.fromNamespaceAndPath(Weather.MODID, "anemometer"), "main");
+	public static final ModelLayerLocation LAYER_LOCATION = new ModelLayerLocation(Identifier.fromNamespaceAndPath(Weather.MODID, "anemometer"), "main");
 
 	public AnemometerModel(ModelPart root) {
-        super(root.getChild("root"), RenderType::entityCutoutNoCull);
+		super(root.getChild("root"), RenderTypes::entityCutout);
 	}
 
 	public static LayerDefinition createBodyLayer() {
