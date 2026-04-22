@@ -9,7 +9,6 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.LevelAccessor;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.InterModComms;
 import net.neoforged.fml.common.Mod;
@@ -36,17 +35,15 @@ public class ServerTickHandler {
 
 	@SubscribeEvent
 	public static void onWorldLoad(LevelEvent.Load event) {
-		LevelAccessor world = event.getLevel();
-		if (!world.isClientSide() && world instanceof ServerLevel) {
-			ServerLevel serverWorld = (ServerLevel) world;
-			ResourceKey<Level> dimension = serverWorld.dimension();
+		if (event.getLevel() instanceof ServerLevel level) {
+			ResourceKey<Level> dimension = level.dimension();
             WeatherManagerServer weatherManagerServer;
-			if (!WeatherUtilConfig.listDimensionsWeather.contains(serverWorld.dimension().identifier().toString())) {
+			if (!WeatherUtilConfig.listDimensionsWeather.contains(level.dimension().identifier().toString())) {
                 weatherManagerServer = new WeatherManagerServer();
             } else {
-                weatherManagerServer = serverWorld.getDataStorage().computeIfAbsent(WeatherManager.TYPE);
+				weatherManagerServer = level.getServer().getDataStorage().computeIfAbsent(WeatherManager.TYPE);
             }
-            weatherManagerServer.setWorld(serverWorld);
+			weatherManagerServer.setWorld(level);
             MANAGERS.put(dimension, weatherManagerServer);
 			MANAGERSLOOKUP.put(dimension.identifier().toString(), weatherManagerServer);
 		}
@@ -54,11 +51,9 @@ public class ServerTickHandler {
 
 	@SubscribeEvent
 	public static void onWorldUnload(LevelEvent.Unload event) {
-		LevelAccessor world = event.getLevel();
-		if (!world.isClientSide() && world instanceof ServerLevel) {
-			ServerLevel serverWorld = (ServerLevel) world;
-			MANAGERS.remove(serverWorld.dimension());
-			MANAGERSLOOKUP.remove(serverWorld.dimension().toString());
+		if (event.getLevel() instanceof ServerLevel level) {
+			MANAGERS.remove(level.dimension());
+			MANAGERSLOOKUP.remove(level.dimension().toString());
 		}
 	}
 

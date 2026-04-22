@@ -4,6 +4,7 @@ import com.corosus.coroutil.util.CULog;
 import com.mojang.serialization.Codec;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.resources.Identifier;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.util.ExtraCodecs;
 import net.minecraft.world.level.Level;
@@ -31,7 +32,7 @@ public abstract class WeatherManager extends SavedData {
         in -> (WeatherManagerServer) new WeatherManagerServer().read((CompoundTag) in),
         WeatherManager::save
     );
-    public static final SavedDataType<WeatherManagerServer> TYPE = new SavedDataType<>(Weather.MODID + "-" + "weather_data", WeatherManagerServer::new, CODEC, null);
+	public static final SavedDataType<WeatherManagerServer> TYPE = new SavedDataType<>(Identifier.fromNamespaceAndPath(Weather.MODID, "weather_data"), WeatherManagerServer::new, CODEC, null);
     private ResourceKey<Level> dimension;
     protected WindManager wind;
 	private List<WeatherObject> listStormObjects = new ArrayList<>();
