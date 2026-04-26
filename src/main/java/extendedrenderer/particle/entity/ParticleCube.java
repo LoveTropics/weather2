@@ -9,9 +9,8 @@ import net.minecraft.client.Camera;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.particle.ParticleRenderType;
-import net.minecraft.client.renderer.block.BlockRenderDispatcher;
+import net.minecraft.client.renderer.block.model.BlockDisplayContext;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
-import net.minecraft.core.BlockPos;
 import net.minecraft.util.Mth;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
@@ -24,6 +23,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ParticleCube extends ParticleTexFX {
+	public static final BlockDisplayContext BLOCK_DISPLAY_CONTEXT = BlockDisplayContext.create();
 
 	public ParticleCube(Level worldIn, double posXIn, double posYIn,
                         double posZIn, double mX, double mY, double mZ,
@@ -45,7 +45,7 @@ public class ParticleCube extends ParticleTexFX {
 				setSprite(sprite);
 			}
 		}
-		int multiplier = Minecraft.getInstance().getBlockColors().getColor(state, this.level, CoroUtilBlock.blockPos(posXIn, posYIn, posZIn), 0);
+		int multiplier = Minecraft.getInstance().getBlockColors().getTintSource(state, 0).colorInWorld(state, this.level, CoroUtilBlock.blockPos(posXIn, posYIn, posZIn));
 		float mr = ((multiplier >>> 16) & 0xFF) / 255f;
 		float mg = ((multiplier >>> 8) & 0xFF) / 255f;
 		float mb = (multiplier & 0xFF) / 255f;
@@ -53,9 +53,7 @@ public class ParticleCube extends ParticleTexFX {
 	}
 
 	public TextureAtlasSprite getSpriteFromState(BlockState state) {
-		Minecraft mc = Minecraft.getInstance();
-		BlockRenderDispatcher blockrenderdispatcher = mc.getBlockRenderer();
-		return blockrenderdispatcher.getBlockModelShaper().getParticleIcon(state, level, BlockPos.ZERO);
+		return Minecraft.getInstance().getModelManager().getBlockStateModelSet().getParticleMaterial(state).sprite();
 	}
 
 	@Override

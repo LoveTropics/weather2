@@ -2,12 +2,12 @@ package extendedrenderer.particle.entity;
 
 import com.corosus.coroutil.util.CoroUtilColor;
 import com.corosus.coroutil.util.CoroUtilMisc;
-import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.color.block.BlockColors;
-import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.multiplayer.ClientLevel;
+import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.block.state.BlockState;
 import org.apache.commons.lang3.ArrayUtils;
 
 import java.util.concurrent.ConcurrentHashMap;
@@ -54,7 +54,7 @@ public class ParticleTexLeafColor extends ParticleTexFX {
             state = state.with(DoublePlantBlock.name, worldIn.getBlockState(pos.down()).get(DoublePlantBlock.name));
         }*/
 
-        int multiplier = this.colors.getColor(state, this.level, pos, 0);
+        int multiplier = this.colors.getTintSource(state, 0).colorInWorld(state, level, pos);
 
         //was this supposed to be temp?!
         //colorCache.clear();

@@ -146,7 +146,7 @@ public class FogAdjuster {
         fogVanilla.getRgb().set(event.getRed(), event.getGreen(), event.getBlue());
 
         if (SceneEnhancer.isFogOverridding()) {
-            float brightness = Mth.clamp(Mth.cos(Minecraft.getInstance().level.getTimeOfDay(1F) * ((float)Math.PI * 2F)) * 2.0F + 0.5F, 0.0F, 1.0F);
+            float brightness = Mth.clamp(Mth.cos(Minecraft.getInstance().level.getDefaultClockTime() * ((float) Math.PI * 2F)) * 2.0F + 0.5F, 0.0F, 1.0F);
             event.setRed(activeProfile.getRgb().x() * brightness);
             event.setGreen(activeProfile.getRgb().y() * brightness);
             event.setBlue(activeProfile.getRgb().z() * brightness);

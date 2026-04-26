@@ -28,7 +28,7 @@ public class TornadoFunnelSimpleClient extends TornadoFunnelSimple {
 
         Level level = stormObject.manager.getWorld();
 
-        renderDistCutoff = Minecraft.getInstance().gameRenderer.getRenderDistance() * 4;
+        renderDistCutoff = Minecraft.getInstance().options.getEffectiveRenderDistance() * 16 * 4;
 
         int layers = (int) (config.getHeight() / heightPerLayer);
         float radiusMax = config.getRadiusOfBase() + (config.getRadiusIncreasePerLayer() * (layers+1));
