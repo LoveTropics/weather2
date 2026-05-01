@@ -14,8 +14,9 @@ import net.minecraft.client.model.geom.builders.PartDefinition;
 import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.resources.Identifier;
 import weather2.Weather;
+import weather2.client.tile.state.WindTurbineRenderState;
 
-public class WindTurbineModel extends Model {
+public class WindTurbineModel extends Model<WindTurbineRenderState> {
     // This layer location should be baked with EntityRendererProvider.Context in the entity renderer and passed into this model's constructor
     public static final ModelLayerLocation LAYER_LOCATION = new ModelLayerLocation(Identifier.fromNamespaceAndPath(Weather.MODID, "wind_turbine"), "main");
 
@@ -48,5 +49,23 @@ public class WindTurbineModel extends Model {
         PartDefinition fin_r4 = shaft.addOrReplaceChild("fin_r4", CubeListBuilder.create().texOffs(34, 31).addBox(-1.0F, -21.0F, -2.0F, 2.0F, 22.0F, 4.0F, new CubeDeformation(0.0F)), PartPose.offsetAndRotation(8.0F, -13.0F, 0.0F, -0.4363F, 0.0F, -0.4712F));
 
         return LayerDefinition.create(meshdefinition, 128, 128);
+    }
+
+    @Override
+    public void setupAnim(WindTurbineRenderState state) {
+        super.setupAnim(state);
+
+        ModelPart root = root();
+        root.x += 8;
+        root.y += 8;
+        root.z += 8;
+        root.xRot += Math.toRadians(180);
+        root.yRot += Math.toRadians(180);
+        root.y -= 32;
+
+        ModelPart top = root.getChild("base").getChild("top");
+        if (top != null) {
+            top.yRot = state.yRot;
+        }
     }
 }

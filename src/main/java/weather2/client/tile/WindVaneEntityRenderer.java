@@ -1,106 +1,70 @@
 package weather2.client.tile;
 
-import com.google.common.collect.Maps;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.model.Model;
-import net.minecraft.client.model.geom.ModelPart;
-import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
-import net.minecraft.client.renderer.texture.TextureAtlas;
+import net.minecraft.client.renderer.feature.ModelFeatureRenderer;
+import net.minecraft.client.renderer.state.level.CameraRenderState;
+import net.minecraft.client.renderer.texture.OverlayTexture;
+import net.minecraft.client.resources.model.sprite.SpriteGetter;
 import net.minecraft.client.resources.model.sprite.SpriteId;
+import net.minecraft.data.AtlasIds;
 import net.minecraft.resources.Identifier;
 import net.minecraft.util.Mth;
-import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.phys.Vec3;
-import org.joml.Vector3f;
 import weather2.ClientTickHandler;
 import weather2.Weather;
-import weather2.WeatherBlocks;
 import weather2.blockentity.WindVaneBlockEntity;
 import weather2.client.entity.model.WindVaneModel;
+import weather2.client.tile.state.WindVaneRenderState;
 import weather2.weathersystem.WeatherManagerClient;
 import weather2.weathersystem.wind.WindManager;
 
-import java.util.Map;
-import java.util.Random;
-
-public class WindVaneEntityRenderer<T extends BlockEntity> implements BlockEntityRenderer<T> {
-
-    private static Map<String, Identifier> resLocMap = Maps.newHashMap();
-    private static Map<String, SpriteId> materialMap = Maps.newHashMap();
-
-    public static SpriteId getTEMaterial(final String path) {
-        return materialMap.computeIfAbsent(path, m -> createTEMaterial(path));
-    }
-
-    private static SpriteId createTEMaterial(final String path) {
-        return new SpriteId(TextureAtlas.LOCATION_BLOCKS, getTextureTE(path));
-    }
-
-    public static Identifier getTextureTE(String path) {
-        return getTexture(String.format("textures/blocks/te/%s.png", path));
-    }
-
-    public static Identifier getTexture(String path) {
-        return resLocMap.computeIfAbsent(path, k -> getResLoc(path));
-    }
-
-    private static Identifier getResLoc(String path) {
-        return Identifier.fromNamespaceAndPath(Weather.MODID, path);
-    }
-
-    public static void renderModel(final SpriteId material, final Model model, PoseStack stack, MultiBufferSource buffer, int combinedLightIn, int combinedOverlayIn) {
-        model.renderToBuffer(stack, buffer.getBuffer(model.renderType(material.texture())), combinedLightIn, combinedOverlayIn, -1);
-    }
-
-    private final Block block;
+public class WindVaneEntityRenderer implements BlockEntityRenderer<WindVaneBlockEntity, WindVaneRenderState> {
+    public static final SpriteId TEXTURE = new SpriteId(AtlasIds.BLOCKS, Identifier.fromNamespaceAndPath(Weather.MODID, "blocks/te/wind_vane.png"));
+    private final SpriteGetter sprites;
     protected final WindVaneModel model;
 
     public WindVaneEntityRenderer(final BlockEntityRendererProvider.Context context) {
-        super();
-        this.block = WeatherBlocks.BLOCK_WIND_VANE.get();
+        this.sprites = context.sprites();
         this.model = new WindVaneModel(Minecraft.getInstance().getEntityModels().bakeLayer(WindVaneModel.LAYER_LOCATION));
     }
 
     @Override
-    public void render(T te, float partialTicks, PoseStack stack, MultiBufferSource buffer, int combinedLightIn, int combinedOverlayIn, Vec3 cameraPos) {
-        this.model.root().getAllParts().forEach(ModelPart::resetPose);
+    public void submit(WindVaneRenderState state, PoseStack stack, SubmitNodeCollector submitNodeCollector, CameraRenderState camera) {
+        WeatherManagerClient weatherMan = ClientTickHandler.weatherManager;
+        if (weatherMan == null) return;
+        WindManager windMan = weatherMan.getWindManager();
+        if (windMan == null) return;
+        submitNodeCollector.submitModel(model, state, stack, state.lightCoords, OverlayTexture.NO_OVERLAY, -1, TEXTURE, sprites, 0, state.breakProgress);
+    }
 
-        //fixes for block
-        ModelPart root = this.model.root();
-        root.x += 8;
-        root.y += 8;
-        root.z += 8;
-        root.xRot += Math.toRadians(180);
-        root.yRot += Math.toRadians(180);
+    @Override
+    public WindVaneRenderState createRenderState() {
+        return new WindVaneRenderState();
+    }
 
-        root.y += 28;
-        float scale = 0.5F;
-        root.offsetScale(new Vector3f(scale, scale, scale));
-
-        ModelPart top = this.model.root().getChild("root").getChild("base").getChild("middle").getChild("top");
-        if (top != null) {
-            WeatherManagerClient weatherMan = ClientTickHandler.weatherManager;
-            if (weatherMan == null) return;
+    @Override
+    public void extractRenderState(WindVaneBlockEntity te, WindVaneRenderState state, float partialTicks, Vec3 cameraPosition, ModelFeatureRenderer.CrumblingOverlay breakProgress) {
+        BlockEntityRenderer.super.extractRenderState(te, state, partialTicks, cameraPosition, breakProgress);
+        RandomSource rand = te.getLevel().getRandom();
+        float lerpAngle = (float) Mth.lerp((double) partialTicks, te.smoothAnglePrev, te.smoothAngle);
+        state.yRot = (float) Math.toRadians(lerpAngle);
+        state.yRotAddition = (float) ((rand.nextFloat() - rand.nextFloat()) * Math.toRadians(2));
+        state.zRot = (float) ((rand.nextFloat() - rand.nextFloat()) * Math.toRadians(1));
+        WeatherManagerClient weatherMan = ClientTickHandler.weatherManager;
+        if (weatherMan != null) {
             WindManager windMan = weatherMan.getWindManager();
-            if (windMan == null) return;
-
-            float lerpAngle = (float) Mth.lerp((double)partialTicks, ((WindVaneBlockEntity) te).smoothAnglePrev, ((WindVaneBlockEntity) te).smoothAngle);
-            float renderAngle = lerpAngle;
-
-            top.yRot = (float) Math.toRadians(renderAngle);
-
-            boolean shaking = windMan.getWindSpeed(te.getBlockPos()) >= 1.5;
-            if (shaking) {
-                Random rand = new Random(te.getLevel().getGameTime());
-                top.yRot += (float) ((rand.nextFloat() - rand.nextFloat()) * Math.toRadians(2));
-                top.zRot = (float) ((rand.nextFloat() - rand.nextFloat()) * Math.toRadians(1));
+            if (windMan != null) {
+                state.shaking = windMan.getWindSpeed(te.getBlockPos()) >= 1.5;
+            } else {
+                state.shaking = false;
             }
+        } else {
+            state.shaking = false;
         }
-
-        renderModel(getTEMaterial("wind_vane"), model, stack, buffer, combinedLightIn, combinedOverlayIn);
     }
 }

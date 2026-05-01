@@ -13,9 +13,11 @@ import net.minecraft.client.model.geom.builders.MeshDefinition;
 import net.minecraft.client.model.geom.builders.PartDefinition;
 import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.resources.Identifier;
+import org.joml.Vector3f;
 import weather2.Weather;
+import weather2.client.tile.state.WindVaneRenderState;
 
-public class WindVaneModel extends Model {
+public class WindVaneModel extends Model<WindVaneRenderState> {
     // This layer location should be baked with EntityRendererProvider.Context in the entity renderer and passed into this model's constructor
     public static final ModelLayerLocation LAYER_LOCATION = new ModelLayerLocation(Identifier.fromNamespaceAndPath(Weather.MODID, "wind_vane"), "main");
 
@@ -69,5 +71,32 @@ public class WindVaneModel extends Model {
             .texOffs(5, 28).addBox(-0.05F, -1.0F, -6.0F, 0.05F, 2.0F, 2.0F, new CubeDeformation(0.0F)), PartPose.offsetAndRotation(0.0F, 4.0F, 0.0F, 0.0F, 1.5708F, 0.0F));
 
         return LayerDefinition.create(meshdefinition, 32, 32);
+    }
+
+    @Override
+    public void setupAnim(WindVaneRenderState state) {
+        super.setupAnim(state);
+
+        //fixes for block
+        ModelPart root = root();
+        root.x += 8;
+        root.y += 8;
+        root.z += 8;
+        root.xRot += Math.toRadians(180);
+        root.yRot += Math.toRadians(180);
+
+        root.y += 28;
+        float scale = 0.5F;
+        root.offsetScale(new Vector3f(scale, scale, scale));
+
+        ModelPart top = root.getChild("root").getChild("base").getChild("middle").getChild("top");
+        if (top != null) {
+            top.yRot = state.yRot;
+
+            if (state.shaking) {
+                top.yRot += state.yRotAddition;
+                top.zRot = state.zRot;
+            }
+        }
     }
 }

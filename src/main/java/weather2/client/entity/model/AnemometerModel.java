@@ -14,8 +14,9 @@ import net.minecraft.client.model.geom.builders.PartDefinition;
 import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.resources.Identifier;
 import weather2.Weather;
+import weather2.client.tile.state.AnemometerRenderState;
 
-public class AnemometerModel extends Model {
+public class AnemometerModel extends Model<AnemometerRenderState> {
 	// This layer location should be baked with EntityRendererProvider.Context in the entity renderer and passed into this model's constructor
 	public static final ModelLayerLocation LAYER_LOCATION = new ModelLayerLocation(Identifier.fromNamespaceAndPath(Weather.MODID, "anemometer"), "main");
 
@@ -62,5 +63,27 @@ public class AnemometerModel extends Model {
 			.texOffs(-1, -1).addBox(0.5F, -11.0F, -8.5F, 1.0F, 1.0F, 3.0F, new CubeDeformation(0.0F)), PartPose.offset(0.0F, 11.5F, 0.0F));
 
 		return LayerDefinition.create(meshdefinition, 16, 16);
+	}
+
+	@Override
+	public void setupAnim(AnemometerRenderState state) {
+		super.setupAnim(state);
+
+		ModelPart root = root();
+		root.x += 8;
+		root.y += 8;
+		root.z += 8;
+		root.xRot += Math.toRadians(180);
+		root.yRot += Math.toRadians(180);
+		root.y -= 32;
+
+		ModelPart top = root.getChild("base").getChild("top");
+		if (top != null) {
+			top.yRot = state.yRot;
+			if (state.shaking) {
+				top.xRot = state.xRot;
+				top.zRot = state.zRot;
+			}
+		}
 	}
 }
