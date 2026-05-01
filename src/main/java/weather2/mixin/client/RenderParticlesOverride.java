@@ -1,12 +1,12 @@
 package weather2.mixin.client;
 
 import com.llamalad7.mixinextras.injector.ModifyReturnValue;
-import net.neoforged.neoforge.client.extensions.IDimensionSpecialEffectsExtension;
+import net.neoforged.neoforge.client.CustomWeatherEffectRenderer;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import weather2.config.ConfigParticle;
 
-@Mixin(IDimensionSpecialEffectsExtension.class)
+@Mixin(CustomWeatherEffectRenderer.class)
 public interface RenderParticlesOverride {
 
     //replaced by RenderLevelStageEvent.Stage.AFTER_PARTICLES

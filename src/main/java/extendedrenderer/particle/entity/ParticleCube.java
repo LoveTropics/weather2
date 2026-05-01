@@ -8,7 +8,6 @@ import extendedrenderer.particle.ParticleRegistry;
 import net.minecraft.client.Camera;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
-import net.minecraft.client.particle.ParticleRenderType;
 import net.minecraft.client.renderer.block.model.BlockDisplayContext;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.util.Mth;
@@ -151,7 +150,7 @@ public class ParticleCube extends ParticleTexFX {
 			f5 = sprite.getV0();
 			f6 = sprite.getV1();
 		}
-		int j = this.getLightColor(partialTicks);
+		int j = this.getLightCoords(partialTicks);
 		if (j > 0) {
 			lastNonZeroBrightness = j;
 		} else {
@@ -167,8 +166,7 @@ public class ParticleCube extends ParticleTexFX {
 	}
 
 	@Override
-	public ParticleRenderType getRenderType() {
+	public Layer getLayer() {
 		return SORTED_OPAQUE_BLOCK;
-		//return super.getRenderType();
 	}
 }

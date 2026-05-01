@@ -162,7 +162,7 @@ public class ParticleTexExtraRender extends ParticleTexFX {
                 /*int height = entityIn.world.getPrecipitationHeight(new BlockPos(ActiveRenderInfo.getPosition().xCoord + f5, this.posY + f6, ActiveRenderInfo.getPosition().zCoord + f7)).getY();
                 if (ActiveRenderInfo.getPosition().yCoord + f6 <= height) continue;*/
 
-                int i = this.getLightColor(partialTicks);
+                int i = this.getLightCoords(partialTicks);
                 if (i > 0) {
                     setLastNonZeroBrightness(i);
                 } else {

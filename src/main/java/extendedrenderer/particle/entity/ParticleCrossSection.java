@@ -85,7 +85,7 @@ public class ParticleCrossSection extends ParticleTexFX {
         float f8 = this.getU1();
         float f5 = this.getV0();
         float f6 = this.getV1();
-        int j = this.getLightColor(partialTicks);
+        int j = this.getLightCoords(partialTicks);
         if (j > 0) {
             lastNonZeroBrightness = j;
         } else {

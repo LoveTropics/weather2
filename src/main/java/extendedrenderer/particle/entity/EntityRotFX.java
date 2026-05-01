@@ -650,7 +650,7 @@ public class EntityRotFX extends SingleQuadParticle implements IWindHandler {
         float f8 = this.getU1();
         float f5 = this.getV0();
         float f6 = this.getV1();
-        int j = this.getLightColor(partialTicks);
+        int j = this.getLightCoords(partialTicks);
         //int j = 15728800;
         if (j > 0) {
             lastNonZeroBrightness = j;
@@ -799,9 +799,8 @@ public class EntityRotFX extends SingleQuadParticle implements IWindHandler {
         this.vanillaMotionDampen = motionDampen;
     }
 
-    @Override
-    public int getLightColor(float p_189214_1_) {
-        return super.getLightColor(p_189214_1_);//(int)((float)super.getBrightnessForRender(p_189214_1_))/* * this.world.getSunBrightness(1F))*/;
+    public int getLightCoords(float p_189214_1_) {
+        return super.getLightCoords(p_189214_1_);//(int)((float)super.getBrightnessForRender(p_189214_1_))/* * this.world.getSunBrightness(1F))*/;
     }
 
     /*public void updateQuaternion(Entity camera) {
