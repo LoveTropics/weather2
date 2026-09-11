@@ -1471,7 +1471,7 @@ public class SceneEnhancer implements Runnable {
 
     public static boolean isFogOverridding() {
 		Minecraft client = Minecraft.getInstance();
-		BlockState blockAtCamera = client.gameRenderer.getMainCamera().getBlockAtCamera();
+		BlockState blockAtCamera = client.gameRenderer.mainCamera().getBlockAtCamera();
 		if (blockAtCamera.getBlock().defaultMapColor() == MapColor.WATER) return false;
     	//return heatwaveIntensity > 0;
 		//return true;

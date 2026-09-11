@@ -28,7 +28,7 @@ import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.common.util.FakePlayerFactory;
-import net.neoforged.neoforge.event.level.BlockEvent;
+import net.neoforged.neoforge.event.level.block.BreakBlockEvent;
 import weather2.ClientTickHandler;
 import weather2.Weather;
 import weather2.config.ClientConfigData;
@@ -549,7 +549,7 @@ public class TornadoHelper {
 			if (fakePlayerProfile == null) {
 				fakePlayerProfile = new GameProfile(UUID.fromString("1396b887-2570-4948-86e9-0633d1d22946"), "weather2FakePlayer");
 			}
-			BlockEvent.BreakEvent event = new BlockEvent.BreakEvent(world, pos, state, FakePlayerFactory.get((ServerLevel) world, fakePlayerProfile));
+			BreakBlockEvent event = new BreakBlockEvent(world, pos, state, FakePlayerFactory.get((ServerLevel) world, fakePlayerProfile));
 			NeoForge.EVENT_BUS.post(event);
 			return !event.isCanceled();
 		} else {

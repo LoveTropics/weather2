@@ -2,8 +2,8 @@ package weather2;
 
 import com.lovetropics.weather.ClientWeather;
 import com.lovetropics.weather.TypeBridge;
+import com.mojang.datafixers.util.Pair;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.util.Tuple;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntitySpawnReason;
 import net.minecraft.world.level.Level;
@@ -67,14 +67,14 @@ public class LoveTropicsIntegration {
 
         @Override
         public StormState getSandstormForEverywhere(ServerLevel level) {
-            Tuple<Integer, Integer> data = TypeBridge.getSandstormData(level);
-            return data != null ? new StormState(data.getA(), data.getB()) : null;
+            Pair<Integer, Integer> data = TypeBridge.getSandstormData(level);
+            return data != null ? new StormState(data.getFirst(), data.getSecond()) : null;
         }
 
         @Override
         public StormState getSnowstormForEverywhere(ServerLevel level) {
-            Tuple<Integer, Integer> data = TypeBridge.getSnowstormData(level);
-            return data != null ? new StormState(data.getA(), data.getB()) : null;
+            Pair<Integer, Integer> data = TypeBridge.getSnowstormData(level);
+            return data != null ? new StormState(data.getFirst(), data.getSecond()) : null;
         }
     }
 

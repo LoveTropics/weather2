@@ -3,7 +3,7 @@ package weather2.weathersystem.tornado.simple;
 import com.corosus.coroutil.util.CULog;
 import extendedrenderer.particle.entity.PivotingParticle;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.EntityTypes;
 import net.minecraft.world.entity.animal.dolphin.Dolphin;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
@@ -123,7 +123,7 @@ public class TornadoFunnelSimple {
                             CULog.dbg("failed to create shark, falling back to dolphin");
                         }
 
-                        ent = new Dolphin(EntityType.DOLPHIN, level);
+                        ent = new Dolphin(EntityTypes.DOLPHIN, level);
                     }
                     Vec3 posRand = new Vec3(pos.x + 0, pos.y + 25, pos.z - 5);
                     ent.setPos(posRand);

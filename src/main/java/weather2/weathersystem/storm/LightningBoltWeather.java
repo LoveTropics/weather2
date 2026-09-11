@@ -3,20 +3,20 @@ package weather2.weathersystem.storm;
 import com.corosus.coroutil.util.CoroUtilBlock;
 import com.google.common.collect.Sets;
 import javax.annotation.Nullable;
-import net.minecraft.advancements.CriteriaTriggers;
+import net.minecraft.advancements.triggers.CriteriaTriggers;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
+import net.minecraft.tags.BlockTags;
 import net.minecraft.world.Difficulty;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.BaseFireBlock;
-import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.LightningRodBlock;
 import net.minecraft.world.level.block.WeatheringCopper;
 import net.minecraft.world.level.block.state.BlockState;
@@ -78,7 +78,7 @@ public class LightningBoltWeather extends Entity {
    private void powerLightningRod() {
       BlockPos blockpos = this.getStrikePosition();
       BlockState blockstate = this.level().getBlockState(blockpos);
-      if (blockstate.is(Blocks.LIGHTNING_ROD)) {
+      if (blockstate.is(BlockTags.LIGHTNING_RODS)) {
          ((LightningRodBlock)blockstate.getBlock()).onLightningStrike(blockstate, this.level(), blockpos);
       }
 
@@ -183,7 +183,7 @@ public class LightningBoltWeather extends Entity {
       BlockState blockstate = level.getBlockState(p_147152_);
       BlockPos blockpos;
       BlockState blockstate1;
-      if (blockstate.is(Blocks.LIGHTNING_ROD)) {
+      if (blockstate.is(BlockTags.LIGHTNING_RODS)) {
          blockpos = p_147152_.relative(blockstate.getValue(LightningRodBlock.FACING).getOpposite());
          blockstate1 = level.getBlockState(blockpos);
       } else {

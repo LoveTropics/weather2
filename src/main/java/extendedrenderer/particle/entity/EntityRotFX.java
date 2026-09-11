@@ -737,7 +737,7 @@ public class EntityRotFX extends SingleQuadParticle implements IWindHandler {
         double yy = y;
         double zz = z;
         if (this.hasPhysics && (x != 0.0D || y != 0.0D || z != 0.0D)) {
-            Vec3 Vector3d = Entity.collideBoundingBox(null, new Vec3(x, y, z), this.getBoundingBox(), this.level, List.of());
+            Vec3 Vector3d = Entity.collideBoundingBox((Entity) null, new Vec3(x, y, z), this.getBoundingBox(), this.level, List.of());
             x = Vector3d.x;
             y = Vector3d.y;
             z = Vector3d.z;
