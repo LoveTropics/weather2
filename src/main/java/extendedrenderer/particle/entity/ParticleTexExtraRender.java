@@ -2,16 +2,16 @@ package extendedrenderer.particle.entity;
 
 import com.corosus.coroutil.util.CoroUtilBlock;
 import com.corosus.coroutil.util.CoroUtilParticle;
-import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Axis;
 import net.minecraft.client.Camera;
 import net.minecraft.client.multiplayer.ClientLevel;
+import net.minecraft.client.renderer.state.level.QuadParticleRenderState;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
+import net.minecraft.util.ARGB;
 import net.minecraft.util.Mth;
 import net.minecraft.world.level.levelgen.Heightmap;
 import net.minecraft.world.phys.Vec3;
 import org.joml.Quaternionf;
-import org.joml.Vector3f;
 import weather2.ClientTickHandler;
 import weather2.weathersystem.WeatherManagerClient;
 import weather2.weathersystem.wind.WindManager;
@@ -87,7 +87,7 @@ public class ParticleTexExtraRender extends ParticleTexFX {
         return false;
     }*/
     @Override
-    public void render(VertexConsumer buffer, Camera renderInfo, float partialTicks) {
+    public void extract(QuadParticleRenderState state, Camera renderInfo, float partialTicks) {
         //override rotations
         Vec3 Vector3d = renderInfo.position();
         Quaternionf quaternion;
@@ -107,10 +107,10 @@ public class ParticleTexExtraRender extends ParticleTexFX {
         float posY = (float)(Mth.lerp((double)partialTicks, this.yo, this.y) - Vector3d.y());
         float posZ = (float)(Mth.lerp((double)partialTicks, this.zo, this.z) - Vector3d.z());
 
-        float f = this.getU0();
-        float f1 = this.getU1();
-        float f2 = this.getV0();
-        float f3 = this.getV1();
+        float u0 = this.getU0();
+        float u1 = this.getU1();
+        float v0 = this.getV0();
+        float v1 = this.getV1();
 
         float fixY = 0;
 
@@ -162,40 +162,17 @@ public class ParticleTexExtraRender extends ParticleTexFX {
                 /*int height = entityIn.world.getPrecipitationHeight(new BlockPos(ActiveRenderInfo.getPosition().xCoord + f5, this.posY + f6, ActiveRenderInfo.getPosition().zCoord + f7)).getY();
                 if (ActiveRenderInfo.getPosition().yCoord + f6 <= height) continue;*/
 
-                int i = this.getLightCoords(partialTicks);
-                if (i > 0) {
-                    setLastNonZeroBrightness(i);
+                int lightCoords = this.getLightCoords(partialTicks);
+                if (lightCoords > 0) {
+                    setLastNonZeroBrightness(lightCoords);
                 } else {
-                    i = getLastNonZeroBrightness();
+                    lightCoords = getLastNonZeroBrightness();
                 }
 
-                Vector3f[] avector3f = new Vector3f[] {new Vector3f(-1.0F, -1.0F, 0.0F), new Vector3f(-1.0F, 1.0F, 0.0F), new Vector3f(1.0F, 1.0F, 0.0F), new Vector3f(1.0F, -1.0F, 0.0F)};
                 float scale = this.getQuadSize(partialTicks);
+                int color = ARGB.colorFromFloat(this.alpha, this.rCol, this.gCol, this.bCol);
 
-                for (int v = 0; v < 4; ++v) {
-                    Vector3f vector3f = avector3f[v];
-                    vector3f.rotate(quaternion);
-                    vector3f.mul(scale);
-                    vector3f.add(posX, posY, posZ);
-                }
-
-                buffer.addVertex((float) (xx + avector3f[0].x()), (float) (yy + avector3f[0].y()), (float) (zz + avector3f[0].z()))
-                    .setUv(f1, f3)
-                    .setColor(this.rCol, this.gCol, this.bCol, this.alpha)
-                    .setLight(i);
-                buffer.addVertex((float) (xx + avector3f[1].x()), (float) (yy + avector3f[1].y()), (float) (zz + avector3f[1].z()))
-                    .setUv(f1, f2)
-                    .setColor(this.rCol, this.gCol, this.bCol, this.alpha)
-                    .setLight(i);
-                buffer.addVertex((float) (xx + avector3f[2].x()), (float) (yy + avector3f[2].y()), (float) (zz + avector3f[2].z()))
-                    .setUv(f, f2)
-                    .setColor(this.rCol, this.gCol, this.bCol, this.alpha)
-                    .setLight(i);
-                buffer.addVertex((float) (xx + avector3f[3].x()), (float) (yy + avector3f[3].y()), (float) (zz + avector3f[3].z()))
-                    .setUv(f, f3)
-                    .setColor(this.rCol, this.gCol, this.bCol, this.alpha)
-                    .setLight(i);
-
+                state.add(getLayer(), (float) (xx + posX), (float) (yy + posY), (float) (zz + posZ), quaternion.x, quaternion.y, quaternion.z, quaternion.w, scale, u0, u1, v0, v1, color, lightCoords);
             }
         }
         catch (Throwable ex) {

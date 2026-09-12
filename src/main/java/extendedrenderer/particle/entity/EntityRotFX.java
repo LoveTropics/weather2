@@ -6,7 +6,6 @@ import com.mojang.blaze3d.pipeline.BlendFunction;
 import com.mojang.blaze3d.pipeline.ColorTargetState;
 import com.mojang.blaze3d.pipeline.DepthStencilState;
 import com.mojang.blaze3d.pipeline.RenderPipeline;
-import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Axis;
 import extendedrenderer.particle.behavior.ParticleBehaviors;
 import net.minecraft.client.Camera;
@@ -14,10 +13,12 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.particle.SingleQuadParticle;
 import net.minecraft.client.renderer.RenderPipelines;
+import net.minecraft.client.renderer.state.level.QuadParticleRenderState;
 import net.minecraft.client.renderer.texture.TextureAtlas;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.core.BlockPos;
 import net.minecraft.resources.Identifier;
+import net.minecraft.util.ARGB;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.Level;
@@ -34,13 +35,12 @@ import weather2.weathersystem.WeatherManagerClient;
 import weather2.weathersystem.wind.WindManager;
 
 import java.util.List;
-import java.util.Optional;
 
 public class EntityRotFX extends SingleQuadParticle implements IWindHandler {
     public static final RenderPipeline TRANSLUCENT_PARTICLE_NO_CULL_PIPELINE = RenderPipeline
         .builder(RenderPipelines.PARTICLE_SNIPPET)
         .withLocation(Identifier.fromNamespaceAndPath(Weather.MODID, "pipeline/translucent_particle_no_cull"))
-        .withColorTargetState(new ColorTargetState(Optional.of(BlendFunction.TRANSLUCENT), ColorTargetState.WRITE_ALL))
+        .withColorTargetState(new ColorTargetState(BlendFunction.TRANSLUCENT))
         .withCull(false)
         .build();
     public static final RenderPipeline OPAQUE_PARTICLE_BLOCK_PIPELINE = RenderPipeline
@@ -607,13 +607,13 @@ public class EntityRotFX extends SingleQuadParticle implements IWindHandler {
     }
 
     @Override
-    public void render(VertexConsumer buffer, Camera renderInfo, float partialTicks) {
+    public void extract(QuadParticleRenderState state, Camera renderInfo, float partialTicks) {
 
         Vec3 Vector3d = renderInfo.position();
         Vec3 pivotedPosition = getPivotedPosition(partialTicks);
-        float f = (float)(Mth.lerp(partialTicks, this.xo, this.x) + pivotedPosition.x - Vector3d.x());
-        float f1 = (float)(Mth.lerp(partialTicks, this.yo, this.y) + pivotedPosition.y - Vector3d.y());
-        float f2 = (float)(Mth.lerp(partialTicks, this.zo, this.z) + pivotedPosition.z - Vector3d.z());
+        float x = (float) (Mth.lerp(partialTicks, this.xo, this.x) + pivotedPosition.x - Vector3d.x());
+        float y = (float) (Mth.lerp(partialTicks, this.yo, this.y) + pivotedPosition.y - Vector3d.y());
+        float z = (float) (Mth.lerp(partialTicks, this.zo, this.z) + pivotedPosition.z - Vector3d.z());
         Quaternionf quaternion;
         if (this.facePlayer || (this.rotationPitch == 0 && this.rotationYaw == 0)) {
             quaternion = renderInfo.rotation();
@@ -628,39 +628,24 @@ public class EntityRotFX extends SingleQuadParticle implements IWindHandler {
             quaternion.mul(Axis.XP.rotationDegrees(Mth.lerp(partialTicks, this.prevRotationPitch, rotationPitch)));
         }
 
-        Quaternionf quaternionf;
-        if (this.roll == 0.0F) {
-            quaternionf = renderInfo.rotation();
+//        Quaternionf quaternionf;
+//        if (this.roll == 0.0F) {
+//            quaternionf = renderInfo.rotation();
+//        } else {
+//            quaternionf = new Quaternionf(renderInfo.rotation());
+//            quaternionf.rotateZ(Mth.lerp(partialTicks, this.oRoll, this.roll));
+//        }
+
+        float scale = this.getQuadSize(partialTicks);
+        int color = ARGB.colorFromFloat(this.alpha, this.rCol, this.gCol, this.bCol);
+        int lightCoords = this.getLightCoords(partialTicks);
+        //int lightCoords = 15728800;
+        if (lightCoords > 0) {
+            lastNonZeroBrightness = lightCoords;
         } else {
-            quaternionf = new Quaternionf(renderInfo.rotation());
-            quaternionf.rotateZ(Mth.lerp(partialTicks, this.oRoll, this.roll));
+            lightCoords = lastNonZeroBrightness;
         }
-
-        Vector3f[] avector3f = new Vector3f[]{new Vector3f(-1.0F, -1.0F, 0.0F), new Vector3f(-1.0F, 1.0F, 0.0F), new Vector3f(1.0F, 1.0F, 0.0F), new Vector3f(1.0F, -1.0F, 0.0F)};
-        float f4 = this.getQuadSize(partialTicks);
-
-        for(int i = 0; i < 4; ++i) {
-            Vector3f vector3f = avector3f[i];
-            vector3f.rotate(quaternion);
-            vector3f.mul(f4);
-            vector3f.add(f, f1, f2);
-        }
-
-        float f7 = this.getU0();
-        float f8 = this.getU1();
-        float f5 = this.getV0();
-        float f6 = this.getV1();
-        int j = this.getLightCoords(partialTicks);
-        //int j = 15728800;
-        if (j > 0) {
-            lastNonZeroBrightness = j;
-        } else {
-            j = lastNonZeroBrightness;
-        }
-        buffer.addVertex(avector3f[0].x(), avector3f[0].y(), avector3f[0].z()).setUv(f8, f6).setColor(this.rCol, this.gCol, this.bCol, this.alpha).setLight(j);
-        buffer.addVertex(avector3f[1].x(), avector3f[1].y(), avector3f[1].z()).setUv(f8, f5).setColor(this.rCol, this.gCol, this.bCol, this.alpha).setLight(j);
-        buffer.addVertex(avector3f[2].x(), avector3f[2].y(), avector3f[2].z()).setUv(f7, f5).setColor(this.rCol, this.gCol, this.bCol, this.alpha).setLight(j);
-        buffer.addVertex(avector3f[3].x(), avector3f[3].y(), avector3f[3].z()).setUv(f7, f6).setColor(this.rCol, this.gCol, this.bCol, this.alpha).setLight(j);
+        state.add(getLayer(), x, y, z, quaternion.x, quaternion.y, quaternion.z, quaternion.w, scale, getU0(), getU1(), getV0(), getV1(), color, lightCoords);
 
     }
 
@@ -904,7 +889,7 @@ public class EntityRotFX extends SingleQuadParticle implements IWindHandler {
         this.bbRender = p_107260_;
     }
 
-    @Override
+    //TODO: culling?
     public AABB getRenderBoundingBox(float partialTicks) {
         if (isUseCustomBBForRenderCulling()) {
             return bbRender;

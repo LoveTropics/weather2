@@ -2,13 +2,13 @@ package extendedrenderer.particle.entity;
 
 import com.corosus.coroutil.util.CULog;
 import com.corosus.coroutil.util.CoroUtilBlock;
-import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Axis;
 import extendedrenderer.particle.ParticleRegistry;
 import net.minecraft.client.Camera;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.renderer.block.model.BlockDisplayContext;
+import net.minecraft.client.renderer.state.level.QuadParticleRenderState;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.util.Mth;
 import net.minecraft.world.level.Level;
@@ -56,7 +56,7 @@ public class ParticleCube extends ParticleTexFX {
 	}
 
 	@Override
-	public void render(VertexConsumer buffer, Camera renderInfo, float partialTicks) {
+	public void extract(QuadParticleRenderState state, Camera renderInfo, float partialTicks) {
 		//if (true) return;
 		Vec3 pos = renderInfo.position();
 		float f = (float) (Mth.lerp(partialTicks, this.xo, this.x) - pos.x());

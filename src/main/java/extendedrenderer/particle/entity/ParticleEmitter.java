@@ -1,8 +1,8 @@
 package extendedrenderer.particle.entity;
 
-import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.minecraft.client.Camera;
 import net.minecraft.client.multiplayer.ClientLevel;
+import net.minecraft.client.renderer.state.level.QuadParticleRenderState;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 
 public class ParticleEmitter extends EntityRotFX {
@@ -20,7 +20,7 @@ public class ParticleEmitter extends EntityRotFX {
     }
 
     @Override
-    public void render(VertexConsumer buffer, Camera renderInfo, float partialTicks) {
-        //super.render(buffer, renderInfo, partialTicks);
+    public void extract(QuadParticleRenderState state, Camera renderInfo, float partialTicks) {
+        //super.extract(state, renderInfo, partialTicks);
     }
 }

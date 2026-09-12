@@ -1,13 +1,11 @@
 package weather2.client.entity.particle;
 
-import net.minecraft.client.Camera;
-import net.minecraft.client.renderer.texture.TextureAtlasSprite;
-import net.minecraft.client.multiplayer.ClientLevel;
-import net.minecraft.world.level.Level;
-
-import com.mojang.blaze3d.vertex.VertexConsumer;
-
 import extendedrenderer.particle.entity.ParticleTexFX;
+import net.minecraft.client.Camera;
+import net.minecraft.client.multiplayer.ClientLevel;
+import net.minecraft.client.renderer.state.level.QuadParticleRenderState;
+import net.minecraft.client.renderer.texture.TextureAtlasSprite;
+import net.minecraft.world.level.Level;
 
 public class ParticleSandstorm extends ParticleTexFX {
 
@@ -23,7 +21,7 @@ public class ParticleSandstorm extends ParticleTexFX {
     }
 
     @Override
-    public void render(VertexConsumer buffer, Camera renderInfo, float partialTicks) {
-        super.render(buffer, renderInfo, partialTicks);
+    public void extract(QuadParticleRenderState state, Camera renderInfo, float partialTicks) {
+        super.extract(state, renderInfo, partialTicks);
     }
 }

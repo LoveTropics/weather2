@@ -1,12 +1,9 @@
 package extendedrenderer.particle.entity;
 
-import com.mojang.blaze3d.vertex.VertexConsumer;
-import net.minecraft.client.Camera;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
-
 
 /**
  * Particle that has a secondary rotation with a 1 dimensional pivot point.
@@ -82,10 +79,5 @@ public class PivotingParticle extends ParticleTexFX {
     @Override
     public AABB getRenderBoundingBox(float partialTicks) {
         return getBoundingBox().move(getPivotedPosition(partialTicks));
-    }
-
-    @Override
-    public void render(VertexConsumer buffer, Camera renderInfo, float partialTicks) {
-        super.render(buffer, renderInfo, partialTicks);
     }
 }
