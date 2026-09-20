@@ -1,6 +1,5 @@
 {
   "type": "minecraft:crafting_shaped",
-  "category": "misc",
   "key": {
     "D": "minecraft:redstone",
     "X": "weather2:weather_item"
@@ -11,7 +10,6 @@
     "X X"
   ],
   "result": {
-    "count": 1,
     "id": "weather2:wind_vane"
   }
 }

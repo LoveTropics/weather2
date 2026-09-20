@@ -1,6 +1,5 @@
 {
   "type": "minecraft:crafting_shaped",
-  "category": "misc",
   "key": {
     "D": "minecraft:redstone",
     "I": "minecraft:gold_ingot",
@@ -12,7 +11,6 @@
     "X X"
   ],
   "result": {
-    "count": 1,
     "id": "weather2:weather_item"
   }
 }

@@ -1,6 +1,5 @@
 {
   "type": "minecraft:crafting_shaped",
-  "category": "misc",
   "key": {
     "D": "minecraft:diamond",
     "G": "minecraft:gold_ingot",
@@ -15,7 +14,6 @@
     "RGR"
   ],
   "result": {
-    "count": 1,
     "id": "weather2:wind_turbine"
   }
 }

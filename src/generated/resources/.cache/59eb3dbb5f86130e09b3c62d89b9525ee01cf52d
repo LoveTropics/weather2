@@ -1,9 +1,9 @@
-// 1.21.8	2025-10-29T23:39:07.2887148	Loot Tables
-c8c5ce560e926e54e54807bfa8292631975278c8 data/weather2/loot_table/blocks/anemometer.json
-c8c3920b1604bd0d96bb0f2fe36af5bec0d17a68 data/weather2/loot_table/blocks/sand_layer.json
-110f066250df5b3b40a1ab65f5db0e42b149bfc0 data/weather2/loot_table/blocks/tornado_sensor.json
-dab63dc3440645fa945cceb5bf0e90e65617307c data/weather2/loot_table/blocks/tornado_siren.json
-52d48e562562111bcbc28c4d88000e7f53be2c23 data/weather2/loot_table/blocks/weather_deflector.json
-c0a4e2a903db1b6c8a509f541f413283c73e4905 data/weather2/loot_table/blocks/weather_forecast.json
-5144ca5845a17038ade0ad75085ec40b1fe313d8 data/weather2/loot_table/blocks/wind_turbine.json
-9844b43ed3b5bdcf2cb5caa511707ef6bf53a3f9 data/weather2/loot_table/blocks/wind_vane.json
+// 26.2	2026-09-20T12:04:37.269872	Loot Tables
+b419e93c1caf3f59b5a3385e8fe4df58b36493be data/weather2/loot_table/blocks/anemometer.json
+650fe8b4c28513322ab88e8271e9dd4f8fee991b data/weather2/loot_table/blocks/sand_layer.json
+b3e6b85274aad91a306e2f6767643e14a6089fc4 data/weather2/loot_table/blocks/tornado_sensor.json
+29ca88fcd6d0b1093ea1e367d78c0ede4856e42d data/weather2/loot_table/blocks/tornado_siren.json
+db447cdad2faad0ba847321d263b5a835a89cb8f data/weather2/loot_table/blocks/weather_deflector.json
+88a2d31f3c0c481cdad36e8ec13002f253c75226 data/weather2/loot_table/blocks/weather_forecast.json
+ea94e9ad2507f0c7da558fa21e4d6ef7573f00d9 data/weather2/loot_table/blocks/wind_turbine.json
+bb4b5468548d666f8477cc2e1a9764b9830decc2 data/weather2/loot_table/blocks/wind_vane.json

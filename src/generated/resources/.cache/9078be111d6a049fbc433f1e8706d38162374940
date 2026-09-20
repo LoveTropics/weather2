@@ -1,4 +1,4 @@
-// 1.21.8	2025-10-29T23:39:07.2897144	Weather2 recipes
+// 26.2	2026-09-20T12:04:37.269872	Weather2 recipes
 5e7a0afc89158e4f7d9a2fb420062a65294a8dff data/weather2/advancement/recipes/misc/anemometer.json
 49adc2cfdce352bcaf1fd949accfae6b3a314bba data/weather2/advancement/recipes/misc/sand_layer.json
 d1a4d4df1f5bd41660b88b6dc3ac6fb267178119 data/weather2/advancement/recipes/misc/tornado_sensor.json
@@ -8,12 +8,12 @@ aa5328115069d09a01a4f908e4667dcda4189eae data/weather2/advancement/recipes/misc/
 1987450b09fd4eba86c8b0723c8ac71358d22056 data/weather2/advancement/recipes/misc/weather_item.json
 3ad16d089aa783b8da8995f8906e5f644f2bbaa6 data/weather2/advancement/recipes/misc/wind_turbine.json
 0d3dcc50ab17e508b26db6fc1804a3cf8b4f4592 data/weather2/advancement/recipes/misc/wind_vane.json
-64e903db531681ade5dcab36afa1a878937e34bd data/weather2/recipe/anemometer.json
-37af65da199c7b71d0a903761c9ee5472d536f61 data/weather2/recipe/sand_layer.json
-8a7629cd18c93773dd91e50640a50dfa9500a2ba data/weather2/recipe/tornado_sensor.json
-2b8a58302c8440d730a3d5e6049844d031c05103 data/weather2/recipe/tornado_siren.json
-d4ab8a882ab6d5121f12f583a644b0350ed89289 data/weather2/recipe/weather_deflector.json
-2ee2370436554c22e52514523b4c3f73e80de144 data/weather2/recipe/weather_forecast.json
-418accd407d501935a0b1e1decd61f78c2a2ce55 data/weather2/recipe/weather_item.json
-68b7dcf36e1380843a4e470b9abce22b1b9ededf data/weather2/recipe/wind_turbine.json
-3e98f81e8692446177386c667521bc52e6871841 data/weather2/recipe/wind_vane.json
+08777d6105a9ba3c0e5f7628886285cb945ba8dc data/weather2/recipe/anemometer.json
+ed90f2f057ae4f702eab521893174abb526aa84c data/weather2/recipe/sand_layer.json
+dd3668f40a575157340774280155be34cdff73fb data/weather2/recipe/tornado_sensor.json
+c53b9164bcb9c2ce5bf2907f7b11f94ba02e1266 data/weather2/recipe/tornado_siren.json
+e34d712ea1f74a42813263b2af54ad27a29948ec data/weather2/recipe/weather_deflector.json
+617f19d0924e6ea25f8d98822c27bc37a512b492 data/weather2/recipe/weather_forecast.json
+64f91536907420df6446df7cace7303bb221387a data/weather2/recipe/weather_item.json
+02aa7f37dc76bb505b56df58edfaa0f38af4d2b5 data/weather2/recipe/wind_turbine.json
+37d053372f63d46472e3e995ccb432f34bfb0ece data/weather2/recipe/wind_vane.json
