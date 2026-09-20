@@ -3,13 +3,16 @@ package extendedrenderer.particle.entity;
 import com.corosus.coroutil.util.CULog;
 import com.corosus.coroutil.util.CoroUtilBlock;
 import com.mojang.math.Axis;
+import extendedrenderer.WeatherParticleRenderState;
 import extendedrenderer.particle.ParticleRegistry;
 import net.minecraft.client.Camera;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
+import net.minecraft.client.particle.ParticleRenderType;
 import net.minecraft.client.renderer.block.model.BlockDisplayContext;
 import net.minecraft.client.renderer.state.level.QuadParticleRenderState;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
+import net.minecraft.util.ARGB;
 import net.minecraft.util.Mth;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
@@ -17,6 +20,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
+import org.joml.Vector3fc;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -56,12 +60,16 @@ public class ParticleCube extends ParticleTexFX {
 	}
 
 	@Override
-	public void extract(QuadParticleRenderState state, Camera renderInfo, float partialTicks) {
+	public void extract(QuadParticleRenderState qState, Camera renderInfo, float partialTicks) {
+		if (!(qState instanceof WeatherParticleRenderState state)) {
+			return;
+		}
+
 		//if (true) return;
 		Vec3 pos = renderInfo.position();
-		float f = (float) (Mth.lerp(partialTicks, this.xo, this.x) - pos.x());
-		float f1 = (float) (Mth.lerp(partialTicks, this.yo, this.y) - pos.y());
-		float f2 = (float) (Mth.lerp(partialTicks, this.zo, this.z) - pos.z());
+		float x = (float) (Mth.lerp(partialTicks, this.xo, this.x) - pos.x());
+		float y = (float) (Mth.lerp(partialTicks, this.yo, this.y) - pos.y());
+		float z = (float) (Mth.lerp(partialTicks, this.zo, this.z) - pos.z());
 		Quaternionf quaternion;
 		if (this.facePlayer || (this.rotationPitch == 0 && this.rotationYaw == 0)) {
 			quaternion = renderInfo.rotation();
@@ -78,89 +86,70 @@ public class ParticleCube extends ParticleTexFX {
 
 		TextureAtlasSprite sprite = null;
 
-		List<Vector3f[]> faces = new ArrayList<>();
-
-		Vector3f[] face;
+		List<Vector3fc[]> faces = new ArrayList<>();
 
 		//xy -z
-		face = new Vector3f[] {
+		faces.add(new Vector3f[] {
 			new Vector3f(-1.0F, -1.0F, -1.0F),
 			new Vector3f(-1.0F, 1.0F, -1.0F),
 			new Vector3f(1.0F, 1.0F, -1.0F),
-			new Vector3f(1.0F, -1.0F, -1.0F)};
-		faces.add(face);
+			new Vector3f(1.0F, -1.0F, -1.0F)});
 
 		//xy +z
-		face = new Vector3f[] {
+		faces.add(new Vector3f[] {
 			new Vector3f(-1.0F, -1.0F, 1.0F),
 			new Vector3f(-1.0F, 1.0F, 1.0F),
 			new Vector3f(1.0F, 1.0F, 1.0F),
-			new Vector3f(1.0F, -1.0F, 1.0F)};
-		faces.add(face);
+			new Vector3f(1.0F, -1.0F, 1.0F)});
 
 		//yz -x
-		face = new Vector3f[] {
+		faces.add(new Vector3f[] {
 			new Vector3f(-1.0F, -1.0F, -1.0F),
 			new Vector3f(-1.0F, 1.0F, -1.0F),
 			new Vector3f(-1.0F, 1.0F, 1.0F),
-			new Vector3f(-1.0F, -1.0F, 1.0F)};
-		faces.add(face);
+			new Vector3f(-1.0F, -1.0F, 1.0F)});
 
 		//yz +x
-		face = new Vector3f[] {
+		faces.add(new Vector3f[] {
 			new Vector3f(1.0F, -1.0F, -1.0F),
 			new Vector3f(1.0F, 1.0F, -1.0F),
 			new Vector3f(1.0F, 1.0F, 1.0F),
-			new Vector3f(1.0F, -1.0F, 1.0F)};
-		faces.add(face);
+			new Vector3f(1.0F, -1.0F, 1.0F)});
 
 		//xz -y
-		face = new Vector3f[] {
+		faces.add(new Vector3f[] {
 			new Vector3f(-1.0F, -1.0F, -1.0F),
 			new Vector3f(-1.0F, -1.0F, 1.0F),
 			new Vector3f(1.0F, -1.0F, 1.0F),
-			new Vector3f(1.0F, -1.0F, -1.0F)};
-		faces.add(face);
+			new Vector3f(1.0F, -1.0F, -1.0F)});
 
 		//xz +y
-		face = new Vector3f[] {
+		faces.add(new Vector3f[] {
 			new Vector3f(-1.0F, 1.0F, -1.0F),
 			new Vector3f(-1.0F, 1.0F, 1.0F),
 			new Vector3f(1.0F, 1.0F, 1.0F),
-			new Vector3f(1.0F, 1.0F, -1.0F)};
-		faces.add(face);
+			new Vector3f(1.0F, 1.0F, -1.0F)});
 
-		float f4 = this.getQuadSize(partialTicks);
-
-		for (Vector3f[] entryFace : faces) {
-			for (int i = 0; i < 4; ++i) {
-				entryFace[i].rotate(quaternion);
-				entryFace[i].mul(f4);
-				entryFace[i].add(f, f1, f2);
-			}
-		}
-
-		float f7 = this.getU0();
-		float f8 = this.getU1();
-		float f5 = this.getV0();
-		float f6 = this.getV1();
+		float scale = this.getQuadSize(partialTicks);
+		float u0 = this.getU0();
+		float u1 = this.getU1();
+		float v0 = this.getV0();
+		float v1 = this.getV1();
 		if (sprite != null) {
-			f7 = sprite.getU0();
-			f8 = sprite.getU1();
-			f5 = sprite.getV0();
-			f6 = sprite.getV1();
+			u0 = sprite.getU0();
+			u1 = sprite.getU1();
+			v0 = sprite.getV0();
+			v1 = sprite.getV1();
 		}
-		int j = this.getLightCoords(partialTicks);
-		if (j > 0) {
-			lastNonZeroBrightness = j;
+		int color = ARGB.colorFromFloat(this.alpha, this.rCol, this.gCol, this.bCol);
+		int lightCoords = this.getLightCoords(partialTicks);
+		if (lightCoords > 0) {
+			lastNonZeroBrightness = lightCoords;
 		} else {
-			j = lastNonZeroBrightness;
+			lightCoords = lastNonZeroBrightness;
 		}
-		for (Vector3f[] entryFace : faces) {
-			buffer.addVertex(entryFace[0].x(), entryFace[0].y(), entryFace[0].z()).setUv(f8, f6).setColor(this.rCol, this.gCol, this.bCol, this.alpha).setLight(j);
-			buffer.addVertex(entryFace[1].x(), entryFace[1].y(), entryFace[1].z()).setUv(f8, f5).setColor(this.rCol, this.gCol, this.bCol, this.alpha).setLight(j);
-			buffer.addVertex(entryFace[2].x(), entryFace[2].y(), entryFace[2].z()).setUv(f7, f5).setColor(this.rCol, this.gCol, this.bCol, this.alpha).setLight(j);
-			buffer.addVertex(entryFace[3].x(), entryFace[3].y(), entryFace[3].z()).setUv(f7, f6).setColor(this.rCol, this.gCol, this.bCol, this.alpha).setLight(j);
+		for (Vector3fc[] entryFace : faces) {
+			state.add(getLayer(), x, y, z, quaternion.x, quaternion.y, quaternion.z, quaternion.w, scale, u0, u1, v0, v1, color, lightCoords, entryFace);
 		}
 
 	}
@@ -168,5 +157,10 @@ public class ParticleCube extends ParticleTexFX {
 	@Override
 	public Layer getLayer() {
 		return SORTED_OPAQUE_BLOCK;
+	}
+
+	@Override
+	public ParticleRenderType getGroup() {
+		return SORTED_OPAQUE_BLOCK_TYPE;
 	}
 }

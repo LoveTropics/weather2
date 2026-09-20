@@ -11,6 +11,7 @@ import extendedrenderer.particle.behavior.ParticleBehaviors;
 import net.minecraft.client.Camera;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
+import net.minecraft.client.particle.ParticleRenderType;
 import net.minecraft.client.particle.SingleQuadParticle;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.client.renderer.state.level.QuadParticleRenderState;
@@ -48,11 +49,13 @@ public class EntityRotFX extends SingleQuadParticle implements IWindHandler {
         .withLocation(Identifier.fromNamespaceAndPath(Weather.MODID, "pipeline/opaque_particle_block"))
         .withDepthStencilState(DepthStencilState.DEFAULT)
         .build();
+    public static final ParticleRenderType SORTED_TRANSLUCENT_TYPE = new ParticleRenderType("SORTED_TRANSLUCENT", "ST");
     public static final Layer SORTED_TRANSLUCENT = new Layer(
         true,
         TextureAtlas.LOCATION_PARTICLES,
         TRANSLUCENT_PARTICLE_NO_CULL_PIPELINE
     );
+    public static final ParticleRenderType SORTED_OPAQUE_BLOCK_TYPE = new ParticleRenderType("SORTED_OPAQUE_BLOCK", "SOB");
     public static final Layer SORTED_OPAQUE_BLOCK = new Layer(
         false,
         TextureAtlas.LOCATION_BLOCKS,
@@ -839,6 +842,11 @@ public class EntityRotFX extends SingleQuadParticle implements IWindHandler {
     @Override
     public Layer getLayer() {
         return SORTED_TRANSLUCENT;
+    }
+
+    @Override
+    public ParticleRenderType getGroup() {
+        return SORTED_TRANSLUCENT_TYPE;
     }
 
     public TextureAtlasSprite getSprite() {

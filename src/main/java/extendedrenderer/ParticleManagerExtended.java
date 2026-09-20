@@ -1,35 +1,36 @@
 package extendedrenderer;
 
-import com.google.common.collect.EvictingQueue;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Queues;
-import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.logging.LogUtils;
 import extendedrenderer.particle.entity.EntityRotFX;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
+import it.unimi.dsi.fastutil.objects.Reference2ObjectMaps;
+import it.unimi.dsi.fastutil.objects.Reference2ObjectOpenHashMap;
 import javax.annotation.Nullable;
-import net.minecraft.CrashReport;
-import net.minecraft.CrashReportCategory;
-import net.minecraft.ReportedException;
 import net.minecraft.client.Camera;
 import net.minecraft.client.multiplayer.ClientLevel;
+import net.minecraft.client.particle.ElderGuardianParticleGroup;
+import net.minecraft.client.particle.ItemPickupParticleGroup;
+import net.minecraft.client.particle.NoRenderParticleGroup;
 import net.minecraft.client.particle.Particle;
 import net.minecraft.client.particle.ParticleDescription;
+import net.minecraft.client.particle.ParticleEngine;
+import net.minecraft.client.particle.ParticleGroup;
 import net.minecraft.client.particle.ParticleProvider;
 import net.minecraft.client.particle.ParticleRenderType;
+import net.minecraft.client.particle.ParticleResources;
+import net.minecraft.client.particle.QuadParticleGroup;
 import net.minecraft.client.particle.SpriteSet;
 import net.minecraft.client.particle.TrackingEmitter;
-import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.culling.Frustum;
+import net.minecraft.client.renderer.state.level.ParticlesRenderState;
 import net.minecraft.client.renderer.texture.SpriteLoader;
 import net.minecraft.client.renderer.texture.TextureAtlas;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
-import net.minecraft.client.renderer.texture.TextureManager;
-import net.minecraft.core.particles.ParticleGroup;
-import net.minecraft.core.particles.ParticleOptions;
-import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.core.particles.ParticleLimit;
 import net.minecraft.resources.FileToIdConverter;
 import net.minecraft.resources.Identifier;
 import net.minecraft.server.packs.resources.PreparableReloadListener;
@@ -40,66 +41,67 @@ import net.minecraft.util.RandomSource;
 import net.minecraft.util.Util;
 import net.minecraft.util.profiling.Profiler;
 import net.minecraft.util.profiling.ProfilerFiller;
+import net.neoforged.neoforge.client.event.RegisterParticleGroupsEvent;
 import org.slf4j.Logger;
 
 import java.io.IOException;
 import java.io.Reader;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.Queue;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
-public class ParticleManagerExtended implements PreparableReloadListener {
+public class ParticleManagerExtended extends ParticleEngine implements PreparableReloadListener {
    private static final Logger LOGGER = LogUtils.getLogger();
    private static final FileToIdConverter PARTICLE_LISTER = FileToIdConverter.json("particles");
     private static final Identifier PARTICLES_ATLAS_INFO = Identifier.withDefaultNamespace("particles");
-   private static final int MAX_PARTICLES_PER_LAYER = 16384;
-	private static final List<ParticleRenderType> RENDER_ORDER = ImmutableList.of(ParticleRenderType.TERRAIN_SHEET, ParticleRenderType.PARTICLE_SHEET_OPAQUE, ParticleRenderType.PARTICLE_SHEET_TRANSLUCENT, ParticleRenderType.CUSTOM, ParticleRenderType.CUSTOM, EntityRotFX.SORTED_OPAQUE_BLOCK, EntityRotFX.SORTED_TRANSLUCENT);
-   protected ClientLevel level;
-   public final Map<ParticleRenderType, Queue<Particle>> particles = Maps.newTreeMap(net.neoforged.neoforge.client.ClientHooks.makeParticleRenderTypeComparator(RENDER_ORDER));
-   private final Queue<TrackingEmitter> trackingEmitters = Queues.newArrayDeque();
-   private final TextureManager textureManager;
-   private final RandomSource random = RandomSource.create();
+    private static final List<ParticleRenderType> RENDER_ORDER = ImmutableList.of(ParticleRenderType.SINGLE_QUADS, ParticleRenderType.ITEM_PICKUP, ParticleRenderType.ELDER_GUARDIANS, EntityRotFX.SORTED_OPAQUE_BLOCK_TYPE, EntityRotFX.SORTED_TRANSLUCENT_TYPE);
+    private final Queue<TrackingEmitter> trackingEmitters = Queues.newArrayDeque();
+    private final Map<ParticleRenderType, Function<ParticleEngine, ParticleGroup<?>>> particleGroupFactories;
+    private final List<ParticleRenderType> particleRenderOrder;
     private final Map<Identifier, ParticleProvider<?>> providers = new java.util.HashMap<>();
    private final Queue<Particle> particlesToAdd = Queues.newArrayDeque();
     private final Map<Identifier, ParticleManagerExtended.MutableSpriteSet> spriteSets = Maps.newHashMap();
    private final TextureAtlas textureAtlas;
-   private final Object2IntOpenHashMap<ParticleGroup> trackedParticleCounts = new Object2IntOpenHashMap<>();
+    private final Object2IntOpenHashMap<ParticleLimit> trackedParticleCounts = new Object2IntOpenHashMap<>();
 
-   public ParticleManagerExtended(ClientLevel p_107299_, TextureManager p_107300_) {
+    public ParticleManagerExtended(ClientLevel level, ParticleResources resourceManager) {
+        super(level, resourceManager);
       this.textureAtlas = new TextureAtlas(TextureAtlas.LOCATION_PARTICLES);
       //p_107300_.register(this.textureAtlas.location(), this.textureAtlas);
-      this.level = p_107299_;
-      this.textureManager = p_107300_;
+        var particleGroupFactories = new Reference2ObjectOpenHashMap<ParticleRenderType, Function<ParticleEngine, ParticleGroup<?>>>();
+        var particleRenderOrder = new ArrayList<>(RENDER_ORDER);
+        net.neoforged.fml.ModLoader.postEvent(new RegisterParticleGroupsEvent(particleGroupFactories, particleRenderOrder));
+        this.particleGroupFactories = Reference2ObjectMaps.unmodifiable(particleGroupFactories);
+        this.particleRenderOrder = List.copyOf(particleRenderOrder);
    }
 
 	@Override
-	public CompletableFuture<Void> reload(PreparationBarrier p_107305_, ResourceManager p_107306_, Executor p_107309_, Executor p_107310_) {
+    public CompletableFuture<Void> reload(PreparableReloadListener.SharedState currentReload, Executor taskExecutor, PreparationBarrier preparationBarrier, Executor reloadExecutor) {
         record ParticleDefinition(Identifier id, Optional<List<Identifier>> sprites) {
       }
+        ResourceManager p_107306_ = currentReload.resourceManager();
       CompletableFuture<List<ParticleDefinition>> completablefuture = CompletableFuture.supplyAsync(() -> {
          return PARTICLE_LISTER.listMatchingResources(p_107306_);
-      }, p_107309_).thenCompose((p_247914_) -> {
+      }, taskExecutor).thenCompose((p_247914_) -> {
          List<CompletableFuture<ParticleDefinition>> list = new ArrayList<>(p_247914_.size());
          p_247914_.forEach((p_247903_, p_247904_) -> {
              Identifier resourcelocation = PARTICLE_LISTER.fileToId(p_247903_);
             list.add(CompletableFuture.supplyAsync(() -> {
                return new ParticleDefinition(resourcelocation, this.loadParticleDescription(resourcelocation, p_247904_));
-            }, p_107309_));
+            }, taskExecutor));
          });
          return Util.sequence(list);
       });
-      CompletableFuture<SpriteLoader.Preparations> completablefuture1 = SpriteLoader.create(this.textureAtlas).loadAndStitch(p_107306_, PARTICLES_ATLAS_INFO, 0, p_107309_).thenCompose(SpriteLoader.Preparations::waitForUpload);
-      return CompletableFuture.allOf(completablefuture1, completablefuture).thenCompose(p_107305_::wait).thenAcceptAsync((p_247900_) -> {
+        CompletableFuture<SpriteLoader.Preparations> completablefuture1 = SpriteLoader.create(this.textureAtlas).loadAndStitch(p_107306_, PARTICLES_ATLAS_INFO, 0, taskExecutor, Set.of());
+        return CompletableFuture.allOf(completablefuture1, completablefuture).thenCompose(preparationBarrier::wait).thenAcceptAsync((p_247900_) -> {
          this.clearParticles();
 		  ProfilerFiller profiler = Profiler.get();
 		  profiler.startTick();
@@ -137,11 +139,7 @@ public class ParticleManagerExtended implements PreparableReloadListener {
 
 		  profiler.pop();
 		  profiler.endTick();
-      }, p_107310_);
-   }
-
-   public void close() {
-      this.textureAtlas.clearTextureData();
+        }, reloadExecutor);
    }
 
     private Optional<List<Identifier>> loadParticleDescription(Identifier p_250648_, Resource p_248793_) {
@@ -158,14 +156,8 @@ public class ParticleManagerExtended implements PreparableReloadListener {
       }
    }
 
-   @Nullable
-   private <T extends ParticleOptions> Particle makeParticle(T p_107396_, double p_107397_, double p_107398_, double p_107399_, double p_107400_, double p_107401_, double p_107402_) {
-      ParticleProvider<T> particleprovider = (ParticleProvider<T>)this.providers.get(BuiltInRegistries.PARTICLE_TYPE.getKey(p_107396_.getType()));
-      return particleprovider == null ? null : particleprovider.createParticle(p_107396_, this.level, p_107397_, p_107398_, p_107399_, p_107400_, p_107401_, p_107402_);
-   }
-
    public void add(Particle p_107345_) {
-      Optional<ParticleGroup> optional = p_107345_.getParticleGroup();
+       Optional<ParticleLimit> optional = p_107345_.getParticleLimit();
       if (optional.isPresent()) {
          if (this.hasSpaceInParticleLimit(optional.get())) {
             this.particlesToAdd.add(p_107345_);
@@ -180,9 +172,9 @@ public class ParticleManagerExtended implements PreparableReloadListener {
    public void tick() {
 	   ProfilerFiller profiler = Profiler.get();
 	   profiler.push("weather2_particle_tick");
-      this.particles.forEach((p_288249_, p_288250_) -> {
+       this.particles.forEach((p_288249_, group) -> {
 		  profiler.push("weather2_particle_tick_" + p_288249_.toString());
-         this.tickParticleList(p_288250_);
+           group.tickParticles();
 		  profiler.pop();
       });
       if (!this.trackingEmitters.isEmpty()) {
@@ -201,110 +193,37 @@ public class ParticleManagerExtended implements PreparableReloadListener {
       Particle particle;
       if (!this.particlesToAdd.isEmpty()) {
          while((particle = this.particlesToAdd.poll()) != null) {
-            this.particles.computeIfAbsent(particle.getRenderType(), (p_107347_) -> {
-               return EvictingQueue.create(16384 * 2);
-            }).add(particle);
+             if (!this.particles.computeIfAbsent(particle.getGroup(), this::createParticleGroup).add(particle)) {
+                 particle.getParticleLimit().ifPresent(options -> this.updateCount(options, -1));
+             }
          }
       }
 	   profiler.pop();
    }
 
-   private void tickParticleList(Collection<Particle> p_107385_) {
-      if (!p_107385_.isEmpty()) {
-         Iterator<Particle> iterator = p_107385_.iterator();
-
-         while(iterator.hasNext()) {
-            Particle particle = iterator.next();
-            this.tickParticle(particle);
-            if (!particle.isAlive()) {
-               particle.getParticleGroup().ifPresent((p_172289_) -> {
-                  this.updateCount(p_172289_, -1);
-               });
-               iterator.remove();
-            }
-         }
-      }
-
-   }
-
-   private void updateCount(ParticleGroup p_172282_, int p_172283_) {
-      this.trackedParticleCounts.addTo(p_172282_, p_172283_);
-   }
-
-   private void tickParticle(Particle p_107394_) {
-      try {
-         p_107394_.tick();
-      } catch (Throwable throwable) {
-         CrashReport crashreport = CrashReport.forThrowable(throwable, "Ticking Particle");
-         CrashReportCategory crashreportcategory = crashreport.addCategory("Particle being ticked");
-         crashreportcategory.setDetail("Particle", p_107394_::toString);
-         crashreportcategory.setDetail("Particle Type", p_107394_.getRenderType()::toString);
-         throw new ReportedException(crashreport);
-      }
-   }
-
-    public void render(Camera camera, float partialTick, MultiBufferSource.BufferSource bufferSource, @Nullable net.minecraft.client.renderer.culling.Frustum frustum, java.util.function.Predicate<ParticleRenderType> renderTypePredicate) {
-	   ProfilerFiller profiler = Profiler.get();
-	   profiler.push("weather2_particle_render");
-//      float fogStart = RenderSystem.getShaderFogStart();
-//      float fogEnd = RenderSystem.getShaderFogEnd();
-//      RenderSystem.setShaderFogStart(fogStart * 4);
-//      RenderSystem.setShaderFogEnd(fogEnd * 4);
-
-        for (ParticleRenderType particlerendertype : this.particles.keySet()) { // Neo: allow custom IParticleRenderType's
-            if (particlerendertype == ParticleRenderType.NO_RENDER || particlerendertype == ParticleRenderType.CUSTOM || !renderTypePredicate.test(particlerendertype)) continue;
-            Queue<Particle> queue = this.particles.get(particlerendertype);
-            if (queue != null && !queue.isEmpty()) {
-                renderParticleType(camera, partialTick, bufferSource, particlerendertype, queue, frustum);
-            }
-        }
-
-        Queue<Particle> queue1 = this.particles.get(ParticleRenderType.CUSTOM);
-        if (queue1 != null && !queue1.isEmpty()) {
-            renderCustomParticles(camera, partialTick, bufferSource, queue1, frustum);
-        }
-
-        bufferSource.endBatch();
-
-//      RenderSystem.setShaderFogStart(fogStart);
-//      RenderSystem.setShaderFogEnd(fogEnd);
-	   profiler.pop();
-   }
-
-    private static void renderParticleType(
-        Camera camera, float partialTick, MultiBufferSource.BufferSource bufferSource, ParticleRenderType particleType, Queue<Particle> particles, @Nullable net.minecraft.client.renderer.culling.Frustum frustum
-    ) {
-        VertexConsumer vertexconsumer = bufferSource.getBuffer(Objects.requireNonNull(particleType.renderType()));
-
-        for (Particle particle : particles) {
-            if (frustum != null && !frustum.isVisible(particle.getRenderBoundingBox(partialTick))) continue;
-            try {
-                particle.render(vertexconsumer, camera, partialTick);
-            }
-            catch (Throwable throwable) {
-                CrashReport crashreport = CrashReport.forThrowable(throwable, "Rendering Particle");
-                CrashReportCategory crashreportcategory = crashreport.addCategory("Particle being rendered");
-                crashreportcategory.setDetail("Particle", particle::toString);
-                crashreportcategory.setDetail("Particle Type", particleType::toString);
-                throw new ReportedException(crashreport);
-            }
+    private ParticleGroup<?> createParticleGroup(ParticleRenderType type) {
+        if (type == EntityRotFX.SORTED_TRANSLUCENT_TYPE || type == EntityRotFX.SORTED_OPAQUE_BLOCK_TYPE) {
+            return new WeatherParticleGroup(this, type);
+        } else if (type == ParticleRenderType.ITEM_PICKUP) {
+            return new ItemPickupParticleGroup(this);
+        } else if (type == ParticleRenderType.ELDER_GUARDIANS) {
+            return new ElderGuardianParticleGroup(this);
+        } else if (this.particleGroupFactories.containsKey(type)) {
+            return this.particleGroupFactories.get(type).apply(this);
+        } else {
+            return type == ParticleRenderType.NO_RENDER ? new NoRenderParticleGroup(this) : new QuadParticleGroup(this, type);
         }
     }
 
-    private static void renderCustomParticles(Camera camera, float partialTick, MultiBufferSource.BufferSource bufferSource, Queue<Particle> particles, @Nullable net.minecraft.client.renderer.culling.Frustum frustum) {
-        PoseStack posestack = new PoseStack();
+    protected void updateCount(ParticleLimit p_172282_, int p_172283_) {
+        this.trackedParticleCounts.addTo(p_172282_, p_172283_);
+    }
 
-        for (Particle particle : particles) {
-            if (frustum != null && !frustum.isVisible(particle.getRenderBoundingBox(partialTick))) continue;
-            try {
-                particle.renderCustom(posestack, bufferSource, camera, partialTick);
-            }
-            catch (Throwable throwable) {
-                CrashReport crashreport = CrashReport.forThrowable(throwable, "Rendering Particle");
-                CrashReportCategory crashreportcategory = crashreport.addCategory("Particle being rendered");
-                crashreportcategory.setDetail("Particle", particle::toString);
-                crashreportcategory.setDetail("Particle Type", "Custom");
-                throw new ReportedException(crashreport);
+    public void extract(ParticlesRenderState particlesRenderState, Frustum frustum, Camera camera, float partialTickTime) {
+        for (ParticleRenderType particleType : particleRenderOrder) {
+            ParticleGroup<?> particles = this.particles.get(particleType);
+            if (particles != null && !particles.isEmpty()) {
+                particlesRenderState.add(particles.extractRenderState(frustum, camera, partialTickTime));
             }
         }
     }
@@ -315,12 +234,8 @@ public class ParticleManagerExtended implements PreparableReloadListener {
       this.trackingEmitters.clear();
    }
 
-   public String countParticles() {
-      return String.valueOf(this.particles.values().stream().mapToInt(Collection::size).sum());
-   }
-
-   private boolean hasSpaceInParticleLimit(ParticleGroup p_172280_) {
-      return this.trackedParticleCounts.getInt(p_172280_) < p_172280_.getLimit();
+    private boolean hasSpaceInParticleLimit(ParticleLimit p_172280_) {
+        return this.trackedParticleCounts.getInt(p_172280_) < p_172280_.limit();
    }
 
    public void clearParticles() {
@@ -334,19 +249,24 @@ public class ParticleManagerExtended implements PreparableReloadListener {
       private List<TextureAtlasSprite> sprites;
 
       public TextureAtlasSprite get(int p_107413_, int p_107414_) {
-         return this.sprites.get(p_107413_ * (this.sprites.size() - 1) / p_107414_);
+          return sprites.get(p_107413_ * (this.sprites.size() - 1) / p_107414_);
       }
 
       public TextureAtlasSprite get(RandomSource p_233889_) {
-         return this.sprites.get(p_233889_.nextInt(this.sprites.size()));
+          return sprites.get(p_233889_.nextInt(this.sprites.size()));
       }
 
-      public void rebind(List<TextureAtlasSprite> p_107416_) {
-         this.sprites = ImmutableList.copyOf(p_107416_);
+       @Override
+       public TextureAtlasSprite first() {
+           return sprites.getFirst();
+       }
+
+       public void rebind(List<TextureAtlasSprite> p_107416_) {
+           sprites = ImmutableList.copyOf(p_107416_);
       }
    }
 
-   public Map<ParticleRenderType, Queue<Particle>> getParticles() {
+    public Map<ParticleRenderType, ParticleGroup<?>> getParticles() {
       return particles;
    }
 }

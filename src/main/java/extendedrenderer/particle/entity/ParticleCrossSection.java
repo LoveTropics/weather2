@@ -1,6 +1,7 @@
 package extendedrenderer.particle.entity;
 
 import com.mojang.math.Axis;
+import extendedrenderer.WeatherParticleRenderState;
 import net.minecraft.client.Camera;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.renderer.state.level.QuadParticleRenderState;
@@ -21,8 +22,10 @@ public class ParticleCrossSection extends ParticleTexFX {
     }
 
     @Override
-    public void extract(QuadParticleRenderState state, Camera renderInfo, float partialTicks) {
-
+    public void extract(QuadParticleRenderState qState, Camera renderInfo, float partialTicks) {
+        if (!(qState instanceof WeatherParticleRenderState state)) {
+            return;
+        }
         Vec3 Vector3d = renderInfo.position();
         float x = (float) (Mth.lerp(partialTicks, this.xo, this.x) - Vector3d.x());
         float y = (float) (Mth.lerp(partialTicks, this.yo, this.y) - Vector3d.y());
@@ -55,20 +58,6 @@ public class ParticleCrossSection extends ParticleTexFX {
 
         float scale = this.getQuadSize(partialTicks);
 
-        for (int i = 0; i < 4; ++i) {
-            Vector3f vector3f = avector3f2[i];
-            vector3f.rotate(quaternion);
-            vector3f.mul(scale);
-            vector3f.add(x, y, z);
-        }
-
-        for (int i = 0; i < 4; ++i) {
-            Vector3f vector3f = avector3f3[i];
-            vector3f.rotate(quaternion);
-            vector3f.mul(scale);
-            vector3f.add(x, y, z);
-        }
-
         float u0 = this.getU0();
         float u1 = this.getU1();
         float v0 = this.getV0();
@@ -82,16 +71,7 @@ public class ParticleCrossSection extends ParticleTexFX {
         }
 
         state.add(getLayer(), x, y, z, quaternion.x, quaternion.y, quaternion.z, quaternion.w, scale, u0, u1, v0, v1, color, lightCoords);
-
-        buffer.addVertex(avector3f2[0].x(), avector3f2[0].y(), avector3f2[0].z()).setUv(u1, v1).setColor(this.rCol, this.gCol, this.bCol, this.alpha).setLight(lightCoords);
-        buffer.addVertex(avector3f2[1].x(), avector3f2[1].y(), avector3f2[1].z()).setUv(u1, v0).setColor(this.rCol, this.gCol, this.bCol, this.alpha).setLight(lightCoords);
-        buffer.addVertex(avector3f2[2].x(), avector3f2[2].y(), avector3f2[2].z()).setUv(u0, v0).setColor(this.rCol, this.gCol, this.bCol, this.alpha).setLight(lightCoords);
-        buffer.addVertex(avector3f2[3].x(), avector3f2[3].y(), avector3f2[3].z()).setUv(u0, v1).setColor(this.rCol, this.gCol, this.bCol, this.alpha).setLight(lightCoords);
-
-        buffer.addVertex(avector3f3[0].x(), avector3f3[0].y(), avector3f3[0].z()).setUv(u1, v1).setColor(this.rCol, this.gCol, this.bCol, this.alpha).setLight(lightCoords);
-        buffer.addVertex(avector3f3[1].x(), avector3f3[1].y(), avector3f3[1].z()).setUv(u1, v0).setColor(this.rCol, this.gCol, this.bCol, this.alpha).setLight(lightCoords);
-        buffer.addVertex(avector3f3[2].x(), avector3f3[2].y(), avector3f3[2].z()).setUv(u0, v0).setColor(this.rCol, this.gCol, this.bCol, this.alpha).setLight(lightCoords);
-        buffer.addVertex(avector3f3[3].x(), avector3f3[3].y(), avector3f3[3].z()).setUv(u0, v1).setColor(this.rCol, this.gCol, this.bCol, this.alpha).setLight(lightCoords);
-
+        state.add(getLayer(), x, y, z, quaternion.x, quaternion.y, quaternion.z, quaternion.w, scale, u0, u1, v0, v1, color, lightCoords, avector3f2);
+        state.add(getLayer(), x, y, z, quaternion.x, quaternion.y, quaternion.z, quaternion.w, scale, u0, u1, v0, v1, color, lightCoords, avector3f3);
     }
 }

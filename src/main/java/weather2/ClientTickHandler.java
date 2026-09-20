@@ -4,6 +4,7 @@ import com.corosus.coroutil.util.CULog;
 import extendedrenderer.ParticleManagerExtended;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
+import net.minecraft.client.particle.ParticleResources;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.player.Player;
@@ -161,7 +162,7 @@ public class ClientTickHandler
 		Minecraft mc = Minecraft.getInstance();
 
 		if (particleManagerExtended == null) {
-			particleManagerExtended = new ParticleManagerExtended(mc.level, mc.getTextureManager());
+			particleManagerExtended = new ParticleManagerExtended(mc.level, new ParticleResources());
 		} else {
 			particleManagerExtended.setLevel((ClientLevel) world);
 		}

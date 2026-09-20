@@ -6,11 +6,11 @@ import com.mojang.brigadier.Command;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.BoolArgumentType;
 import com.mojang.brigadier.arguments.FloatArgumentType;
-import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.context.CommandContext;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.particle.Particle;
 import net.minecraft.client.particle.ParticleEngine;
+import net.minecraft.client.particle.ParticleGroup;
 import net.minecraft.client.particle.ParticleRenderType;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
@@ -77,7 +77,7 @@ public class CommandWeather2Client {
                     .then(literal("debug")
                         .then(literal("particles_weather2").executes(c -> {
                             msg(c, "total particle count: " + ClientTickHandler.particleManagerExtended().countParticles());
-                            Map<ParticleRenderType, Queue<Particle>> particles = ClientTickHandler.particleManagerExtended().getParticles();
+                            Map<ParticleRenderType, ParticleGroup<?>> particles = ClientTickHandler.particleManagerExtended().getParticles();
                             if (particles != null) {
                                 msg(c, "particle type count: " + particles.size());
                                 msg(c, "detailed particle info output to log file");
@@ -85,7 +85,7 @@ public class CommandWeather2Client {
                                 int maxCount = 200;
                                 int count = 0;
                                 CULog.log("outputting particle data:");
-                                for (Map.Entry<ParticleRenderType, Queue<Particle>> type : particles.entrySet()) {
+                                for (Map.Entry<ParticleRenderType, ParticleGroup<?>> type : particles.entrySet()) {
                                     CULog.log("type: " + type.getKey() + " -> " + type.getValue().size() + " - classpath: " + type.getKey().getClass().getName());
                                     if (count > maxCount) {
                                         CULog.log("aborted due to large particle type list");

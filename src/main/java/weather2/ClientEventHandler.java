@@ -1,11 +1,13 @@
 package weather2;
 
 import extendedrenderer.ParticleManagerExtended;
+import net.minecraft.client.renderer.culling.Frustum;
 import net.minecraft.world.entity.Entity;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.EventPriority;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
+import net.neoforged.neoforge.client.event.ExtractLevelRenderStateEvent;
 import net.neoforged.neoforge.client.event.RenderLevelStageEvent;
 import net.neoforged.neoforge.client.event.ViewportEvent;
 import net.neoforged.neoforge.event.tick.EntityTickEvent;
@@ -23,12 +25,12 @@ public class ClientEventHandler {
     }
 
     @SubscribeEvent
-    public static void worldRenderAfterParticles(RenderLevelStageEvent.AfterTranslucentParticles event) {
+    public static void worldRenderAfterParticles(ExtractLevelRenderStateEvent event) {
         if (ConfigDebug.Particle_engine_render) {
             //System.out.println("dsf " + event.getPartialTick().getGameTimeDeltaTicks());
             ParticleManagerExtended particleManagerExtended = ClientTickHandler.particleManagerExtended();
             if (particleManagerExtended != null) {
-                particleManagerExtended.render(event.getCamera(), event.getPartialTick().getGameTimeDeltaTicks(), event.getLevelRenderer().renderBuffers.bufferSource(), event.getFrustum(), type -> true);
+                particleManagerExtended.extract(event.getRenderState().particlesRenderState, new Frustum(event.getFrustum()).offset(-3.0F), event.getCamera(), event.getDeltaTracker().getGameTimeDeltaPartialTick(false));
             }
         }
     }
