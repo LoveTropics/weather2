@@ -18,6 +18,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.particle.FlameParticle;
 import net.minecraft.client.particle.Particle;
+import net.minecraft.client.particle.ParticleGroup;
 import net.minecraft.client.particle.SuspendedParticle;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.core.BlockPos;
@@ -75,6 +76,7 @@ import weather2.weathersystem.tornado.TornadoManagerTodoRenameMe;
 import weather2.weathersystem.wind.WindManager;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -1402,8 +1404,9 @@ public class SceneEnhancer implements Runnable {
 
 		//Built in particles
         if (WeatherUtilParticle.fxLayers != null && windMan.getWindSpeed(player.blockPosition()) >= 0.10) {
-			for (Queue<Particle> type : WeatherUtilParticle.fxLayers.values()) {
-				for (Particle particle : type) {
+			Collection<ParticleGroup<?>> values = WeatherUtilParticle.fxLayers.values();
+	        for (ParticleGroup<?> type : values) {
+				for (Particle particle : type.particles) {
 					if (particle instanceof SuspendedParticle) {
 						continue;
 					}

@@ -4,6 +4,7 @@ import extendedrenderer.particle.entity.EntityRotFX;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.particle.Particle;
 import net.minecraft.client.particle.ParticleEngine;
+import net.minecraft.client.particle.ParticleGroup;
 import net.minecraft.client.particle.ParticleRenderType;
 import net.minecraft.core.BlockPos;
 import net.minecraft.util.Mth;
@@ -15,7 +16,7 @@ import java.util.Random;
 
 public class WeatherUtilParticle {
     //public static ArrayDeque<Particle>[][] fxLayers;
-    public static Map<ParticleRenderType, Queue<Particle>> fxLayers;
+    public static  Map<ParticleRenderType, ParticleGroup<?>> fxLayers;
 
     public static int effLeafID = 0;
     public static int effRainID = 1;
@@ -43,30 +44,7 @@ public class WeatherUtilParticle {
 
     public static void getFXLayers()
     {
-        //fxLayers
-        Field field = null;
-
-        try
-        {
-            field = (ParticleEngine.class).getDeclaredField("particles");//ObfuscationReflectionHelper.remapFieldNames("net.minecraft.client.particle.EffectRenderer", new String[] { "fxLayers" })[0]);
-            field.setAccessible(true);
-            fxLayers = (Map<ParticleRenderType, Queue<Particle>>)field.get(Minecraft.getInstance().particleEngine);
-        }
-        catch (Exception ex)
-        {
-            //System.out.println("temp message: obf reflection fail!");
-            //ex.printStackTrace();
-            try
-            {
-                field = (ParticleEngine.class).getDeclaredField("f_107289_");
-                field.setAccessible(true);
-                fxLayers = (Map<ParticleRenderType, Queue<Particle>>)field.get(Minecraft.getInstance().particleEngine);
-            }
-            catch (Exception ex2)
-            {
-                ex2.printStackTrace();
-            }
-        }
+        fxLayers = Minecraft.getInstance().particleEngine.particles;
     }
 
     public static float getParticleWeight(EntityRotFX entity1)
