@@ -4,6 +4,7 @@ import com.corosus.coroutil.util.CoroUtilColor;
 import com.corosus.coroutil.util.CoroUtilMisc;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.color.block.BlockColors;
+import net.minecraft.client.color.block.BlockTintSource;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.core.BlockPos;
@@ -54,7 +55,8 @@ public class ParticleTexLeafColor extends ParticleTexFX {
             state = state.with(DoublePlantBlock.name, worldIn.getBlockState(pos.down()).get(DoublePlantBlock.name));
         }*/
 
-        int multiplier = this.colors.getTintSource(state, 0).colorInWorld(state, level, pos);
+        BlockTintSource tintSource = this.colors.getTintSource(state, 0);
+        int multiplier = tintSource == null ? 0xFFFFFFFF : tintSource.colorInWorld(state, level, pos);
 
         //was this supposed to be temp?!
         //colorCache.clear();
@@ -66,7 +68,7 @@ public class ParticleTexLeafColor extends ParticleTexFX {
 
             if (colors.length == 0) {
 
-                //if there is no color to use AND theres no multiplier, fallback to good ol green
+                //if there is no color to use AND theres no multiplier, fall back to good ol green
                 if (!hasColor(state) || (multiplier & 0xFFFFFF) == 0xFFFFFF) {
                     multiplier = 5811761; //color for vanilla leaf in forest biome
                 }
