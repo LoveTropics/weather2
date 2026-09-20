@@ -92,8 +92,8 @@ public class WeatherParticleRenderState extends QuadParticleRenderState {
 
     private static class Storage {
         private int capacity = INITIAL_PARTICLE_CAPACITY;
-        private float[] floatValues = new float[12288];
-        private int[] intValues = new int[2048];
+        private float[] floatValues = new float[FLOATS_PER_PARTICLE * INITIAL_PARTICLE_CAPACITY];
+        private int[] intValues = new int[INTS_PER_PARTICLE * INITIAL_PARTICLE_CAPACITY];
         private int currentParticleIndex;
 
         public void add(float x, float y, float z, float xRot, float yRot, float zRot, float wRot, float scale, float u0, float u1, float v0, float v1, int color, int lightCoords, Vector3fc[] vertices) {
@@ -167,8 +167,8 @@ public class WeatherParticleRenderState extends QuadParticleRenderState {
 
         private void grow() {
             capacity *= 2;
-            floatValues = Arrays.copyOf(floatValues, capacity * 12);
-            intValues = Arrays.copyOf(intValues, capacity * 2);
+            floatValues = Arrays.copyOf(floatValues, capacity * FLOATS_PER_PARTICLE);
+            intValues = Arrays.copyOf(intValues, capacity * INTS_PER_PARTICLE);
         }
 
         public int count() {
