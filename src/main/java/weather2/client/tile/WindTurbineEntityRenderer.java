@@ -2,6 +2,7 @@ package weather2.client.tile;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.Sheets;
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
@@ -20,7 +21,7 @@ import weather2.client.entity.model.WindTurbineModel;
 import weather2.client.tile.state.WindTurbineRenderState;
 
 public class WindTurbineEntityRenderer implements BlockEntityRenderer<WindTurbineBlockEntity, WindTurbineRenderState> {
-    public static final SpriteId TEXTURE = new SpriteId(AtlasIds.BLOCKS, Identifier.fromNamespaceAndPath(Weather.MODID, "blocks/te/wind_turbine.png"));
+    public static final SpriteId TEXTURE = Sheets.BLOCK_ENTITIES_MAPPER.apply(Identifier.fromNamespaceAndPath(Weather.MODID, "te/wind_turbine.png"));
     private final SpriteGetter sprites;
     protected final WindTurbineModel model;
 

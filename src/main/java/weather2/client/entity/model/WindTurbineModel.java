@@ -63,9 +63,10 @@ public class WindTurbineModel extends Model<WindTurbineRenderState> {
         root.yRot += Math.toRadians(180);
         root.y -= 32;
 
-        ModelPart top = root.getChild("base").getChild("top");
-        if (top != null) {
-            top.yRot = state.yRot;
-        }
+        // These don't exist?
+//        ModelPart top = root.getChild("base").getChild("top");
+//        if (top != null) {
+//            top.yRot = state.yRot;
+//        }
     }
 }
