@@ -37,6 +37,7 @@ import net.neoforged.fml.util.thread.EffectiveSide;
 import weather2.EntityRegistry;
 import weather2.ServerTickHandler;
 import weather2.Weather;
+import weather2.Weather2Tags;
 import weather2.attachments.EntityNandoAttachment;
 import weather2.attachments.WeatherAttachments;
 import weather2.client.SceneEnhancer;
@@ -2420,17 +2421,16 @@ public class StormObject extends WeatherObject {
 
 			double entHeightFromBase = Math.max(0.1F, entity.getY() - posBaseFormationPos.y);
 
-			if (entity instanceof Player) {
-				if (((Player) entity).getMainHandItem().getItem().toString().contains("acid_repellent_umbrella") ||
-						((Player) entity).getOffhandItem().getItem().toString().contains("acid_repellent_umbrella")) {
+			if (entity instanceof Player player) {
+                if (player.getMainHandItem().is(Weather2Tags.ACID_REPELLENT) || player.getOffhandItem().is(Weather2Tags.ACID_REPELLENT)) {
 					if (entHeightFromBase > 80) {
 						dampenY = 0.7F;
 					}
 					dampenXZ = 1.4F;
 					grabAdj -= 20;
-				}
+                }
 
-				float weightAdj = WeatherUtilEntity.getWeightAdjFromEquipment(1F, (Player) entity);
+				float weightAdj = WeatherUtilEntity.getWeightAdjFromEquipment(1F, player);
 
 				dampenY /= weightAdj;
 				dampenXZ /= weightAdj;

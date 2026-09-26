@@ -6,9 +6,13 @@ import com.corosus.modconfig.IConfigCategory;
 import com.mojang.brigadier.CommandDispatcher;
 import extendedrenderer.particle.ParticleRegistry;
 import net.minecraft.commands.CommandSourceStack;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.core.registries.Registries;
+import net.minecraft.data.DataProvider;
+import net.minecraft.data.PackOutput;
 import net.minecraft.data.loot.LootTableProvider;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.CreativeModeTabs;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParamSets;
@@ -44,12 +48,14 @@ import weather2.config.ConfigTornado;
 import weather2.config.ConfigWind;
 import weather2.data.BlockAndItemProvider;
 import weather2.data.BlockLootTables;
+import weather2.data.TagProvider;
 import weather2.data.WeatherRecipeProvider;
 
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
 // The value here should match an entry in the META-INF/mods.toml file
@@ -60,7 +66,9 @@ public class Weather
     public static final Logger LOGGER = LogManager.getLogger();
 
     public static final String MODID = "weather2";
-    public static final boolean LTMINIGAMES_LOADED = ModList.get().isLoaded("ltminigames");
+    public static final String LTMINIGAMES_MODID = "ltminigames";
+
+    public static final boolean LTMINIGAMES_LOADED = ModList.get().isLoaded(LTMINIGAMES_MODID);
     public static final boolean LTWEATHER_LOADED = ModList.get().isLoaded("ltweather");
 
     public static boolean initProperNeededForWorld = true;
@@ -213,5 +221,10 @@ public class Weather
     private void gatherClientData(GatherDataEvent event) {
         event.createProvider(ParticleRegistry::new);
         event.createProvider(BlockAndItemProvider::new);
+        event.createProvider(TagProvider::new);
+    }
+
+    public static Identifier id(String path) {
+        return Identifier.fromNamespaceAndPath(MODID, path);
     }
 }
