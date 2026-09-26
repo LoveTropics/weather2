@@ -9,11 +9,9 @@ import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.context.CommandContext;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
-import net.minecraft.world.entity.EntityTypes;
 import net.minecraft.world.phys.Vec3;
-import net.tropicraft.core.common.entity.TropicraftEntities;
+import weather2.LoveTropicsIntegration;
 import weather2.ServerTickHandler;
 import weather2.config.ConfigMisc;
 import weather2.config.ConfigWind;
@@ -222,7 +220,7 @@ public class WeatherCommand {
                         stormObject.setupStorm(null);
                         stormObject.levelCurIntensityStage = StormObject.STATE_STAGE1;
                         stormObject.levelStormIntensityMax = StormObject.STATE_STAGE4;
-                        stormObject.setNadoEntitySpawnSettings(NadoEntitySpawnSettings.of(new EntityTemplate(TropicraftEntities.HAMMERHEAD.get())));
+                        stormObject.setNadoEntitySpawnSettings(NadoEntitySpawnSettings.of(new EntityTemplate(LoveTropicsIntegration.getSharkEntityType())));
                         stormObject.setupTornadoAwayFromPlayersAimAtPlayers();
 
 

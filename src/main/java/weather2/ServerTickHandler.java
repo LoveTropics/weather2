@@ -18,7 +18,6 @@ import net.neoforged.neoforge.event.level.LevelEvent;
 import net.neoforged.neoforge.event.tick.LevelTickEvent;
 import net.neoforged.neoforge.event.tick.PlayerTickEvent;
 import net.neoforged.neoforge.event.tick.ServerTickEvent;
-import net.tropicraft.core.common.entity.TropicraftEntities;
 import weather2.config.ClientConfigData;
 import weather2.config.ConfigMisc;
 import weather2.config.WeatherUtilConfig;
@@ -134,7 +133,7 @@ public class ServerTickHandler {
 					stormObject.setupStorm(null);
 					stormObject.levelCurIntensityStage = StormObject.STATE_STAGE1;
 					stormObject.levelStormIntensityMax = StormObject.STATE_STAGE4;
-					stormObject.setNadoEntitySpawnSettings(NadoEntitySpawnSettings.of(new EntityTemplate(TropicraftEntities.HAMMERHEAD.get())));
+					stormObject.setNadoEntitySpawnSettings(NadoEntitySpawnSettings.of(new EntityTemplate(LoveTropicsIntegration.getSharkEntityType())));
 					stormObject.setupTornadoAwayFromPlayersAimAtPlayers();
 
 					wm.addStormObject(stormObject);

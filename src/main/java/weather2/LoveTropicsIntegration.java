@@ -3,19 +3,23 @@ package weather2;
 import com.lovetropics.weather.ClientWeather;
 import com.lovetropics.weather.TypeBridge;
 import com.mojang.datafixers.util.Pair;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.EntitySpawnReason;
+import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.EntityTypes;
-import net.minecraft.world.level.Level;
-import net.tropicraft.core.common.entity.TropicraftEntities;
-import net.tropicraft.core.common.entity.underdasea.SharkEntity;
+import net.neoforged.neoforge.registries.DeferredHolder;
 import weather2.datatypes.PrecipitationType;
 import weather2.datatypes.StormState;
 import weather2.ltcompat.ClientWeatherIntegration;
 import weather2.ltcompat.ServerWeatherIntegration;
 
 public class LoveTropicsIntegration {
+
+    public static final Identifier HAMMERHEAD_SHARK = Identifier.fromNamespaceAndPath("tropicraft", "hammerhead_shark");
+    public static final DeferredHolder<EntityType<?>, EntityType<?>> HAMMER_HEAD_SHARK = DeferredHolder.create(Registries.ENTITY_TYPE, HAMMERHEAD_SHARK);
+
     public static final class LoveTropicsClientWeatherValues implements ClientWeatherIntegration.ClientWeatherValues {
         public static final ClientWeatherIntegration.ClientWeatherValues INSTANCE = new LoveTropicsClientWeatherValues();
 
@@ -87,7 +91,7 @@ public class LoveTropicsIntegration {
         return LoveTropicsClientWeatherValues.INSTANCE;
     }
 
-    public static boolean isShark(Entity entity) {
-        return entity.is(EntityTypes.PIGLIN_BRUTE);
+    public static EntityType<?> getSharkEntityType() {
+        return HAMMER_HEAD_SHARK.isBound() ? HAMMER_HEAD_SHARK.value() : EntityTypes.DOLPHIN;
     }
 }

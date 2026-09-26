@@ -11,7 +11,7 @@ public class WeatherAttachments {
     public static final DeferredRegister<AttachmentType<?>> REGISTER = DeferredRegister.create(NeoForgeRegistries.ATTACHMENT_TYPES, Weather.MODID);
 
     public static final DeferredHolder<AttachmentType<?>, AttachmentType<EntityNandoAttachment>> NADO_ENTITY = REGISTER.register(
-            "nado_entity", () -> AttachmentType.builder(() -> new EntityNandoAttachment())
+            "nado_entity", () -> AttachmentType.builder(EntityNandoAttachment::new)
                     .serialize(EntityNandoAttachment.CODEC)
                     .build()
     );
