@@ -14,6 +14,10 @@ group = maven_group
 
 repositories {
     mavenLocal()
+    maven {
+        url "https://cursemaven.com"
+    }
+    maven { url = "https://api.modrinth.com/maven" }
     flatDir {
         dir 'libs'
     }
@@ -68,7 +72,7 @@ dependencies {
     runtimeOnly "curse.maven:fusion-connected-textures-854949:${fusion_version}"
     runtimeOnly ("com.lovetropics.ltextras:LTExtras:${ltextras_version}")
     runtimeOnly ("com.tropicraft:Tropicraft:${tropicraft_version}")
-    runtimeOnly("org.lovetropics:peekaboo:$peekaboo_version")
+    runtimeOnly ("org.lovetropics:peekaboo:$peekaboo_version")
 
     implementation ("com.lovetropics.ltweather:ltweather-neoforge:${ltweather_version}")
     implementation ("com.lovetropics.minigames:LTMinigames:${ltminigames_version}")
