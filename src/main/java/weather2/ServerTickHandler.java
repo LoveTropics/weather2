@@ -2,9 +2,10 @@ package weather2;
 
 import com.corosus.coroutil.util.CULog;
 import com.corosus.modconfig.ConfigMod;
-import com.lovetropics.minigames.common.util.EntityTemplate;
+import com.mojang.logging.LogUtils;
 import it.unimi.dsi.fastutil.objects.Reference2ObjectOpenHashMap;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.NbtOps;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -18,6 +19,10 @@ import net.neoforged.neoforge.event.level.LevelEvent;
 import net.neoforged.neoforge.event.tick.LevelTickEvent;
 import net.neoforged.neoforge.event.tick.PlayerTickEvent;
 import net.neoforged.neoforge.event.tick.ServerTickEvent;
+import org.slf4j.Logger;
+import weather2.api.EntityTemplate;
+import weather2.api.Tornado;
+import weather2.api.TornadoAPI;
 import weather2.config.ClientConfigData;
 import weather2.config.ConfigMisc;
 import weather2.config.WeatherUtilConfig;
@@ -34,6 +39,8 @@ import java.util.UUID;
 public class ServerTickHandler {
 	private static final Map<ResourceKey<Level>, WeatherManagerServer> MANAGERS = new Reference2ObjectOpenHashMap<>();
 	private static final HashMap<String, WeatherManagerServer> MANAGERSLOOKUP = new HashMap<>();
+
+	private static final Logger LOGGER = LogUtils.getLogger();
 
 	@SubscribeEvent
 	public static void onWorldLoad(LevelEvent.Load event) {
@@ -103,70 +110,86 @@ public class ServerTickHandler {
 			String dimResource = tag.getStringOr("dimension", "");
 			WeatherManagerServer wm = MANAGERSLOOKUP.get(dimResource);
 			if (wm != null) {
-				if (msg.method().equals("player_tornado")) {
-					int timeTicks = tag.getIntOr("time_ticks", 0);
-					boolean baby = tag.getBooleanOr("baby", false);
-					//boolean sharknado = tag.getBoolean("sharknado");
-					String uuid = tag.getStringOr("uuid", "");
-					Player player = wm.getWorld().getPlayerByUUID(UUID.fromString(uuid));
-					if (player != null) {
-						StormObject stormObject = new StormObject(wm);
-
-						stormObject.setupStorm(player);
-						stormObject.levelCurIntensityStage = StormObject.STATE_STAGE1;
-						stormObject.levelStormIntensityMax = StormObject.STATE_STAGE1;
-						stormObject.setupPlayerControlledTornado(player);
-						stormObject.setPlayerControlledTimeLeft(timeTicks);
-						stormObject.setBaby(baby);
-						//stormObject.setSharknado(sharknado);
-
-						wm.addStormObject(stormObject);
-						wm.syncStormNew(stormObject);
-
-						CULog.dbg("processed imc message: " + tag);
-					} else {
-						CULog.err("error cant find player in dimension " + dimResource + " for uuid " + uuid + " via IMC");
+                switch (msg.method()) {
+					case "spawn_tornado" -> {
+						Level level = wm.getWorld();
+						if (level instanceof ServerLevel serverLevel) {
+							try {
+								Tornado tornado = Tornado.CODEC.parse(level.registryAccess().createSerializationContext(NbtOps.INSTANCE), tag).getOrThrow();
+								TornadoAPI.spawnTornado(serverLevel, tornado);
+							} catch (Exception e) {
+								LOGGER.error("Error processing spawn_tornado IMC message", e);
+							}
+						}
 					}
-				} else if (msg.method().equals("sharknado")) {
-					StormObject stormObject = new StormObject(wm);
+                    case "player_tornado" -> {
+                        int timeTicks = tag.getIntOr("time_ticks", 0);
+                        boolean baby = tag.getBooleanOr("baby", false);
+                        //boolean sharknado = tag.getBoolean("sharknado");
+                        String uuid = tag.getStringOr("uuid", "");
+                        Player player = wm.getWorld().getPlayerByUUID(UUID.fromString(uuid));
+                        if (player != null) {
+                            StormObject stormObject = new StormObject(wm);
 
-					stormObject.setupStorm(null);
-					stormObject.levelCurIntensityStage = StormObject.STATE_STAGE1;
-					stormObject.levelStormIntensityMax = StormObject.STATE_STAGE4;
-					stormObject.setNadoEntitySpawnSettings(NadoEntitySpawnSettings.of(new EntityTemplate(LoveTropicsIntegration.getSharkEntityType())));
-					stormObject.setupTornadoAwayFromPlayersAimAtPlayers();
+                            stormObject.setupStorm(player);
+                            stormObject.levelCurIntensityStage = StormObject.STATE_STAGE1;
+                            stormObject.levelStormIntensityMax = StormObject.STATE_STAGE1;
+                            stormObject.setupPlayerControlledTornado(player);
+                            stormObject.setPlayerControlledTimeLeft(timeTicks);
+                            stormObject.setBaby(baby);
+                            //stormObject.setSharknado(sharknado);
 
-					wm.addStormObject(stormObject);
-					wm.syncStormNew(stormObject);
+                            wm.addStormObject(stormObject);
+                            wm.syncStormNew(stormObject);
 
-                    CULog.dbg("processed imc message: " + tag + " - " + msg + " - " + wm.getDimension());
-				} else if (msg.method().equals("firenado")) {
-					StormObject stormObject = new StormObject(wm);
+                            CULog.dbg("processed imc message: " + tag);
+                        } else {
+                            CULog.err("error cant find player in dimension " + dimResource + " for uuid " + uuid + " via IMC");
+                        }
+                    }
+                    case "sharknado" -> {
+                        StormObject stormObject = new StormObject(wm);
 
-					stormObject.setupStorm(null);
-					stormObject.levelCurIntensityStage = StormObject.STATE_STAGE1;
-					stormObject.levelStormIntensityMax = StormObject.STATE_STAGE4;
-					stormObject.isFirenado = true;
-					stormObject.setupTornadoAwayFromPlayersAimAtPlayers();
+                        stormObject.setupStorm(null);
+                        stormObject.levelCurIntensityStage = StormObject.STATE_STAGE1;
+                        stormObject.levelStormIntensityMax = StormObject.STATE_STAGE4;
+                        stormObject.setNadoEntitySpawnSettings(NadoEntitySpawnSettings.of(new EntityTemplate(LoveTropicsIntegration.getSharkEntityType())));
+                        stormObject.setupTornadoAwayFromPlayersAimAtPlayers();
 
-					wm.addStormObject(stormObject);
-					wm.syncStormNew(stormObject);
+                        wm.addStormObject(stormObject);
+                        wm.syncStormNew(stormObject);
 
-					CULog.dbg("processed imc message: " + tag);
-				} else if (msg.method().equals("tornado")) {
-					StormObject stormObject = new StormObject(wm);
+                        CULog.dbg("processed imc message: " + tag + " - " + msg + " - " + wm.getDimension());
+                    }
+                    case "firenado" -> {
+                        StormObject stormObject = new StormObject(wm);
 
-					stormObject.setupStorm(null);
-					stormObject.levelCurIntensityStage = StormObject.STATE_STAGE1;
-					stormObject.levelStormIntensityMax = StormObject.STATE_STAGE4;
+                        stormObject.setupStorm(null);
+                        stormObject.levelCurIntensityStage = StormObject.STATE_STAGE1;
+                        stormObject.levelStormIntensityMax = StormObject.STATE_STAGE4;
+                        stormObject.isFirenado = true;
+                        stormObject.setupTornadoAwayFromPlayersAimAtPlayers();
+
+                        wm.addStormObject(stormObject);
+                        wm.syncStormNew(stormObject);
+
+                        CULog.dbg("processed imc message: " + tag);
+                    }
+                    case "tornado" -> {
+                        StormObject stormObject = new StormObject(wm);
+
+                        stormObject.setupStorm(null);
+                        stormObject.levelCurIntensityStage = StormObject.STATE_STAGE1;
+                        stormObject.levelStormIntensityMax = StormObject.STATE_STAGE4;
 //					stormObject.setSharknado(false);
-					stormObject.setupTornadoAwayFromPlayersAimAtPlayers();
+                        stormObject.setupTornadoAwayFromPlayersAimAtPlayers();
 
-					wm.addStormObject(stormObject);
-					wm.syncStormNew(stormObject);
+                        wm.addStormObject(stormObject);
+                        wm.syncStormNew(stormObject);
 
-					CULog.dbg("processed imc message: " + tag);
-				}
+                        CULog.dbg("processed imc message: " + tag);
+                    }
+                }
 			} else {
 				CULog.err("error cant find WeatherManagerServer for dimension " + dimResource + " via IMC");
 			}

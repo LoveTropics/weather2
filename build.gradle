@@ -73,9 +73,9 @@ dependencies {
     runtimeOnly ("com.lovetropics.ltextras:LTExtras:${ltextras_version}")
     runtimeOnly ("com.tropicraft:Tropicraft:${tropicraft_version}")
     runtimeOnly ("org.lovetropics:peekaboo:$peekaboo_version")
+    runtimeOnly ("com.lovetropics.minigames:LTMinigames:${ltminigames_version}")
 
     implementation ("com.lovetropics.ltweather:ltweather-neoforge:${ltweather_version}")
-    implementation ("com.lovetropics.minigames:LTMinigames:${ltminigames_version}")
     implementation ("com.corosus.coroutil:coroutil-neoforge:${project.minecraft_version}-${project.coroutil_version}")
 }
 

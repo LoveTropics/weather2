@@ -16,7 +16,7 @@ import weather2.ltcompat.ServerWeatherIntegration;
 
 public class LoveTropicsIntegration {
 
-    public static final Identifier HAMMERHEAD_SHARK = Identifier.fromNamespaceAndPath("tropicraft", "hammerhead_shark");
+    public static final Identifier HAMMERHEAD_SHARK = Identifier.fromNamespaceAndPath("tropicraft", "hammerhead");
     public static final DeferredHolder<EntityType<?>, EntityType<?>> HAMMER_HEAD_SHARK = DeferredHolder.create(Registries.ENTITY_TYPE, HAMMERHEAD_SHARK);
 
     public static final class LoveTropicsClientWeatherValues implements ClientWeatherIntegration.ClientWeatherValues {

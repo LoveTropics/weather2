@@ -1,7 +1,6 @@
 package weather2.command;
 
 import com.corosus.coroutil.util.CoroUtilBlock;
-import com.lovetropics.minigames.common.util.EntityTemplate;
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.FloatArgumentType;
@@ -9,17 +8,15 @@ import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.context.CommandContext;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
-import net.minecraft.commands.arguments.ComponentArgument;
 import net.minecraft.commands.arguments.NbtTagArgument;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtOps;
 import net.minecraft.nbt.Tag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.phys.Vec3;
 import weather2.LoveTropicsIntegration;
 import weather2.ServerTickHandler;
+import weather2.api.EntityTemplate;
 import weather2.api.Tornado;
 import weather2.api.TornadoAPI;
 import weather2.config.ConfigMisc;
