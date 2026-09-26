@@ -1,5 +1,6 @@
 package weather2.weathersystem.storm;
 
+import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.fml.LogicalSide;
 import net.neoforged.fml.util.thread.EffectiveSide;
@@ -83,15 +84,15 @@ public class WeatherObject {
 		return 40;
 	}
 
-	public void read() {
+	public void read(Level level) {
 
 	}
 
-	public void write() {
+	public void write(Level level) {
 
     }
 
-	public void nbtSyncFromServer() {
+	public void nbtSyncFromServer(Level level) {
 		CachedNBTTagCompound parNBT = this.getNbtCache();
 		ID = parNBT.getLong("ID");
 		//Weather.dbg("StormObject " + ID + " receiving sync");
@@ -104,7 +105,7 @@ public class WeatherObject {
 		this.weatherObjectType = EnumWeatherObjectType.get(parNBT.getInt("weatherObjectType"));
 	}
 
-	public void nbtSyncForClient() {
+	public void nbtSyncForClient(Level level) {
 		CachedNBTTagCompound nbt = this.getNbtCache();
 		nbt.putDouble("posX", pos.x);
 		nbt.putDouble("posY", pos.y);

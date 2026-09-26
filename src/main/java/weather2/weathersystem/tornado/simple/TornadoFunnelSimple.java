@@ -1,14 +1,12 @@
 package weather2.weathersystem.tornado.simple;
 
-import com.corosus.coroutil.util.CULog;
 import extendedrenderer.particle.entity.PivotingParticle;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.EntityTypes;
-import net.minecraft.world.entity.animal.dolphin.Dolphin;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
-import weather2.LoveTropicsIntegration;
-import weather2.Weather;
+import weather2.attachments.WeatherAttachments;
+import weather2.weathersystem.storm.NadoEntitySpawnSettings;
 import weather2.weathersystem.storm.StormObject;
 import weather2.weathersystem.tornado.ActiveTornadoConfig;
 
@@ -111,24 +109,14 @@ public class TornadoFunnelSimple {
 
         Level level = stormObject.manager.getWorld();
 
-        if (stormObject.isSharknado()) {
+        NadoEntitySpawnSettings nadoEntitySpawnSettings = stormObject.getNadoEntitySpawnSettings();
+        if (nadoEntitySpawnSettings != null) {
             if (!level.isClientSide()) {
-                if (level.getGameTime() % 20 == 0) {
-                    Entity ent = null;
-                    if (Weather.isLoveTropicsInstalled()) {
-                        ent = LoveTropicsIntegration.createShark(level);
-                    }
-                    if (ent == null) {
-                        if (Weather.isLoveTropicsInstalled()) {
-                            CULog.dbg("failed to create shark, falling back to dolphin");
-                        }
-
-                        ent = new Dolphin(EntityTypes.DOLPHIN, level);
-                    }
-                    Vec3 posRand = new Vec3(pos.x + 0, pos.y + 25, pos.z - 5);
-                    ent.setPos(posRand);
-                    ent.setDeltaMovement(3F, 0, 0);
-                    level.addFreshEntity(ent);
+                if (level.getGameTime() % nadoEntitySpawnSettings.spawnRate() == 0) {
+                    Entity spawnedEntity = nadoEntitySpawnSettings.template().create((ServerLevel) level, pos.x, pos.y + 25, pos.z, 0F, 0F);
+                    spawnedEntity.getData(WeatherAttachments.NADO_ENTITY).setWasCreatedByNando(true);
+                    spawnedEntity.setDeltaMovement(3F, 0, 0);
+                    level.addFreshEntity(spawnedEntity);
                 }
             }
         }

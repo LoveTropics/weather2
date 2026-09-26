@@ -6,6 +6,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.Identifier;
 import net.minecraft.resources.ResourceKey;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.ExtraCodecs;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.saveddata.SavedData;
@@ -28,11 +29,7 @@ import java.util.List;
 import java.util.Map;
 
 public abstract class WeatherManager extends SavedData {
-    public static final Codec<WeatherManagerServer> CODEC = ExtraCodecs.NBT.xmap(
-        in -> (WeatherManagerServer) new WeatherManagerServer().read((CompoundTag) in),
-        WeatherManager::save
-    );
-	public static final SavedDataType<WeatherManagerServer> TYPE = new SavedDataType<>(Identifier.fromNamespaceAndPath(Weather.MODID, "weather_data"), WeatherManagerServer::new, CODEC, null);
+	public static final SavedDataType<WeatherManagerServer> TYPE = new SavedDataType<>(Identifier.fromNamespaceAndPath(Weather.MODID, "weather_data"), level -> new WeatherManagerServer(), WeatherManager::createCodec);
     private ResourceKey<Level> dimension;
     protected WindManager wind;
 	private List<WeatherObject> listStormObjects = new ArrayList<>();
@@ -393,7 +390,7 @@ public abstract class WeatherManager extends SavedData {
 		return storms;
 	}
 
-    public CompoundTag save() {
+    public CompoundTag save(Level level) {
 
         CULog.dbg("WeatherManager save");
         CompoundTag data = new CompoundTag();
@@ -401,7 +398,7 @@ public abstract class WeatherManager extends SavedData {
         for (int i = 0; i < listStormObjects.size(); i++) {
             WeatherObject obj = listStormObjects.get(i);
             obj.getNbtCache().setUpdateForced(true);
-            obj.write();
+            obj.write(level);
             obj.getNbtCache().setUpdateForced(false);
             listStormsNBT.put("storm_" + obj.ID, obj.getNbtCache().getNewNBT());
         }
@@ -429,7 +426,7 @@ public abstract class WeatherManager extends SavedData {
         return data;
     }
 
-    public WeatherManager read(CompoundTag data) {
+    public WeatherManager read(ServerLevel level, CompoundTag data) {
 
         CULog.dbg("weather data: " + data);
 
@@ -470,7 +467,7 @@ public abstract class WeatherManager extends SavedData {
 			}
 			try {
 				wo.getNbtCache().setNewNBT(stormData);
-				wo.read();
+				wo.read(level);
 				wo.getNbtCache().updateCacheFromNew();
 			}
 			catch (Exception ex) {
@@ -531,4 +528,11 @@ public abstract class WeatherManager extends SavedData {
     public boolean isDirty() {
         return true;
     }
+
+	private static Codec<WeatherManagerServer> createCodec(ServerLevel level) {
+		return ExtraCodecs.NBT.xmap(
+				in -> (WeatherManagerServer) new WeatherManagerServer().read(level, (CompoundTag) in),
+				weatherManager -> weatherManager.save(weatherManager.getWorld())
+		);
+	}
 }

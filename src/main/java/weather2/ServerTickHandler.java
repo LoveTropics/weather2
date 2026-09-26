@@ -2,6 +2,7 @@ package weather2;
 
 import com.corosus.coroutil.util.CULog;
 import com.corosus.modconfig.ConfigMod;
+import com.lovetropics.minigames.common.util.EntityTemplate;
 import it.unimi.dsi.fastutil.objects.Reference2ObjectOpenHashMap;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceKey;
@@ -17,11 +18,13 @@ import net.neoforged.neoforge.event.level.LevelEvent;
 import net.neoforged.neoforge.event.tick.LevelTickEvent;
 import net.neoforged.neoforge.event.tick.PlayerTickEvent;
 import net.neoforged.neoforge.event.tick.ServerTickEvent;
+import net.tropicraft.core.common.entity.TropicraftEntities;
 import weather2.config.ClientConfigData;
 import weather2.config.ConfigMisc;
 import weather2.config.WeatherUtilConfig;
 import weather2.weathersystem.WeatherManager;
 import weather2.weathersystem.WeatherManagerServer;
+import weather2.weathersystem.storm.NadoEntitySpawnSettings;
 import weather2.weathersystem.storm.StormObject;
 
 import java.util.HashMap;
@@ -131,7 +134,7 @@ public class ServerTickHandler {
 					stormObject.setupStorm(null);
 					stormObject.levelCurIntensityStage = StormObject.STATE_STAGE1;
 					stormObject.levelStormIntensityMax = StormObject.STATE_STAGE4;
-					stormObject.setSharknado(true);
+					stormObject.setNadoEntitySpawnSettings(NadoEntitySpawnSettings.of(new EntityTemplate(TropicraftEntities.HAMMERHEAD.get())));
 					stormObject.setupTornadoAwayFromPlayersAimAtPlayers();
 
 					wm.addStormObject(stormObject);
@@ -157,7 +160,7 @@ public class ServerTickHandler {
 					stormObject.setupStorm(null);
 					stormObject.levelCurIntensityStage = StormObject.STATE_STAGE1;
 					stormObject.levelStormIntensityMax = StormObject.STATE_STAGE4;
-					stormObject.setSharknado(false);
+//					stormObject.setSharknado(false);
 					stormObject.setupTornadoAwayFromPlayersAimAtPlayers();
 
 					wm.addStormObject(stormObject);

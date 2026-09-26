@@ -131,33 +131,33 @@ public class WeatherObjectSandstormOld extends WeatherObject {
 	}
 
 	@Override
-	public void nbtSyncForClient() {
-		super.nbtSyncForClient();
+	public void nbtSyncForClient(Level level) {
+		super.nbtSyncForClient(level);
 		CachedNBTTagCompound data = this.getNbtCache();
 		data.putInt("age", age);
 		data.putInt("maxAge", maxAge);
 	}
 
 	@Override
-	public void nbtSyncFromServer() {
-		super.nbtSyncFromServer();
+	public void nbtSyncFromServer(Level level) {
+		super.nbtSyncFromServer(level);
 		CachedNBTTagCompound parNBT = this.getNbtCache();
 		this.age = parNBT.getInt("age");
 		this.maxAge = parNBT.getInt("maxAge");
 	}
 
 	@Override
-	public void read() {
-		super.read();
-		nbtSyncFromServer();
+	public void read(Level level) {
+		super.read(level);
+		nbtSyncFromServer(level);
 		CachedNBTTagCompound var1 = this.getNbtCache();
 		motion = new Vec3(var1.getDouble("vecX"), var1.getDouble("vecY"), var1.getDouble("vecZ"));
 	}
 
 	@Override
-	public void write() {
-		super.write();
-		nbtSyncForClient();
+	public void write(Level level) {
+		super.write(level);
+		nbtSyncForClient(level);
 
 		CachedNBTTagCompound nbt = this.getNbtCache();
 

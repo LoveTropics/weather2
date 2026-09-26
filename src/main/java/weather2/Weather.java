@@ -31,6 +31,7 @@ import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredRegister;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import weather2.attachments.WeatherAttachments;
 import weather2.command.WeatherCommand;
 import weather2.config.ConfigDebug;
 import weather2.config.ConfigMisc;
@@ -129,6 +130,8 @@ public class Weather
         //WeatherUtilConfig.nbtLoadDataAll();
 
         SoundRegistry.init();
+
+        WeatherAttachments.REGISTER.register(modBus);
     }
 
     public void registerPackets(final RegisterPayloadHandlersEvent event) {

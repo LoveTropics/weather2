@@ -293,7 +293,7 @@ public class WeatherManagerServer extends WeatherManager {
         CompoundTag data = new CompoundTag();
         data.putString("packetCommand", "WeatherData");
         data.putString("command", "syncStormRemove");
-        parStorm.nbtSyncForClient();
+        parStorm.nbtSyncForClient(world);
         data.put("data", parStorm.getNbtCache().getNewNBT());
         //data.put("data", parStorm.nbtSyncForClient(new NBTTagCompound()));
         //fix for client having broken states
@@ -689,7 +689,7 @@ public class WeatherManagerServer extends WeatherManager {
 
         CachedNBTTagCompound cache = parStorm.getNbtCache();
         cache.setUpdateForced(true);
-        parStorm.nbtSyncForClient();
+        parStorm.nbtSyncForClient(world);
         cache.setUpdateForced(false);
         data.put("data", cache.getNewNBT());
 
@@ -708,7 +708,7 @@ public class WeatherManagerServer extends WeatherManager {
         data.putString("packetCommand", "WeatherData");
         data.putString("command", "syncStormUpdate");
         parStorm.getNbtCache().setNewNBT(new CompoundTag());
-        parStorm.nbtSyncForClient();
+        parStorm.nbtSyncForClient(world);
         data.put("data", parStorm.getNbtCache().getNewNBT());
         boolean testNetworkData = false;
         if (testNetworkData) {

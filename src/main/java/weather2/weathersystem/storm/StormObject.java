@@ -15,12 +15,13 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
 import net.minecraft.core.particles.DustParticleOptions;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.NbtOps;
+import net.minecraft.nbt.Tag;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.animal.dolphin.Dolphin;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.biome.Biome;
@@ -34,9 +35,10 @@ import net.minecraft.world.phys.shapes.Shapes;
 import net.neoforged.fml.LogicalSide;
 import net.neoforged.fml.util.thread.EffectiveSide;
 import weather2.EntityRegistry;
-import weather2.LoveTropicsIntegration;
 import weather2.ServerTickHandler;
 import weather2.Weather;
+import weather2.attachments.EntityNandoAttachment;
+import weather2.attachments.WeatherAttachments;
 import weather2.client.SceneEnhancer;
 import weather2.config.ConfigMisc;
 import weather2.config.ConfigParticle;
@@ -220,7 +222,7 @@ public class StormObject extends WeatherObject {
 	private boolean baby = false;
 	private boolean pet = false;
 	private boolean petGrabsItems = false;
-	private boolean sharknado = false;
+	private NadoEntitySpawnSettings nadoEntitySpawnSettings = null;
 
 	private boolean configNeedsSync = true;
 
@@ -312,10 +314,10 @@ public class StormObject extends WeatherObject {
 	}
 
 	@Override
-	public void read()
+	public void read(Level level)
     {
-		super.read();
-		nbtSyncFromServer();
+		super.read(level);
+		nbtSyncFromServer(level);
 
 		CachedNBTTagCompound var1 = this.getNbtCache();
 
@@ -326,10 +328,10 @@ public class StormObject extends WeatherObject {
     }
 
     @Override
-	public void write()
+	public void write(Level level)
     {
-		super.write();
-		nbtSyncForClient();
+		super.write(level);
+		nbtSyncForClient(level);
 
 		CachedNBTTagCompound nbt = this.getNbtCache();
 
@@ -342,7 +344,7 @@ public class StormObject extends WeatherObject {
 
 	//receiver method
 	@Override
-	public void nbtSyncFromServer() {
+	public void nbtSyncFromServer(Level level) {
 
 		CachedNBTTagCompound parNBT = this.getNbtCache();
 
@@ -357,7 +359,7 @@ public class StormObject extends WeatherObject {
 			System.out.println("Received    " + keys);
 		}
 
-		super.nbtSyncFromServer();
+		super.nbtSyncFromServer(level);
 
 		//state = parNBT.getInt("state");
 
@@ -420,7 +422,9 @@ public class StormObject extends WeatherObject {
 		baby = parNBT.getBoolean("baby");
 		pet = parNBT.getBoolean("pet");
 		petGrabsItems = parNBT.getBoolean("petGrabsItems");
-		sharknado = parNBT.getBoolean("sharknado");
+		if (parNBT.contains("nado_entity")) {
+			nadoEntitySpawnSettings = NadoEntitySpawnSettings.CODEC.parse(level.registryAccess().createSerializationContext(NbtOps.INSTANCE), parNBT.get("nado_entity")).getOrThrow();
+		}
 
 		if (posBaseFormationPos == Vec3.ZERO) {
 			posBaseFormationPos = new Vec3(parNBT.getDouble("posBaseFormationPosX"), parNBT.getDouble("posBaseFormationPosX"), parNBT.getDouble("posBaseFormationPosX"));
@@ -431,8 +435,8 @@ public class StormObject extends WeatherObject {
 
 	//compose nbt data for packet (and serialization in future)
 	@Override
-	public void nbtSyncForClient() {
-		super.nbtSyncForClient();
+	public void nbtSyncForClient(Level level) {
+		super.nbtSyncForClient(level);
 
 		CachedNBTTagCompound data = this.getNbtCache();
 
@@ -501,7 +505,11 @@ public class StormObject extends WeatherObject {
 		data.putBoolean("baby", baby);
 		data.putBoolean("pet", pet);
 		data.putBoolean("petGrabsItems", petGrabsItems);
-		data.putBoolean("sharknado", sharknado);
+		if (nadoEntitySpawnSettings != null) {
+			Tag nadoSpawnNBT = NadoEntitySpawnSettings.CODEC.encodeStart(level.registryAccess().createSerializationContext(NbtOps.INSTANCE), nadoEntitySpawnSettings).getOrThrow();
+			nadoSpawnNBT.asCompound().ifPresent((tag) -> data.put("nado_entity", tag));
+
+		}
 
 		//do a force sync every 30 seconds, solves issues like first data sometimes not coming in right: eg top y block if height never changes in flat world
 		if (manager != null && (manager.getWorld().getGameTime()) % (20 * 30) == 0) {
@@ -518,9 +526,9 @@ public class StormObject extends WeatherObject {
 
 	}
 
-	public CompoundTag nbtForIMC() {
+	public CompoundTag nbtForIMC(Level level) {
 		//we basically need all the same data minus a few soooo whatever
-		nbtSyncForClient();
+		nbtSyncForClient(level);
 		return getNbtCache().getNewNBT();
 	}
 
@@ -955,7 +963,7 @@ public class StormObject extends WeatherObject {
 			}
 		}
 
-		if (isSharknado()) {
+		if (nadoEntitySpawnSettings != null) {
 			finalSpeed = 0.1F;
 		}
 
@@ -2373,16 +2381,15 @@ public class StormObject extends WeatherObject {
 	}
 
 	public void spinEntityv2(Entity entity) {
-
-		if (entity.getPersistentData().getBooleanOr("tornado_shoot", false)) {
-			if (!entity.getPersistentData().contains("tornado_shoot_target")) {
+		EntityNandoAttachment attachment = entity.getData(WeatherAttachments.NADO_ENTITY);
+		if (attachment.isWasCreatedByNando() && attachment.hasMovedEnough()) {
+			if (!attachment.hasPlayer()) {
 				Player player = getRandomNearPlayer(entity);
 				if (player != null) {
-					entity.getPersistentData().putString("tornado_shoot_target", player.getUUID().toString());
+					attachment.setPlayer(player);
 				}
 			} else {
-				UUID uuid = UUID.fromString(entity.getPersistentData().getStringOr("tornado_shoot_target", ""));
-				Player player = manager.getWorld().getPlayerByUUID(uuid);
+				Player player = attachment.getPlayer(manager.getWorld());
 				if (player != null) {
 					double vecx = player.position().x - entity.position().x;
 					double vecy = player.position().y - entity.position().y;
@@ -2447,14 +2454,8 @@ public class StormObject extends WeatherObject {
 				}
 			}
 
-            if (entHeightFromBase > 90 && isSharknado()) {
-				if (Weather.isLoveTropicsInstalled()) {
-                    if (LoveTropicsIntegration.isShark(entity)) {
-                        entity.getPersistentData().putBoolean("tornado_shoot", true);
-                    }
-                } else if (entity instanceof Dolphin) {
-                    entity.getPersistentData().putBoolean("tornado_shoot", true);
-                }
+            if (entHeightFromBase > 90 && nadoEntitySpawnSettings != null) {
+				attachment.setHasMovedEnough(true);
 			}
 		}
 
@@ -2530,8 +2531,8 @@ public class StormObject extends WeatherObject {
 		pullStrength *= pullYAmp;
 		if (pet) pullStrength = 0.05;
 		if (pet) pullStrengthY = 0.05;
-		if (sharknado && forPlayer) pullStrength = 0.05;
-		if (sharknado && forPlayer) pullStrengthY = 0.1;
+		if (nadoEntitySpawnSettings != null && forPlayer) pullStrength = 0.05;
+		if (nadoEntitySpawnSettings != null && forPlayer) pullStrengthY = 0.1;
 		double pullY = pullStrengthY * (distXZMaxForYGrab - distXZForYGrab) / distXZMaxForYGrab;
 		double pullXZ = pullStrength * (distXZMax - distXZ) / distXZMax;
 		double xx = -Math.sin(angle) * pullXZ;
@@ -3104,12 +3105,12 @@ public class StormObject extends WeatherObject {
 		this.petGrabsItems = petGrabsItems;
 	}
 
-	public boolean isSharknado() {
-		return sharknado;
+	public void setNadoEntitySpawnSettings(NadoEntitySpawnSettings nadoEntitySpawn) {
+		this.nadoEntitySpawnSettings = nadoEntitySpawn;
 	}
 
-	public void setSharknado(boolean sharknado) {
-		this.sharknado = sharknado;
+	public NadoEntitySpawnSettings getNadoEntitySpawnSettings() {
+		return nadoEntitySpawnSettings;
 	}
 
 	public void setAndUpdateTornado() {

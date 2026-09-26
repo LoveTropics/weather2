@@ -6,6 +6,7 @@ import com.mojang.datafixers.util.Pair;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntitySpawnReason;
+import net.minecraft.world.entity.EntityTypes;
 import net.minecraft.world.level.Level;
 import net.tropicraft.core.common.entity.TropicraftEntities;
 import net.tropicraft.core.common.entity.underdasea.SharkEntity;
@@ -87,10 +88,6 @@ public class LoveTropicsIntegration {
     }
 
     public static boolean isShark(Entity entity) {
-        return entity instanceof SharkEntity;
-    }
-
-    public static SharkEntity createShark(Level level) {
-        return TropicraftEntities.HAMMERHEAD.create(level, EntitySpawnReason.EVENT);
+        return entity.is(EntityTypes.PIGLIN_BRUTE);
     }
 }

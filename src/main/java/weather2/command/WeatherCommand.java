@@ -1,6 +1,7 @@
 package weather2.command;
 
 import com.corosus.coroutil.util.CoroUtilBlock;
+import com.lovetropics.minigames.common.util.EntityTemplate;
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.FloatArgumentType;
@@ -8,14 +9,18 @@ import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.context.CommandContext;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
+import net.minecraft.world.entity.EntityTypes;
 import net.minecraft.world.phys.Vec3;
+import net.tropicraft.core.common.entity.TropicraftEntities;
 import weather2.ServerTickHandler;
 import weather2.config.ConfigMisc;
 import weather2.config.ConfigWind;
 import weather2.config.WeatherUtilConfig;
 import weather2.util.WeatherUtil;
 import weather2.weathersystem.WeatherManagerServer;
+import weather2.weathersystem.storm.NadoEntitySpawnSettings;
 import weather2.weathersystem.storm.StormObject;
 import weather2.weathersystem.storm.WeatherObjectParticleStorm;
 
@@ -26,154 +31,204 @@ public class WeatherCommand {
     public static void register(final CommandDispatcher<CommandSourceStack> dispatcher) {
         dispatcher.register(
             literal("weather2")
-                .then(literal("kill_all_storms").requires(Commands.hasPermission(Commands.LEVEL_GAMEMASTERS)).executes(c -> {
-                    WeatherManagerServer wm = ServerTickHandler.getWeatherManagerFor(c.getSource().getLevel().dimension());
-                    wm.clearAllStorms();
-                    c.getSource().sendSuccess(() -> Component.literal("Killed all storms"), true);
-                    return Command.SINGLE_SUCCESS;
-                }))
-                .then(literal("debug").requires(Commands.hasPermission(Commands.LEVEL_GAMEMASTERS))
-                    .then(literal("print_grab_list").executes(c -> {
-                        WeatherUtil.testAllBlocks();
-                        c.getSource().sendSuccess(() -> Component.literal("Tornado grab list printed to debug.log"), true);
-                        return Command.SINGLE_SUCCESS;
-                    }))
-                    .then(literal("storm_chance").executes(c -> {
+                .then(literal("kill_all_storms")
+                    .requires(Commands.hasPermission(Commands.LEVEL_GAMEMASTERS))
+                    .executes(c -> {
                         WeatherManagerServer wm = ServerTickHandler.getWeatherManagerFor(c.getSource().getLevel().dimension());
-                        float chance = wm.getBiomeBasedStormSpawnChanceInArea(CoroUtilBlock.blockPos(c.getSource().getPosition().x, c.getSource().getPosition().y, c.getSource().getPosition().z));
-
-                        c.getSource().sendSuccess(() -> Component.literal("Likelyhood of storms to spawn here within 1024 blocks: " + (chance * 100)), true);
+                        wm.clearAllStorms();
+                        c.getSource().sendSuccess(() -> Component.literal("Killed all storms"), true);
                         return Command.SINGLE_SUCCESS;
-                    }))
+                    })
                 )
-                .then(literal("wind_event").requires(Commands.hasPermission(Commands.LEVEL_GAMEMASTERS))
-                    .then(literal("clear").executes(c -> {
-                        WeatherManagerServer wm = ServerTickHandler.getWeatherManagerFor(c.getSource().getLevel().dimension());
-                        wm.getWindManager().stopLowWindEvent();
-                        wm.getWindManager().stopHighWindEvent();
-                        c.getSource().sendSuccess(() -> Component.literal("Stopped any active high or low wind events"), true);
-                        return Command.SINGLE_SUCCESS;
-                    }))
-                    .then(literal("high").executes(c -> {
-                        WeatherManagerServer wm = ServerTickHandler.getWeatherManagerFor(c.getSource().getLevel().dimension());
-                        wm.getWindManager().stopLowWindEvent();
-                        wm.getWindManager().startHighWindEvent();
-                        c.getSource().sendSuccess(() -> Component.literal("Started high wind event"), true);
-                        return Command.SINGLE_SUCCESS;
-                    }))
-                    .then(literal("low").executes(c -> {
-                        WeatherManagerServer wm = ServerTickHandler.getWeatherManagerFor(c.getSource().getLevel().dimension());
-                        wm.getWindManager().stopHighWindEvent();
-                        wm.getWindManager().startLowWindEvent();
-                        wm.getWindManager().windSpeedGlobal = (float) (ConfigWind.windSpeedMin + 0.2F);
-                        c.getSource().sendSuccess(() -> Component.literal("Started low wind event"), true);
-                        return Command.SINGLE_SUCCESS;
-                    }))
+                .then(literal("debug")
+                    .requires(Commands.hasPermission(Commands.LEVEL_GAMEMASTERS))
+                    .then(literal("print_grab_list")
+                        .executes(c -> {
+                            WeatherUtil.testAllBlocks();
+                            c.getSource().sendSuccess(() -> Component.literal("Tornado grab list printed to debug.log"), true);
+                            return Command.SINGLE_SUCCESS;
+                        })
+                    )
+                    .then(literal("storm_chance")
+                        .executes(c -> {
+                            WeatherManagerServer wm = ServerTickHandler.getWeatherManagerFor(c.getSource().getLevel().dimension());
+                            float chance = wm.getBiomeBasedStormSpawnChanceInArea(CoroUtilBlock.blockPos(c.getSource().getPosition().x, c.getSource().getPosition().y, c.getSource().getPosition().z));
+                            c.getSource().sendSuccess(() -> Component.literal("Likelyhood of storms to spawn here within 1024 blocks: " + (chance * 100)), true);return Command.SINGLE_SUCCESS;
+                        })
+                    )
                 )
-                .then(literal("wind_angle").requires(Commands.hasPermission(Commands.LEVEL_GAMEMASTERS))
-                    .then(argument("angle", IntegerArgumentType.integer(0, 359)).executes(c -> {
-                        int angle = IntegerArgumentType.getInteger(c, "angle");
-                        WeatherManagerServer wm = ServerTickHandler.getWeatherManagerFor(c.getSource().getLevel().dimension());
-                        wm.getWindManager().windAngleGlobal = angle;
-                        c.getSource().sendSuccess(() -> Component.literal("Set wind angle for clouds to " + angle), true);
-                        return Command.SINGLE_SUCCESS;
-                    }))
+                .then(literal("wind_event")
+                    .requires(Commands.hasPermission(Commands.LEVEL_GAMEMASTERS))
+                    .then(literal("clear")
+                        .executes(c -> {
+                            WeatherManagerServer wm = ServerTickHandler.getWeatherManagerFor(c.getSource().getLevel().dimension());
+                            wm.getWindManager().stopLowWindEvent();
+                            wm.getWindManager().stopHighWindEvent();
+                            c.getSource().sendSuccess(() -> Component.literal("Stopped any active high or low wind events"), true);
+                            return Command.SINGLE_SUCCESS;
+                        })
+                    )
+                    .then(literal("high")
+                        .executes(c -> {
+                            WeatherManagerServer wm = ServerTickHandler.getWeatherManagerFor(c.getSource().getLevel().dimension());
+                            wm.getWindManager().stopLowWindEvent();
+                            wm.getWindManager().startHighWindEvent();
+                            c.getSource().sendSuccess(() -> Component.literal("Started high wind event"), true);
+                            return Command.SINGLE_SUCCESS;
+                        })
+                    )
+                    .then(literal("low")
+                        .executes(c -> {
+                            WeatherManagerServer wm = ServerTickHandler.getWeatherManagerFor(c.getSource().getLevel().dimension());
+                            wm.getWindManager().stopHighWindEvent();
+                            wm.getWindManager().startLowWindEvent();
+                            wm.getWindManager().windSpeedGlobal = (float) (ConfigWind.windSpeedMin + 0.2F);
+                            c.getSource().sendSuccess(() -> Component.literal("Started low wind event"), true);
+                            return Command.SINGLE_SUCCESS;
+                        })
+                    )
                 )
-                .then(literal("wind_speed").requires(Commands.hasPermission(Commands.LEVEL_GAMEMASTERS))
-                    .then(argument("speed", FloatArgumentType.floatArg(0, 1.5F)).executes(c -> {
-                        float speed = FloatArgumentType.getFloat(c, "speed");
-                        WeatherManagerServer wm = ServerTickHandler.getWeatherManagerFor(c.getSource().getLevel().dimension());
-                        wm.getWindManager().windSpeedGlobal = speed;
-                        c.getSource().sendSuccess(() -> Component.literal("Set wind speed for clouds to " + speed), true);
-                        return Command.SINGLE_SUCCESS;
-                    }))
+                .then(literal("wind_angle")
+                    .requires(Commands.hasPermission(Commands.LEVEL_GAMEMASTERS))
+                    .then(argument("angle", IntegerArgumentType.integer(0, 359))
+                        .executes(c -> {
+                            int angle = IntegerArgumentType.getInteger(c, "angle");
+                            WeatherManagerServer wm = ServerTickHandler.getWeatherManagerFor(c.getSource().getLevel().dimension());
+                            wm.getWindManager().windAngleGlobal = angle;
+                            c.getSource().sendSuccess(() -> Component.literal("Set wind angle for clouds to " + angle), true);
+                            return Command.SINGLE_SUCCESS;
+                        })
+                    )
                 )
-                .then(literal("server_precipitation").requires(Commands.hasPermission(Commands.LEVEL_GAMEMASTERS))
-                    .then(argument("amount", FloatArgumentType.floatArg(0, 1.0F)).executes(c -> {
-                        float amount = FloatArgumentType.getFloat(c, "amount");
-                        WeatherManagerServer wm = ServerTickHandler.getWeatherManagerFor(c.getSource().getLevel().dimension());
-                        wm.vanillaRainAmountOnServer = amount;
-                        if (ConfigMisc.overcastMode) {
-                            c.getSource().sendSuccess(() -> Component.literal("Server precipitation amount set to " + amount), true);
-                        } else {
-                            c.getSource().sendSuccess(() -> Component.literal("overcastMode not on, this will change nothing"), true);
-                        }
-                        return Command.SINGLE_SUCCESS;
-                    }))
+                .then(literal("wind_speed")
+                    .requires(Commands.hasPermission(Commands.LEVEL_GAMEMASTERS))
+                    .then(argument("speed", FloatArgumentType.floatArg(0, 1.5F))
+                        .executes(c -> {
+                            float speed = FloatArgumentType.getFloat(c, "speed");
+                            WeatherManagerServer wm = ServerTickHandler.getWeatherManagerFor(c.getSource().getLevel().dimension());
+                            wm.getWindManager().windSpeedGlobal = speed;
+                            c.getSource().sendSuccess(() -> Component.literal("Set wind speed for clouds to " + speed), true);
+                            return Command.SINGLE_SUCCESS;
+                        })
+                    )
                 )
-                .then(literal("summon").requires(Commands.hasPermission(Commands.LEVEL_GAMEMASTERS)).requires(s -> WeatherUtilConfig.listDimensionsWeather.contains(s.getLevel().dimension().identifier().toString()))
-                    .then(literal("storm_rain").executes(c -> {
-                        StormObject stormObject = summonStorm(c, StormObject.STATE_NORMAL);
+                .then(literal("server_precipitation")
+                    .requires(Commands.hasPermission(Commands.LEVEL_GAMEMASTERS))
+                    .then(argument("amount", FloatArgumentType.floatArg(0, 1.0F))
+                        .executes(c -> {
+                            float amount = FloatArgumentType.getFloat(c, "amount");
+                            WeatherManagerServer wm = ServerTickHandler.getWeatherManagerFor(c.getSource().getLevel().dimension());
+                            wm.vanillaRainAmountOnServer = amount;
+                            if (ConfigMisc.overcastMode) {
+                                c.getSource().sendSuccess(() -> Component.literal("Server precipitation amount set to " + amount), true);
+                            } else {
+                                c.getSource().sendSuccess(() -> Component.literal("overcastMode not on, this will change nothing"), true);
+                            }
+                            return Command.SINGLE_SUCCESS;
+                        })
+                    )
+                )
+                .then(literal("summon")
+                    .requires(Commands.hasPermission(Commands.LEVEL_GAMEMASTERS))
+                    .requires(s -> WeatherUtilConfig.listDimensionsWeather.contains(s.getLevel().dimension().identifier().toString()))
+                    .then(literal("storm_rain")
+                        .executes(c -> {
+                            StormObject stormObject = summonStorm(c, StormObject.STATE_NORMAL);
+                            c.getSource().sendSuccess(() -> Component.literal("Summoned rain storm"), true);
+                            return Command.SINGLE_SUCCESS;
+                        })
+                    )
+                    .then(literal("storm_lightning")
+                        .executes(c -> {
+                            StormObject stormObject = summonStorm(c, StormObject.STATE_THUNDER);
 
-                        c.getSource().sendSuccess(() -> Component.literal("Summoned rain storm"), true);
-                        return Command.SINGLE_SUCCESS;
-                    }))
-                    .then(literal("storm_lightning").executes(c -> {
-                        StormObject stormObject = summonStorm(c, StormObject.STATE_THUNDER);
+                            stormObject.initRealStorm(null, null);
+                            stormObject.levelCurIntensityStage = StormObject.STATE_THUNDER;
+                            stormObject.levelStormIntensityMax = StormObject.STATE_THUNDER;
 
-                        stormObject.initRealStorm(null, null);
-                        stormObject.levelCurIntensityStage = StormObject.STATE_THUNDER;
-                        stormObject.levelStormIntensityMax = StormObject.STATE_THUNDER;
+                            c.getSource().sendSuccess(() -> Component.literal("Summoned lightning storm"), true);
+                            return Command.SINGLE_SUCCESS;
+                        })
+                    )
+                    .then(literal("storm_highwind")
+                        .executes(c -> {
+                            StormObject stormObject = summonStorm(c, StormObject.STATE_HIGHWIND);
 
-                        c.getSource().sendSuccess(() -> Component.literal("Summoned lightning storm"), true);
-                        return Command.SINGLE_SUCCESS;
-                    }))
-                    .then(literal("storm_highwind").executes(c -> {
-                        StormObject stormObject = summonStorm(c, StormObject.STATE_HIGHWIND);
+                            stormObject.initRealStorm(null, null);
+                            stormObject.levelCurIntensityStage = StormObject.STATE_HIGHWIND;
+                            stormObject.levelStormIntensityMax = StormObject.STATE_HIGHWIND;
 
-                        stormObject.initRealStorm(null, null);
-                        stormObject.levelCurIntensityStage = StormObject.STATE_HIGHWIND;
-                        stormObject.levelStormIntensityMax = StormObject.STATE_HIGHWIND;
+                            c.getSource().sendSuccess(() -> Component.literal("Summoned highwind storm"), true);
+                            return Command.SINGLE_SUCCESS;
+                        })
+                    )
+                    .then(literal("storm_hail")
+                        .executes(c -> {
+                            StormObject stormObject = summonStorm(c, StormObject.STATE_HAIL);
 
-                        c.getSource().sendSuccess(() -> Component.literal("Summoned highwind storm"), true);
-                        return Command.SINGLE_SUCCESS;
-                    }))
-                    .then(literal("storm_hail").executes(c -> {
-                        StormObject stormObject = summonStorm(c, StormObject.STATE_HAIL);
+                            stormObject.initRealStorm(null, null);
+                            stormObject.levelCurIntensityStage = StormObject.STATE_HAIL;
+                            stormObject.levelStormIntensityMax = StormObject.STATE_HAIL;
 
-                        stormObject.initRealStorm(null, null);
-                        stormObject.levelCurIntensityStage = StormObject.STATE_HAIL;
-                        stormObject.levelStormIntensityMax = StormObject.STATE_HAIL;
+                            c.getSource().sendSuccess(() -> Component.literal("Summoned hail storm"), true);
+                            return Command.SINGLE_SUCCESS;
+                        })
+                    )
+                    .then(literal("tornado_f0")
+                        .executes(c -> {
+                            StormObject stormObject = summonStorm(c, StormObject.STATE_FORMING);
+                            stormObject.levelStormIntensityMax = StormObject.STATE_STAGE1;
 
-                        c.getSource().sendSuccess(() -> Component.literal("Summoned hail storm"), true);
-                        return Command.SINGLE_SUCCESS;
-                    }))
-                    .then(literal("tornado_f0").executes(c -> {
-                        StormObject stormObject = summonStorm(c, StormObject.STATE_FORMING);
-                        stormObject.levelStormIntensityMax = StormObject.STATE_STAGE1;
+                            c.getSource().sendSuccess(() -> Component.literal("Summoned forming tornado"), true);
+                            return Command.SINGLE_SUCCESS;
+                        })
+                    )
+                    .then(literal("tornado_f1")
+                        .executes(c -> {
+                            StormObject stormObject = summonStorm(c, StormObject.STATE_STAGE1);
 
-                        c.getSource().sendSuccess(() -> Component.literal("Summoned forming tornado"), true);
-                        return Command.SINGLE_SUCCESS;
-                    }))
-                    .then(literal("tornado_f1").executes(c -> {
-                        StormObject stormObject = summonStorm(c, StormObject.STATE_STAGE1);
+                            c.getSource().sendSuccess(() -> Component.literal("Summoned f1 tornado"), true);
+                            return Command.SINGLE_SUCCESS;
+                        })
+                    )
+                    .then(literal("tornado_f2")
+                        .executes(c -> {
+                            StormObject stormObject = summonStorm(c, StormObject.STATE_STAGE2);
 
-                        c.getSource().sendSuccess(() -> Component.literal("Summoned f1 tornado"), true);
-                        return Command.SINGLE_SUCCESS;
-                    }))
-                    .then(literal("tornado_f2").executes(c -> {
-                        StormObject stormObject = summonStorm(c, StormObject.STATE_STAGE2);
+                            c.getSource().sendSuccess(() -> Component.literal("Summoned f2 tornado"), true);
+                            return Command.SINGLE_SUCCESS;
+                        })
+                    )
+                    .then(literal("tornado_f3")
+                        .executes(c -> {
+                            StormObject stormObject = summonStorm(c, StormObject.STATE_STAGE3);
 
-                        c.getSource().sendSuccess(() -> Component.literal("Summoned f2 tornado"), true);
-                        return Command.SINGLE_SUCCESS;
-                    }))
-                    .then(literal("tornado_f3").executes(c -> {
-                        StormObject stormObject = summonStorm(c, StormObject.STATE_STAGE3);
+                            c.getSource().sendSuccess(() -> Component.literal("Summoned f3 tornado"), true);
+                            return Command.SINGLE_SUCCESS;
+                        })
+                    )
+                    .then(literal("tornado_f4")
+                        .executes(c -> {
+                            StormObject stormObject = summonStorm(c, StormObject.STATE_STAGE4);
 
-                        c.getSource().sendSuccess(() -> Component.literal("Summoned f3 tornado"), true);
-                        return Command.SINGLE_SUCCESS;
-                    }))
-                    .then(literal("tornado_f4").executes(c -> {
-                        StormObject stormObject = summonStorm(c, StormObject.STATE_STAGE4);
-
-                        c.getSource().sendSuccess(() -> Component.literal("Summoned f4 tornado"), true);
-                        return Command.SINGLE_SUCCESS;
-                    }))
+                            c.getSource().sendSuccess(() -> Component.literal("Summoned f4 tornado"), true);
+                            return Command.SINGLE_SUCCESS;
+                        })
+                    )
                     .then(literal("sharknado").executes(c -> {
-                        StormObject stormObject = summonStorm(c, StormObject.STATE_STAGE1);
-                        stormObject.levelStormIntensityMax = StormObject.STATE_STAGE4;
+                        WeatherManagerServer wm = ServerTickHandler.getWeatherManagerFor(c.getSource().getLevel().dimension());
+                        StormObject stormObject = new StormObject(wm);
 
-                        stormObject.setSharknado(true);
+                        stormObject.setupStorm(null);
+                        stormObject.levelCurIntensityStage = StormObject.STATE_STAGE1;
+                        stormObject.levelStormIntensityMax = StormObject.STATE_STAGE4;
+                        stormObject.setNadoEntitySpawnSettings(NadoEntitySpawnSettings.of(new EntityTemplate(TropicraftEntities.HAMMERHEAD.get())));
+                        stormObject.setupTornadoAwayFromPlayersAimAtPlayers();
+
+
+                        wm.addStormObject(stormObject);
+                        wm.syncStormNew(stormObject);
+
 
                         c.getSource().sendSuccess(() -> Component.literal("Summoned sharknado"), true);
                         return Command.SINGLE_SUCCESS;

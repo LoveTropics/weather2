@@ -59,7 +59,7 @@ public class WeatherManagerClient extends WeatherManager {
 		return Minecraft.getInstance().level;
 	}
 
-	public void nbtSyncFromServer(CompoundTag parNBT) {
+	public void nbtSyncFromServer(Level level, CompoundTag parNBT) {
 		//check command
 		//commands:
 		//new storm
@@ -106,7 +106,7 @@ public class WeatherManagerClient extends WeatherManager {
 
 			//StormObject so
 			wo.getNbtCache().setNewNBT(stormNBT);
-			wo.nbtSyncFromServer();
+			wo.nbtSyncFromServer(level);
 			wo.getNbtCache().updateCacheFromNew();
 
 			addStormObject(wo);
@@ -131,7 +131,7 @@ public class WeatherManagerClient extends WeatherManager {
 			WeatherObject so = lookupStormObjectsByID.get(ID);
 			if (so != null) {
 				so.getNbtCache().setNewNBT(stormNBT);
-				so.nbtSyncFromServer();
+				so.nbtSyncFromServer(level);
 				so.getNbtCache().updateCacheFromNew();
 			} else {
 				Weather.dbg("error syncing storm, cant find by ID: " + ID + ", probably due to client resetting and waiting on full resync (this is ok)");
