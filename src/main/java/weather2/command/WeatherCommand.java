@@ -9,16 +9,25 @@ import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.context.CommandContext;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
+import net.minecraft.commands.arguments.ComponentArgument;
+import net.minecraft.commands.arguments.NbtTagArgument;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.NbtOps;
+import net.minecraft.nbt.Tag;
 import net.minecraft.network.chat.Component;
+import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.phys.Vec3;
 import weather2.LoveTropicsIntegration;
 import weather2.ServerTickHandler;
+import weather2.api.Tornado;
+import weather2.api.TornadoAPI;
 import weather2.config.ConfigMisc;
 import weather2.config.ConfigWind;
 import weather2.config.WeatherUtilConfig;
 import weather2.util.WeatherUtil;
 import weather2.weathersystem.WeatherManagerServer;
-import weather2.weathersystem.storm.NadoEntitySpawnSettings;
+import weather2.api.NadoEntitySpawnSettings;
 import weather2.weathersystem.storm.StormObject;
 import weather2.weathersystem.storm.WeatherObjectParticleStorm;
 
@@ -129,6 +138,9 @@ public class WeatherCommand {
                 .then(literal("summon")
                     .requires(Commands.hasPermission(Commands.LEVEL_GAMEMASTERS))
                     .requires(s -> WeatherUtilConfig.listDimensionsWeather.contains(s.getLevel().dimension().identifier().toString()))
+                    .then(literal("tornado")
+                        .then(argument("nbt", NbtTagArgument.nbtTag())
+                                .executes(WeatherCommand::summonTornado)))
                     .then(literal("storm_rain")
                         .executes(c -> {
                             StormObject stormObject = summonStorm(c, StormObject.STATE_NORMAL);
@@ -387,5 +399,15 @@ public class WeatherCommand {
         wm.addStormObject(stormObject);
         wm.syncStormNew(stormObject);
         return stormObject;
+    }
+
+    private static int summonTornado(CommandContext<CommandSourceStack> c) {
+        Tag nbt = NbtTagArgument.getNbtTag(c, "nbt");
+        MinecraftServer server = c.getSource().getServer();
+
+        Tornado tornado = Tornado.CODEC.parse(server.registryAccess().createSerializationContext(NbtOps.INSTANCE), nbt).getOrThrow();
+        TornadoAPI.spawnTornado(c.getSource().getLevel(), tornado);
+
+        return Command.SINGLE_SUCCESS;
     }
 }

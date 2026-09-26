@@ -1,4 +1,4 @@
-package weather2.weathersystem.storm;
+package weather2.api;
 
 import com.lovetropics.minigames.common.util.EntityTemplate;
 import com.mojang.serialization.Codec;
@@ -7,7 +7,7 @@ import net.minecraft.SharedConstants;
 
 public record NadoEntitySpawnSettings(EntityTemplate template, int spawnRate, float damageAmount) {
 
-    private static final float DEFAULT_DAMAGE_AMOUNT = 1.5f;
+    public static final float DEFAULT_DAMAGE_AMOUNT = 1.5f;
 
     public static final Codec<NadoEntitySpawnSettings> CODEC = RecordCodecBuilder.create(i -> i.group(
             EntityTemplate.CODEC.fieldOf("entity").forGetter(NadoEntitySpawnSettings::template),

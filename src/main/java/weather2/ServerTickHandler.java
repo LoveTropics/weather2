@@ -23,7 +23,7 @@ import weather2.config.ConfigMisc;
 import weather2.config.WeatherUtilConfig;
 import weather2.weathersystem.WeatherManager;
 import weather2.weathersystem.WeatherManagerServer;
-import weather2.weathersystem.storm.NadoEntitySpawnSettings;
+import weather2.api.NadoEntitySpawnSettings;
 import weather2.weathersystem.storm.StormObject;
 
 import java.util.HashMap;

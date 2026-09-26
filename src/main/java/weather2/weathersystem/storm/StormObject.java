@@ -38,6 +38,7 @@ import weather2.EntityRegistry;
 import weather2.ServerTickHandler;
 import weather2.Weather;
 import weather2.Weather2Tags;
+import weather2.api.NadoEntitySpawnSettings;
 import weather2.attachments.EntityNandoAttachment;
 import weather2.attachments.WeatherAttachments;
 import weather2.client.SceneEnhancer;
@@ -2402,8 +2403,9 @@ public class StormObject extends WeatherObject {
 					float rotationYaw = (float)(Mth.atan2(vecz, vecx) * 180.0D / Math.PI) - 90.0F;
 					entity.setYRot(rotationYaw);
 
+					float damageAmount = nadoEntitySpawnSettings != null ? nadoEntitySpawnSettings.damageAmount() : NadoEntitySpawnSettings.DEFAULT_DAMAGE_AMOUNT;
 					if (player.position().distanceTo(entity.position()) < 3 && entity.isAlive()) {
-						player.hurt(manager.getWorld().damageSources().cactus(), 1.5F);
+						player.hurt(manager.getWorld().damageSources().cactus(), damageAmount);
 						if (player.level() instanceof ServerLevel serverLevel) {
 							entity.kill(serverLevel);
 						}
