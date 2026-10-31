@@ -1,7 +1,6 @@
 package weather2;
 
 import com.lovetropics.weather.ClientWeather;
-import com.lovetropics.weather.TypeBridge;
 import com.mojang.datafixers.util.Pair;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.Identifier;
@@ -9,6 +8,8 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.EntityTypes;
 import net.neoforged.neoforge.registries.DeferredHolder;
+import org.lovetropics.games.common.core.game.weather.WeatherController;
+import org.lovetropics.games.common.core.game.weather.WeatherControllerManager;
 import weather2.datatypes.PrecipitationType;
 import weather2.datatypes.StormState;
 import weather2.ltcompat.ClientWeatherIntegration;
@@ -34,7 +35,7 @@ public class LoveTropicsIntegration {
         }
 
         public PrecipitationType getPrecipitationType() {
-            return PrecipitationType.VALUES[TypeBridge.getPrecipitationTypeOrdinal(ClientWeather.get())];
+            return PrecipitationType.VALUES[ClientWeather.get().getPrecipitationType().ordinal()];
         }
 
         public float getWindSpeed() {
@@ -66,18 +67,21 @@ public class LoveTropicsIntegration {
 
         @Override
         public float getWindSpeed(ServerLevel level) {
-            return TypeBridge.getWindSpeed(level);
+            WeatherController weatherController = WeatherControllerManager.forWorld(level);
+            return weatherController.getWindSpeed();
         }
 
         @Override
         public StormState getSandstormForEverywhere(ServerLevel level) {
-            Pair<Integer, Integer> data = TypeBridge.getSandstormData(level);
+            WeatherController controller = WeatherControllerManager.forWorld(level);
+            Pair<Integer, Integer> data = controller != null && controller.getSandstorm() != null ? new Pair<>(controller.getSandstorm().buildupTickRate(), controller.getSandstorm().maxStackable()) : null;
             return data != null ? new StormState(data.getFirst(), data.getSecond()) : null;
         }
 
         @Override
         public StormState getSnowstormForEverywhere(ServerLevel level) {
-            Pair<Integer, Integer> data = TypeBridge.getSnowstormData(level);
+            WeatherController controller = WeatherControllerManager.forWorld(level);
+            Pair<Integer, Integer> data = controller != null && controller.getSnowstorm() != null ? new Pair<>(controller.getSnowstorm().buildupTickRate(), controller.getSnowstorm().maxStackable()) : null;
             return data != null ? new StormState(data.getFirst(), data.getSecond()) : null;
         }
     }

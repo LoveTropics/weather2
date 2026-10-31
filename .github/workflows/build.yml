@@ -12,7 +12,7 @@ jobs:
     steps:
       - uses: actions/checkout@v5
 
-      - name: Set up JDK 25
+      - name: Setup JDK
         uses: actions/setup-java@v5
         with:
           java-version: '25'
@@ -21,16 +21,20 @@ jobs:
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v5
 
-      - name: Build with Gradle
-        run: ./gradlew build
+      - name: Build & Publish to Maven
+        env:
+          MAVEN_URL: ${{ secrets.LT_MAVEN_SNAPSHOTS_URL }}
+          MAVEN_USERNAME: ${{ secrets.LT_MAVEN_USER }}
+          MAVEN_PASSWORD: ${{ secrets.LT_MAVEN_PASS }}
+        run: ./gradlew build publish
 
-      - name: Locate built JAR file
+      - name: Locate built JARfile
         id: jar
-        run: echo "jarfile=$(find build/libs/ -name "*.jar" -not -name "*slim*" -not -name "*source*")" >> $GITHUB_OUTPUT
+        run: echo "##[set-output name=jarfile;]$(find build/libs/ -name "*.jar" -not -name "*slim*" -not -name "*source*")"
 
       - name: Set Artifact name
         id: jarname
-        run: echo "jarname=$(find build/libs/ -name "*.jar" -not -name "*slim*" -not -name "*source*" | sed 's:.*/::')" >> $GITHUB_OUTPUT
+        run: echo "##[set-output name=jarname;]$(find build/libs/ -name "*.jar" -not -name "*slim*" -not -name "*source*" | sed 's:.*/::')"
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4

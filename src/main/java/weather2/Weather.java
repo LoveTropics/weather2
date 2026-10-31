@@ -3,13 +3,11 @@ package weather2;
 import com.corosus.coroutil.util.CULog;
 import com.corosus.modconfig.ConfigMod;
 import com.corosus.modconfig.IConfigCategory;
+import com.lovetropics.weather.LTWeather;
 import com.mojang.brigadier.CommandDispatcher;
 import extendedrenderer.particle.ParticleRegistry;
 import net.minecraft.commands.CommandSourceStack;
-import net.minecraft.core.HolderLookup;
 import net.minecraft.core.registries.Registries;
-import net.minecraft.data.DataProvider;
-import net.minecraft.data.PackOutput;
 import net.minecraft.data.loot.LootTableProvider;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
@@ -55,7 +53,6 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
-import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
 // The value here should match an entry in the META-INF/mods.toml file
@@ -69,7 +66,6 @@ public class Weather
     public static final String LTMINIGAMES_MODID = "ltminigames";
 
     public static final boolean LTMINIGAMES_LOADED = ModList.get().isLoaded(LTMINIGAMES_MODID);
-    public static final boolean LTWEATHER_LOADED = ModList.get().isLoaded("ltweather");
 
     public static boolean initProperNeededForWorld = true;
 
@@ -140,6 +136,10 @@ public class Weather
         SoundRegistry.init();
 
         WeatherAttachments.REGISTER.register(modBus);
+
+        if (isLoveTropicsInstalled()) {
+            new LTWeather().init(modContainer);
+        }
     }
 
     public void registerPackets(final RegisterPayloadHandlersEvent event) {
@@ -186,10 +186,6 @@ public class Weather
 
     public static boolean isLoveTropicsInstalled() {
         return LTMINIGAMES_LOADED;
-    }
-
-    public static boolean isLoveTropicsWeatherInstalled() {
-        return LTWEATHER_LOADED;
     }
 
     private void registerCommands(RegisterCommandsEvent event) {
