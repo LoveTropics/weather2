@@ -19,10 +19,9 @@ import net.neoforged.neoforge.event.level.LevelEvent;
 import net.neoforged.neoforge.event.tick.LevelTickEvent;
 import net.neoforged.neoforge.event.tick.PlayerTickEvent;
 import net.neoforged.neoforge.event.tick.ServerTickEvent;
+import org.lovetropics.games.common.util.EntityTemplate;
 import org.slf4j.Logger;
-import weather2.api.EntityTemplate;
 import weather2.api.Tornado;
-import weather2.api.TornadoAPI;
 import weather2.config.ClientConfigData;
 import weather2.config.ConfigMisc;
 import weather2.config.WeatherUtilConfig;
@@ -111,17 +110,6 @@ public class ServerTickHandler {
 			WeatherManagerServer wm = MANAGERSLOOKUP.get(dimResource);
 			if (wm != null) {
                 switch (msg.method()) {
-					case "spawn_tornado" -> {
-						Level level = wm.getWorld();
-						if (level instanceof ServerLevel serverLevel) {
-							try {
-								Tornado tornado = Tornado.CODEC.parse(level.registryAccess().createSerializationContext(NbtOps.INSTANCE), tag).getOrThrow();
-								TornadoAPI.spawnTornado(serverLevel, tornado);
-							} catch (Exception e) {
-								LOGGER.error("Error processing spawn_tornado IMC message", e);
-							}
-						}
-					}
                     case "player_tornado" -> {
                         int timeTicks = tag.getIntOr("time_ticks", 0);
                         boolean baby = tag.getBooleanOr("baby", false);

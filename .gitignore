@@ -30,3 +30,4 @@ run
 *.class
 *.war
 *.ear
+.DS_Store

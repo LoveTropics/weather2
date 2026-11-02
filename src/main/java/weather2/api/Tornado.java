@@ -1,7 +1,12 @@
 package weather2.api;
 
-import com.mojang.serialization.Codec;
-import com.mojang.serialization.codecs.RecordCodecBuilder;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.phys.Vec3;
+import weather2.ServerTickHandler;
+import weather2.weathersystem.WeatherManagerServer;
+import weather2.weathersystem.storm.StormObject;
 
 import java.util.Optional;
 
@@ -11,17 +16,48 @@ public record Tornado(
         boolean isFireNado,
         Optional<NadoEntitySpawnSettings> entitySpawnSettings,
         int startStage,
-        int maxStage
+        int maxStage,
+        Optional<Vec3> spawnLocation,
+        Optional<Vec3> aimLocation,
+        Optional<Entity> entityTarget
 ) {
 
-    public static final Codec<Tornado> CODEC = RecordCodecBuilder.create(i -> i.group(
-            PlayerController.CODEC.optionalFieldOf("player_controller").forGetter(Tornado::playerController),
-            Codec.BOOL.optionalFieldOf("baby", false).forGetter(Tornado::isBaby),
-            Codec.BOOL.optionalFieldOf("fire", false).forGetter(Tornado::isFireNado),
-            NadoEntitySpawnSettings.CODEC.optionalFieldOf("entity_spawn_settings").forGetter(Tornado::entitySpawnSettings),
-            Codec.INT.optionalFieldOf("start_stage", 5).forGetter(Tornado::startStage), // This should be better than some magic numbers
-            Codec.INT.optionalFieldOf("max_stage", 8).forGetter(Tornado::maxStage) // Again should be better than some magic numbers
-    ).apply(i, Tornado::new));
+    public boolean spawnTornado(ServerLevel level) {
+        WeatherManagerServer wm = ServerTickHandler.getWeatherManagerFor(level);
+        if (wm == null) {
+            return false;
+        }
+
+        StormObject stormObject = new StormObject(wm);
+        if (playerController.isPresent()) {
+            PlayerController pc = playerController.get();
+            Player player = level.getPlayerByUUID(pc.player());
+            if (player == null) {
+                return false;
+            }
+            stormObject.setupStorm(player);
+            stormObject.setupPlayerControlledTornado(player);
+            stormObject.setPlayerControlledTimeLeft(pc.lengthInTicks());
+        } else {
+            stormObject.setupStorm(null);
+
+            Vec3 targetLocation = aimLocation.orElse(stormObject.getLegacyTargetLocation());
+            Vec3 locationToSpawn = spawnLocation.orElse(stormObject.getLegacySpawnLocation(targetLocation));
+            stormObject.initPositions(locationToSpawn);
+            stormObject.aimAtCoords(targetLocation);
+            entityTarget.ifPresent(stormObject::setEntityTarget);
+        }
+
+        entitySpawnSettings.ifPresent(stormObject::setNadoEntitySpawnSettings);
+        stormObject.setBaby(isBaby);
+        stormObject.isFirenado = isFireNado;
+        stormObject.levelCurIntensityStage = startStage;
+        stormObject.levelStormIntensityMax = maxStage;
+
+        wm.addStormObject(stormObject);
+        wm.syncStormNew(stormObject);
+        return true;
+    }
 
 
 }

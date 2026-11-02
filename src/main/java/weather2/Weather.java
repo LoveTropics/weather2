@@ -91,7 +91,7 @@ public class Weather
                 output.accept(WeatherItems.BLOCK_WIND_TURBINE_ITEM.get());
             }).build());
 
-    public Weather(ModContainer modContainer) {
+    public Weather(IEventBus bus, ModContainer modContainer) {
 
         //TODO: 1.21 might not need
         //ParticleRegistry2ElectricBubbleoo.bootstrap();
@@ -138,7 +138,7 @@ public class Weather
         WeatherAttachments.REGISTER.register(modBus);
 
         if (isLoveTropicsInstalled()) {
-            new LTWeather().init(modContainer);
+            new LTWeather().init(bus, modContainer);
         }
     }
 

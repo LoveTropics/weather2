@@ -113,7 +113,7 @@ public class TornadoFunnelSimple {
         if (nadoEntitySpawnSettings != null) {
             if (!level.isClientSide()) {
                 if (level.getGameTime() % nadoEntitySpawnSettings.spawnRate() == 0) {
-                    Entity spawnedEntity = nadoEntitySpawnSettings.template().create((ServerLevel) level, pos.x, pos.y + 25, pos.z, 0F, 0F);
+                    Entity spawnedEntity = nadoEntitySpawnSettings.template().spawn((ServerLevel) level, pos.x, pos.y + 25, pos.z, 0F, 0F);
                     spawnedEntity.getData(WeatherAttachments.NADO_ENTITY).setWasCreatedByNando(true);
                     spawnedEntity.setDeltaMovement(3F, 0, 0);
                     level.addFreshEntity(spawnedEntity);

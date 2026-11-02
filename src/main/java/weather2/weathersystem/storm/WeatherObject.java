@@ -46,7 +46,7 @@ public class WeatherObject {
 		ID = lastUsedStormID++;
 	}
 
-	public void tick() {
+	public void tick(Level level) {
 
 	}
 

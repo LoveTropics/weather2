@@ -23,6 +23,7 @@ import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.GameType;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.block.Blocks;
@@ -108,6 +109,7 @@ public class StormObject extends WeatherObject {
 	public static List<Integer> layers = new ArrayList<Integer>(Arrays.asList(static_YPos_layer0, static_YPos_layer1, static_YPos_layer2));
 	public int layer = 0;
 
+	private UUID entityTarget = null;
 	public boolean angleIsOverridden = false;
 	public float angleMovementTornadoOverride = 0;
 
@@ -665,8 +667,8 @@ public class StormObject extends WeatherObject {
         }
 	}
 
-	public void tick() {
-		super.tick();
+	public void tick(Level level) {
+		super.tick(level);
 		age++;
 		if (levelCurIntensityStage >= STATE_STAGE1) ageSinceTornadoTouchdown++;
 		//Weather.dbg("ticking storm " + ID + " - manager: " + manager);
@@ -773,7 +775,7 @@ public class StormObject extends WeatherObject {
 			//attrib_tornado_severity = ATTRIB_F1;
 			//debug //
 
-			tickMovement();
+			tickMovement(level);
 
 			//System.out.println("cloud motion: " + motion + " wind angle: " + angle);
 
@@ -829,7 +831,7 @@ public class StormObject extends WeatherObject {
 		return calculatedPos;
 	}
 
-	public void tickMovement() {
+	public void tickMovement(Level level) {
 
 		double distToTarget = 1F;
 		if (playerControlled) {
@@ -846,6 +848,13 @@ public class StormObject extends WeatherObject {
 						aimStormAtClosestOrProvidedPlayer(entP);
 					}
 				}
+			}
+		}
+
+		if (entityTarget != null) {
+			Entity entity = level.getEntity(entityTarget);
+			if (entity != null) {
+				aimAtCoords(entity.position());
 			}
 		}
 
@@ -1700,6 +1709,10 @@ public class StormObject extends WeatherObject {
 		angleMovementTornadoOverride = yaw;
 
 		//Weather.dbg("stormfront aimed at player " + CoroUtilEntity.getName(entP));
+	}
+
+	public void setEntityTarget(Entity entity) {
+		this.entityTarget = entity.getUUID();
 	}
 
 	public void aimAwayFromCoords(Vec3 vec) {
@@ -3043,18 +3056,26 @@ public class StormObject extends WeatherObject {
 		return calculatedYPos;
 	}
 
-	public void setupTornadoAwayFromPlayersAimAtPlayers() {
+	public Vec3 getLegacyTargetLocation() {
 		List<? extends Player> players = manager.getWorld().players();
-		List<Player> playersNear = new ArrayList<>();
-		double xAdd = 0;
-		double yAdd = 0;
-		double zAdd = 0;
 		Vec3 vecAdd = new Vec3(0, 0, 0);
 		for (Player player : players) {
+			if (player.gameMode() == GameType.CREATIVE) {
+				continue;
+			}
 			vecAdd = vecAdd.add(player.position());
 		}
 		vecAdd = new Vec3(vecAdd.x / players.size(), vecAdd.y / players.size(), vecAdd.z / players.size());
-		initPositions(vecAdd.add(150, 0, 150));
+		return vecAdd;
+	}
+
+	public Vec3 getLegacySpawnLocation(Vec3 targetLocation) {
+		return targetLocation.add(150, 0, 150);
+	}
+
+	public void setupTornadoAwayFromPlayersAimAtPlayers() {
+		Vec3 vecAdd = getLegacyTargetLocation();
+		initPositions(getLegacySpawnLocation(vecAdd));
 		aimAtCoords(vecAdd);
 	}
 

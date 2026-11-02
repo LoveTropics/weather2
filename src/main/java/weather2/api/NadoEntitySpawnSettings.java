@@ -3,6 +3,7 @@ package weather2.api;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.SharedConstants;
+import org.lovetropics.games.common.util.EntityTemplate;
 
 public record NadoEntitySpawnSettings(EntityTemplate template, int spawnRate, float damageAmount) {
 

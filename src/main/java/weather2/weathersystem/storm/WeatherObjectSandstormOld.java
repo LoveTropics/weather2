@@ -45,8 +45,8 @@ public class WeatherObjectSandstormOld extends WeatherObject {
 	}
 
 	@Override
-	public void tick() {
-		super.tick();
+	public void tick(Level level) {
+		super.tick(level);
 
 		if (!manager.getWorld().isClientSide()) {
 			this.age++;

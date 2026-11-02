@@ -14,11 +14,10 @@ import net.minecraft.nbt.Tag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.phys.Vec3;
+import org.lovetropics.games.common.util.EntityTemplate;
 import weather2.LoveTropicsIntegration;
 import weather2.ServerTickHandler;
-import weather2.api.EntityTemplate;
 import weather2.api.Tornado;
-import weather2.api.TornadoAPI;
 import weather2.config.ConfigMisc;
 import weather2.config.ConfigWind;
 import weather2.config.WeatherUtilConfig;
@@ -402,8 +401,9 @@ public class WeatherCommand {
         Tag nbt = NbtTagArgument.getNbtTag(c, "nbt");
         MinecraftServer server = c.getSource().getServer();
 
-        Tornado tornado = Tornado.CODEC.parse(server.registryAccess().createSerializationContext(NbtOps.INSTANCE), nbt).getOrThrow();
-        TornadoAPI.spawnTornado(c.getSource().getLevel(), tornado);
+        // Todo Reimplement
+//        Tornado tornado = Tornado.CODEC.parse(server.registryAccess().createSerializationContext(NbtOps.INSTANCE), nbt).getOrThrow();
+//        tornado.spawnTornado(c.getSource().getLevel());
 
         return Command.SINGLE_SUCCESS;
     }

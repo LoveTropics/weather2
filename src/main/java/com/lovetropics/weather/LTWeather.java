@@ -1,5 +1,7 @@
 package com.lovetropics.weather;
 
+import com.lovetropics.weather.minigames.Weather2GameBehaviours;
+import net.neoforged.bus.api.IEventBus;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
@@ -14,7 +16,7 @@ public class LTWeather
 {
     public static boolean initProperNeededForWorld = true;
 
-    public void init(ModContainer modContainer) {
+    public void init(IEventBus bus, ModContainer modContainer) {
         // Register the setup method for modloading
         modContainer.getEventBus().addListener(this::setup);
         NeoForge.EVENT_BUS.addListener(this::serverStop);
@@ -25,6 +27,7 @@ public class LTWeather
         }
 
         NeoForge.EVENT_BUS.register(this);
+        Weather2GameBehaviours.init(bus);
     }
 
     public void registerPackets(final RegisterPayloadHandlersEvent event) {
