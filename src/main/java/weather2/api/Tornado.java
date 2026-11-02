@@ -46,7 +46,8 @@ public record Tornado(
             Vec3 locationToSpawn = spawnLocation.orElse(stormObject.getLegacySpawnLocation(targetLocation));
             stormObject.initPositions(locationToSpawn);
             stormObject.aimAtCoords(targetLocation);
-            entityTarget.ifPresent(stormObject::setEntityTarget);
+            entityTarget.ifPresent(stormObject::setLtTargetEntity);
+            aimLocation.ifPresent(stormObject::setLtTargetPos); // This one will "win" if both are set.
         }
 
         entitySpawnSettings.ifPresent(stormObject::setNadoEntitySpawnSettings);

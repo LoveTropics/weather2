@@ -109,7 +109,6 @@ public class StormObject extends WeatherObject {
 	public static List<Integer> layers = new ArrayList<Integer>(Arrays.asList(static_YPos_layer0, static_YPos_layer1, static_YPos_layer2));
 	public int layer = 0;
 
-	private UUID entityTarget = null;
 	public boolean angleIsOverridden = false;
 	public float angleMovementTornadoOverride = 0;
 
@@ -237,7 +236,10 @@ public class StormObject extends WeatherObject {
 
 	private boolean debugCloudTemperature = false;
 
+	/// These are not serialized right now, I think it fine but might need in the future - UnReal
 	private float ltSpeed = 0.1f;
+	private Vec3 ltTargetPos = null;
+	private UUID ltTargetEntity = null;
 
 	public StormObject(WeatherManager parManager) {
 		super(parManager);
@@ -853,11 +855,15 @@ public class StormObject extends WeatherObject {
 			}
 		}
 
-		if (entityTarget != null) {
-			Entity entity = level.getEntity(entityTarget);
+		if (ltTargetEntity != null) {
+			Entity entity = level.getEntity(ltTargetEntity);
 			if (entity != null) {
 				aimAtCoords(entity.position());
 			}
+		}
+
+		if (ltTargetPos != null) {
+			aimAtCoords(ltTargetPos);
 		}
 
 		//storm movement via wind
@@ -1713,8 +1719,8 @@ public class StormObject extends WeatherObject {
 		//Weather.dbg("stormfront aimed at player " + CoroUtilEntity.getName(entP));
 	}
 
-	public void setEntityTarget(Entity entity) {
-		this.entityTarget = entity.getUUID();
+	public void setLtTargetEntity(Entity entity) {
+		this.ltTargetEntity = entity.getUUID();
 	}
 
 	public void aimAwayFromCoords(Vec3 vec) {
@@ -3181,6 +3187,10 @@ public class StormObject extends WeatherObject {
 
 	public void setLtSpeed(float ltSpeed) {
 		this.ltSpeed = ltSpeed;
+	}
+
+	public void setLtTargetPos(Vec3 ltTargetPos) {
+		this.ltTargetPos = ltTargetPos;
 	}
 }
 
