@@ -1,12 +1,12 @@
 package com.lovetropics.weather.minigames.actions;
 
+import com.lovetropics.weather.api.SerilzeableTorando;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.StringRepresentable;
-import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.Vec3;
 import org.lovetropics.games.common.core.game.GameException;
@@ -15,16 +15,13 @@ import org.lovetropics.games.common.core.game.behavior.IGameBehavior;
 import org.lovetropics.games.common.core.game.behavior.event.EventRegistrar;
 import org.lovetropics.games.common.core.game.behavior.event.GameActionEvents;
 import org.lovetropics.games.common.core.game.region.RegionQuery;
-import weather2.api.NadoEntitySpawnSettings;
-import weather2.api.PlayerController;
-import weather2.api.Tornado;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
 public record SpawnTornadoAction(
-		TornadoSpawn tornado,
+		SerilzeableTorando tornado,
 		SpawnMode spawnMode,
 		boolean aimAtTarget,
 		int xOffset,
@@ -33,7 +30,7 @@ public record SpawnTornadoAction(
 ) implements IGameBehavior {
 
 	public static final MapCodec<SpawnTornadoAction> CODEC = RecordCodecBuilder.mapCodec(i -> i.group(
-			TornadoSpawn.CODEC.fieldOf("tornado").forGetter(SpawnTornadoAction::tornado),
+			SerilzeableTorando.CODEC.fieldOf("tornado").forGetter(SpawnTornadoAction::tornado),
 			SpawnMode.CODEC.optionalFieldOf("mode", SpawnMode.PRE_LEVEL).forGetter(SpawnTornadoAction::spawnMode),
 			Codec.BOOL.optionalFieldOf("aim_at_target", false).forGetter(SpawnTornadoAction::aimAtTarget),
 			Codec.INT.optionalFieldOf("x_offset", 150).forGetter(SpawnTornadoAction::xOffset),
@@ -78,58 +75,6 @@ public record SpawnTornadoAction(
 
 			return true;
 		});
-	}
-
-	public record TornadoSpawn(
-			Optional<PlayerController> playerController,
-			boolean isBaby,
-			boolean isFireNado,
-			Optional<NadoEntitySpawnSettings> entitySpawnSettings,
-			float speed,
-			int startStage,
-			int maxStage
-	) {
-
-		public static final Codec<TornadoSpawn> CODEC = RecordCodecBuilder.create(i -> i.group(
-				PlayerController.CODEC.optionalFieldOf("player_controller").forGetter(TornadoSpawn::playerController),
-				Codec.BOOL.optionalFieldOf("baby", false).forGetter(TornadoSpawn::isBaby),
-				Codec.BOOL.optionalFieldOf("fire", false).forGetter(TornadoSpawn::isFireNado),
-				NadoEntitySpawnSettings.CODEC.optionalFieldOf("entity_spawn_settings").forGetter(TornadoSpawn::entitySpawnSettings),
-				Codec.FLOAT.optionalFieldOf("speed", 0.1f).forGetter(TornadoSpawn::speed),
-				Codec.INT.optionalFieldOf("start_stage", 5).forGetter(TornadoSpawn::startStage), // This should be better than some magic numbers
-				Codec.INT.optionalFieldOf("max_stage", 8).forGetter(TornadoSpawn::maxStage) // Again should be better than some magic numbers
-		).apply(i, TornadoSpawn::new));
-
-
-		public Tornado createTornado(Vec3 spawnLocation, Vec3 aimLocation) {
-			return new Tornado(
-					playerController,
-					isBaby,
-					isFireNado,
-					entitySpawnSettings,
-					startStage,
-					maxStage,
-					speed,
-					Optional.of(spawnLocation),
-					Optional.of(aimLocation),
-					Optional.empty()
-			);
-		}
-
-		public Tornado createTornado(Vec3 spawnLocation, Vec3 aimLocation, Entity entity) {
-			return new Tornado(
-					playerController,
-					isBaby,
-					isFireNado,
-					entitySpawnSettings,
-					startStage,
-					maxStage,
-					speed,
-					Optional.of(spawnLocation),
-					Optional.of(aimLocation),
-					Optional.of(entity)
-			);
-		}
 	}
 
 	public enum SpawnMode implements StringRepresentable {
