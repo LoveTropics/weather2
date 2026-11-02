@@ -1,6 +1,6 @@
 package com.lovetropics.weather.minigames.actions;
 
-import com.lovetropics.weather.api.SerilzeableTorando;
+import com.lovetropics.weather.api.SerializableTornado;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
@@ -21,7 +21,7 @@ import java.util.List;
 import java.util.Optional;
 
 public record SpawnTornadoAction(
-		SerilzeableTorando tornado,
+		SerializableTornado tornado,
 		SpawnMode spawnMode,
 		boolean aimAtTarget,
 		int xOffset,
@@ -30,7 +30,7 @@ public record SpawnTornadoAction(
 ) implements IGameBehavior {
 
 	public static final MapCodec<SpawnTornadoAction> CODEC = RecordCodecBuilder.mapCodec(i -> i.group(
-			SerilzeableTorando.CODEC.fieldOf("tornado").forGetter(SpawnTornadoAction::tornado),
+			SerializableTornado.CODEC.fieldOf("tornado").forGetter(SpawnTornadoAction::tornado),
 			SpawnMode.CODEC.optionalFieldOf("mode", SpawnMode.PRE_LEVEL).forGetter(SpawnTornadoAction::spawnMode),
 			Codec.BOOL.optionalFieldOf("aim_at_target", false).forGetter(SpawnTornadoAction::aimAtTarget),
 			Codec.INT.optionalFieldOf("x_offset", 150).forGetter(SpawnTornadoAction::xOffset),

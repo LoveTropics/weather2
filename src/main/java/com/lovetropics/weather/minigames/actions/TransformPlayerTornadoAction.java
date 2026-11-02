@@ -32,6 +32,7 @@ public record TransformPlayerTornadoAction(int timeTicks, boolean baby) implemen
 				Optional.empty(),
 				5,
 				5,
+				0.1f,
 				Optional.empty(),
 				Optional.empty(),
 				Optional.empty()
