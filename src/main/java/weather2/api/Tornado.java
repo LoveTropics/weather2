@@ -18,6 +18,7 @@ public record Tornado(
         int startStage,
         int maxStage,
         float speed,
+        Optional<Integer> lengthInTicks,
         Optional<Vec3> spawnLocation,
         Optional<Vec3> aimLocation,
         Optional<Entity> entityTarget
@@ -56,6 +57,7 @@ public record Tornado(
         stormObject.isFirenado = isFireNado;
         stormObject.levelCurIntensityStage = startStage;
         stormObject.levelStormIntensityMax = maxStage;
+        lengthInTicks.ifPresent(stormObject::setLtTime);
 
         wm.addStormObject(stormObject);
         wm.syncStormNew(stormObject);

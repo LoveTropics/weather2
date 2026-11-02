@@ -17,7 +17,8 @@ public record SerializableTornado(
         Optional<NadoEntitySpawnSettings> entitySpawnSettings,
         float speed,
         int startStage,
-        int maxStage
+        int maxStage,
+        Optional<Integer> lengthInTicks
 ) {
 
     public static final Codec<SerializableTornado> CODEC = RecordCodecBuilder.create(i -> i.group(
@@ -27,7 +28,8 @@ public record SerializableTornado(
             NadoEntitySpawnSettings.CODEC.optionalFieldOf("entity_spawn_settings").forGetter(SerializableTornado::entitySpawnSettings),
             Codec.FLOAT.optionalFieldOf("speed", 0.1f).forGetter(SerializableTornado::speed),
             Codec.INT.optionalFieldOf("start_stage", 5).forGetter(SerializableTornado::startStage), // This should be better than some magic numbers
-            Codec.INT.optionalFieldOf("max_stage", 8).forGetter(SerializableTornado::maxStage) // Again should be better than some magic numbers
+            Codec.INT.optionalFieldOf("max_stage", 8).forGetter(SerializableTornado::maxStage), // Again should be better than some magic numbers
+            Codec.INT.optionalFieldOf("length_in_ticks").forGetter(SerializableTornado::lengthInTicks)
     ).apply(i, SerializableTornado::new));
 
 
@@ -40,6 +42,7 @@ public record SerializableTornado(
                 startStage,
                 maxStage,
                 speed,
+                lengthInTicks,
                 Optional.of(spawnLocation),
                 Optional.of(aimLocation),
                 Optional.empty()
@@ -55,6 +58,7 @@ public record SerializableTornado(
                 startStage,
                 maxStage,
                 speed,
+                lengthInTicks,
                 Optional.of(spawnLocation),
                 Optional.of(aimLocation),
                 Optional.of(entity)

@@ -240,6 +240,8 @@ public class StormObject extends WeatherObject {
 	private float ltSpeed = 0.1f;
 	private Vec3 ltTargetPos = null;
 	private UUID ltTargetEntity = null;
+	private int ltTime = 0;
+	private boolean ltIsTimed = false;
 
 	public StormObject(WeatherManager parManager) {
 		super(parManager);
@@ -1556,6 +1558,14 @@ public class StormObject extends WeatherObject {
 					featherFallAllNearbyPlayers();
 					remove();
 				}
+			}
+		}
+
+		if (ltIsTimed) {
+			ltTime--;
+			if (ltTime <= 0) {
+				featherFallAllNearbyPlayers();
+				remove();
 			}
 		}
 	}
@@ -3191,6 +3201,11 @@ public class StormObject extends WeatherObject {
 
 	public void setLtTargetPos(Vec3 ltTargetPos) {
 		this.ltTargetPos = ltTargetPos;
+	}
+
+	public void setLtTime(int ltTime) {
+		this.ltTime = ltTime;
+		this.ltIsTimed = true;
 	}
 }
 

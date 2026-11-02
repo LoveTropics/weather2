@@ -35,6 +35,7 @@ public record TransformPlayerTornadoAction(int timeTicks, boolean baby) implemen
 				0.1f,
 				Optional.empty(),
 				Optional.empty(),
+				Optional.empty(),
 				Optional.empty()
 		);
 		tornado.spawnTornado(player.level());
