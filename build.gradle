@@ -9,11 +9,15 @@ tasks.named('wrapper', Wrapper).configure {
     distributionType = Wrapper.DistributionType.BIN
 }
 
-version = mod_version
+def env = System.getenv()
+if (env.RELEASE) {
+    version = mod_version
+} else {
+    version = "$mod_version-SNAPSHOT"
+}
 group = maven_group
 
 repositories {
-    mavenLocal()
     maven {
         url = 'https://maven.lovetropics.org/releases'
         content {
@@ -101,6 +105,7 @@ dependencies {
     runtimeOnly "org.lovetropics:LTExtras:${ltextras_version}"
     runtimeOnly "maven.modrinth:tropicraft:$tropicraft_version"
     runtimeOnly ("org.lovetropics:peekaboo:$peekaboo_version")
+
     implementation ("org.lovetropics:LTMinigames:${ltminigames_version}")
 
     implementation ("org.lovetropics:CoroUtil:${coroutil_version}")
@@ -149,7 +154,6 @@ idea {
     }
 }
 
-def env = System.getenv()
 
 publishing {
     publications {
