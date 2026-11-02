@@ -17,6 +17,7 @@ public record Tornado(
         Optional<NadoEntitySpawnSettings> entitySpawnSettings,
         int startStage,
         int maxStage,
+        float speed,
         Optional<Vec3> spawnLocation,
         Optional<Vec3> aimLocation,
         Optional<Entity> entityTarget
@@ -50,6 +51,7 @@ public record Tornado(
 
         entitySpawnSettings.ifPresent(stormObject::setNadoEntitySpawnSettings);
         stormObject.setBaby(isBaby);
+        stormObject.setLtSpeed(speed);
         stormObject.isFirenado = isFireNado;
         stormObject.levelCurIntensityStage = startStage;
         stormObject.levelStormIntensityMax = maxStage;

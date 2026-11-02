@@ -237,6 +237,8 @@ public class StormObject extends WeatherObject {
 
 	private boolean debugCloudTemperature = false;
 
+	private float ltSpeed = 0.1f;
+
 	public StormObject(WeatherManager parManager) {
 		super(parManager);
 
@@ -953,7 +955,7 @@ public class StormObject extends WeatherObject {
 		}
 
 		if (love_tropics_tweaks) {
-			finalSpeed = 0.1F;
+			finalSpeed = this.ltSpeed;
 			//finalSpeed = 0F;
 		}
 
@@ -3176,4 +3178,9 @@ public class StormObject extends WeatherObject {
 	public void setBeingDeflectedCached(boolean beingDeflectedCached) {
 		isBeingDeflectedCached = beingDeflectedCached;
 	}
+
+	public void setLtSpeed(float ltSpeed) {
+		this.ltSpeed = ltSpeed;
+	}
 }
+

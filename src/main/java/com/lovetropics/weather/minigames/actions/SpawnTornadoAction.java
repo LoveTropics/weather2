@@ -8,7 +8,6 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.StringRepresentable;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.level.GameType;
 import net.minecraft.world.phys.Vec3;
 import org.lovetropics.games.common.core.game.GameException;
 import org.lovetropics.games.common.core.game.IGamePhase;
@@ -71,7 +70,7 @@ public record SpawnTornadoAction(
 									.spawnTornado(player.level());
 						} else {
 							tornado.createTornado(spawnLocation, targetLocation)
-							.spawnTornado(player.level());
+									.spawnTornado(player.level());
 						}
 					}
 				}
@@ -86,6 +85,7 @@ public record SpawnTornadoAction(
 			boolean isBaby,
 			boolean isFireNado,
 			Optional<NadoEntitySpawnSettings> entitySpawnSettings,
+			float speed,
 			int startStage,
 			int maxStage
 	) {
@@ -95,6 +95,7 @@ public record SpawnTornadoAction(
 				Codec.BOOL.optionalFieldOf("baby", false).forGetter(TornadoSpawn::isBaby),
 				Codec.BOOL.optionalFieldOf("fire", false).forGetter(TornadoSpawn::isFireNado),
 				NadoEntitySpawnSettings.CODEC.optionalFieldOf("entity_spawn_settings").forGetter(TornadoSpawn::entitySpawnSettings),
+				Codec.FLOAT.optionalFieldOf("speed", 0.1f).forGetter(TornadoSpawn::speed),
 				Codec.INT.optionalFieldOf("start_stage", 5).forGetter(TornadoSpawn::startStage), // This should be better than some magic numbers
 				Codec.INT.optionalFieldOf("max_stage", 8).forGetter(TornadoSpawn::maxStage) // Again should be better than some magic numbers
 		).apply(i, TornadoSpawn::new));
@@ -108,6 +109,7 @@ public record SpawnTornadoAction(
 					entitySpawnSettings,
 					startStage,
 					maxStage,
+					speed,
 					Optional.of(spawnLocation),
 					Optional.of(aimLocation),
 					Optional.empty()
@@ -122,12 +124,12 @@ public record SpawnTornadoAction(
 					entitySpawnSettings,
 					startStage,
 					maxStage,
+					speed,
 					Optional.of(spawnLocation),
 					Optional.of(aimLocation),
 					Optional.of(entity)
 			);
 		}
-
 	}
 
 	public enum SpawnMode implements StringRepresentable {
