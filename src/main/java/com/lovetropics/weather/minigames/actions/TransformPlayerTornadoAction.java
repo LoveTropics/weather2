@@ -13,10 +13,11 @@ import weather2.api.Tornado;
 
 import java.util.Optional;
 
-public record TransformPlayerTornadoAction(int timeTicks, boolean baby) implements IGameBehavior {
+public record TransformPlayerTornadoAction(int timeTicks, boolean baby, boolean giveSlowFalling) implements IGameBehavior {
 	public static final MapCodec<TransformPlayerTornadoAction> CODEC = RecordCodecBuilder.mapCodec(i -> i.group(
 			Codec.INT.fieldOf("time_ticks").forGetter(c -> c.timeTicks),
-			Codec.BOOL.fieldOf("baby").forGetter(c -> c.baby)
+			Codec.BOOL.fieldOf("baby").forGetter(c -> c.baby),
+			Codec.BOOL.optionalFieldOf("give_slow_falling", true).forGetter(TransformPlayerTornadoAction::baby)
 	).apply(i, TransformPlayerTornadoAction::new));
 
 	@Override
@@ -36,7 +37,8 @@ public record TransformPlayerTornadoAction(int timeTicks, boolean baby) implemen
 				Optional.empty(),
 				Optional.empty(),
 				Optional.empty(),
-				Optional.empty()
+				Optional.empty(),
+				giveSlowFalling
 		);
 		tornado.spawnTornado(player.level());
 		return true;

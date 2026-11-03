@@ -679,7 +679,9 @@ public class TornadoHelper {
 									if (WeatherUtilEntity.isEntityOutside(entity1) || (storm.isPlayerControlled() && WeatherUtilEntity.canPosSeePos(parWorld, entity1.position(), storm.posGround))) {
 										//Weather.dbg("entity1.motionY: " + entity1.motionY);
 										if (featherFallInstead) {
-											((Player) entity1).addEffect(new MobEffectInstance(MobEffects.SLOW_FALLING, 600, 0, false, true, true));
+											if (storm.isLtSlowFallingEffect()) {
+												((Player) entity1).addEffect(new MobEffectInstance(MobEffects.SLOW_FALLING, 600, 0, false, true, true));
+											}
 										} else {
 											storm.spinEntityv2(entity1);
 										}
@@ -689,7 +691,9 @@ public class TornadoHelper {
 									//trying only server side to fix warp back issue (which might mean client and server are mismatching for some rules)
 									//if (!entity1.world.isClientSide()) {
 									if (featherFallInstead) {
-										((LivingEntity) entity1).addEffect(new MobEffectInstance(MobEffects.SLOW_FALLING, 600, 0, false, true, true));
+										if (storm.isLtSlowFallingEffect()) {
+											((LivingEntity) entity1).addEffect(new MobEffectInstance(MobEffects.SLOW_FALLING, 600, 0, false, true, true));
+										}
 									} else {
 										storm.spinEntityv2(entity1);
 									}

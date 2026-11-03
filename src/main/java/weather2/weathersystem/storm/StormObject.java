@@ -242,6 +242,7 @@ public class StormObject extends WeatherObject {
 	private UUID ltTargetEntity = null;
 	private int ltTime = 0;
 	private boolean ltIsTimed = false;
+	private boolean ltGiveSlowFallingEffect = true;
 
 	public StormObject(WeatherManager parManager) {
 		super(parManager);
@@ -3206,6 +3207,14 @@ public class StormObject extends WeatherObject {
 	public void setLtTime(int ltTime) {
 		this.ltTime = ltTime;
 		this.ltIsTimed = true;
+	}
+
+	public void setLtGiveSlowFallingEffect(boolean ltGiveSlowFallingEffect) {
+		this.ltGiveSlowFallingEffect = ltGiveSlowFallingEffect;
+	}
+
+	public boolean isLtSlowFallingEffect() {
+		return ltGiveSlowFallingEffect;
 	}
 }
 

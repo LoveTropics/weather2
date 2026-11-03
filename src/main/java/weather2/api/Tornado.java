@@ -21,7 +21,8 @@ public record Tornado(
         Optional<Integer> lengthInTicks,
         Optional<Vec3> spawnLocation,
         Optional<Vec3> aimLocation,
-        Optional<Entity> entityTarget
+        Optional<Entity> entityTarget,
+        boolean giveSlowFallingEffect
 ) {
 
     public boolean spawnTornado(ServerLevel level) {
@@ -58,6 +59,7 @@ public record Tornado(
         stormObject.levelCurIntensityStage = startStage;
         stormObject.levelStormIntensityMax = maxStage;
         lengthInTicks.ifPresent(stormObject::setLtTime);
+        stormObject.setLtGiveSlowFallingEffect(giveSlowFallingEffect);
 
         wm.addStormObject(stormObject);
         wm.syncStormNew(stormObject);
