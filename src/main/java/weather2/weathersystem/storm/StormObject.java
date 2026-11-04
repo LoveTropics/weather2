@@ -2403,7 +2403,7 @@ public class StormObject extends WeatherObject {
 		List<? extends Player> players = manager.getWorld().players();
 		List<Player> playersNear = new ArrayList<>();
 		for (Player player : players) {
-			if (!player.isSpectator() && player.position().distanceTo(posGround) < 196 && player.hasLineOfSight(entityLineOfSightSource)) {
+			if (!player.isSpectator() && player.gameMode() != GameType.CREATIVE && player.position().distanceTo(posGround) < 196 && player.hasLineOfSight(entityLineOfSightSource)) {
 				playersNear.add(player);
 			}
 		}
